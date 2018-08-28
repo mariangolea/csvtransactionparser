@@ -59,7 +59,7 @@ public class INGParser implements BankTextReportParser {
     private final static NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Bank.ING.locale);
     private final static DateFormat ROMANIAN_DATE_FORMAT = DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE);
     private static final DateFormat COMPLETED_DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM, Bank.ING.locale);
-    private static final DateFormat START_DATE_FORMAT = new SimpleDateFormat("dd-mm-yy");
+    private final DateFormat START_DATE_FORMAT = new SimpleDateFormat("dd-mm-yy");
 
     @Override
     public PdfPageParseResponse parseTransactions(String pdfPage) {

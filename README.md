@@ -1,4 +1,6 @@
 [![CircleCI](https://circleci.com/gh/mariangolea/pdftransactionparser/tree/master.svg?style=svg)](https://circleci.com/gh/mariangolea/pdftransactionparser/tree/master)
+https://sonarcloud.io/api/project_badges/quality_gate?project=BankPdfParser%3ABankPdfParser
+
 
 # pdftransactionparser
 Desktop app allowing users to read bank pdf transaction report files and store on their drive only.

@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/mariangolea/pdftransactionparser/tree/master.svg?style=svg)](https://circleci.com/gh/mariangolea/pdftransactionparser/tree/master)
+
 # pdftransactionparser
 Desktop app allowing users to read bank pdf transaction report files and store on their drive only.
 

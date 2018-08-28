@@ -31,11 +31,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>apache.pdfbox</groupId>
+            <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>2.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/pdfbox-app-2.0.11.jar</systemPath>
+            <version>2.0.11</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,0 +1,1 @@
+mvn sonar:sonar -Dsonar.organization=mariangolea-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=16a3e33108b64dbd52550997820d2f2384afeb70

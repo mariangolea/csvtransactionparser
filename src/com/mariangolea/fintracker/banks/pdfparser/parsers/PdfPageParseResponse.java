@@ -9,7 +9,17 @@ import java.util.List;
  * @author mariangolea@gmail.com
  */
 public class PdfPageParseResponse {
-    public int pageNumber;
+    private int pageNumber;
     public final List<BankTransactionGroup> transactionGroups = new ArrayList<>();
     public final List<String> unrecognizedStrings = new ArrayList<>();
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(int pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+    
+    
 }

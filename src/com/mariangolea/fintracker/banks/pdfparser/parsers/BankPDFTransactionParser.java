@@ -51,12 +51,14 @@ public final class BankPDFTransactionParser{
 
             if (parser != null) {
                 PdfPageParseResponse response = parser.parseTransactions(firstPage);
+                response.setPageNumber(1);
                 result.add(response);
                 for (int i = 2; i <= document.getNumberOfPages(); i++) {
                     pdfStripper.setStartPage(i);
                     pdfStripper.setEndPage(i);
                     firstPage = pdfStripper.getText(document);
                     response = parser.parseTransactions(firstPage);
+                    response.setPageNumber(i);
                     result.add(response);
                 }
             } else{

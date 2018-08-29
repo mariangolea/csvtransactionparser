@@ -11,15 +11,16 @@ import java.util.Locale;
  * @author mariangolea@gmail.com
  */
 public enum Bank {
-	ING("INGBROBU", Locale.ENGLISH), BRD("BRDEROBU", Locale.ENGLISH), BT("BTRLRO22", Locale.ENGLISH), BCR("RNCBROBU",
-			Locale.ENGLISH);
+    ING("INGBROBU", Locale.ENGLISH),
+    BRD("BRDEROBU", Locale.ENGLISH),
+    BT("BTRLRO22", Locale.ENGLISH),
+    BCR("RNCBROBU", Locale.ENGLISH);
 
-	public final String swiftCode;
-	public final Locale locale;
+    public final String swiftCode;
+    public final Locale locale;
 
-	private Bank(final String swiftCode, final Locale locale) {
-		this.swiftCode = swiftCode;
-		this.locale = locale;
-	}
-
+    private Bank(final String swiftCode, final Locale locale) {
+        this.swiftCode = swiftCode;
+        this.locale = locale;
+    }
 }

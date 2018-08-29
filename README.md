@@ -1,5 +1,6 @@
 [![CircleCI](https://circleci.com/gh/mariangolea/pdftransactionparser/tree/master.svg?style=svg)](https://circleci.com/gh/mariangolea/pdftransactionparser/tree/master)
-<img src="https://sonarcloud.io/api/project_badges/quality_gate?project=BankPdfParser%3ABankPdfParser" alt="SonarCloud quality status">
+[![SonarCloud](https://sonarcloud.io/api/project_badges/quality_gate?project=BankPdfParser%3ABankPdfParser)](https://sonarcloud.io/dashboard?id=BankPdfParser%3ABankPdfParser)
+
 
 
 # pdftransactionparser

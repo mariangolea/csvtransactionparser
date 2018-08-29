@@ -1,5 +1,6 @@
 package com.mariangolea.fintracker.banks.pdfparser.parsers;
 
+import com.mariangolea.fintracker.banks.pdfparser.api.Bank;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,10 +47,8 @@ public class INGParser extends AbstractBankParser {
         }
     }
 
-    protected static final String COLUMN_NAMES_LINE = "Debit CreditDetalii tranzactieData";
-
     public INGParser() {
-        super(COLUMN_NAMES_LINE, new SimpleDateFormat("dd-MM-yyyy"), NumberFormat.getInstance(ROMANIAN_LOCALE));
+        super(Bank.ING.relevantContentHeaderLine, new SimpleDateFormat("dd-MM-yyyy"), NumberFormat.getInstance(ROMANIAN_LOCALE));
     }
 
     @Override

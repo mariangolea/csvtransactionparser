@@ -49,8 +49,8 @@ public class PdfParserUICategorizer extends JFrame {
     private final JTextPane outResponseLabel = new JTextPane();
     private final DefaultListModel<BankTransactionGroup> computerModel = new DefaultListModel<>();
     private JList<BankTransactionGroup> inListView;
-    private final DefaultListModel<BankTransactionGroup> inModel = new DefaultListModel<>();
-    private final DefaultListModel<BankTransactionGroup> outModel = new DefaultListModel<>();
+    protected final DefaultListModel<BankTransactionGroup> inModel = new DefaultListModel<>();
+    protected final DefaultListModel<BankTransactionGroup> outModel = new DefaultListModel<>();
     private JList<BankTransactionGroup> outListView;
     private final List<PdfFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
@@ -61,7 +61,7 @@ public class PdfParserUICategorizer extends JFrame {
         userPrefs = preferences.loadUserPreferences();
     }
 
-    private void loadData(final List<PdfFileParseResponse> parsedTransactions) {
+    protected void loadData(final List<PdfFileParseResponse> parsedTransactions) {
         inModel.addListDataListener(new TransactionGroupListSelectionListener(inListView, inResponseLabel));
         inListView.addListSelectionListener(new TransactionGroupListSelectionListener(inListView, inResponseLabel));
         outModel.addListDataListener(new TransactionGroupListSelectionListener(outListView, outResponseLabel));

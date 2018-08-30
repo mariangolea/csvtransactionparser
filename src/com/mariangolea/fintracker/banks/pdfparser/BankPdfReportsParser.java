@@ -10,10 +10,14 @@ import javax.swing.JFrame;
 public class BankPdfReportsParser {
 
     public static void main(String[] args) {
-        PdfParserUICategorizer ui = new PdfParserUICategorizer();
-        ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ui.createUI();
-        ui.pack();;
-        ui.setVisible(true);
+        PdfParserUICategorizer panel = new PdfParserUICategorizer();
+        JFrame frame = new JFrame();
+               frame.setTitle("Bank Transactions Merger");
+        frame.setJMenuBar(panel.createMenu());
+        frame.setContentPane(panel);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();;
+        frame.setVisible(true);
     }
 }

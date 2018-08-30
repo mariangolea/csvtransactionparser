@@ -42,9 +42,9 @@ import javax.swing.text.BadLocationException;
  *
  * @author mariangolea@gmail.com
  */
-public class PdfParserUICategorizer extends JFrame {
+public class PdfParserUICategorizer extends JPanel {
 
-    private final JTextPane feedbackPane = new JTextPane();
+    protected final JTextPane feedbackPane = new JTextPane();
     private final JTextPane inResponseLabel = new JTextPane();
     private final JTextPane outResponseLabel = new JTextPane();
     private final DefaultListModel<BankTransactionGroup> computerModel = new DefaultListModel<>();
@@ -56,8 +56,12 @@ public class PdfParserUICategorizer extends JFrame {
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
     private UserPreferences userPrefs;
 
+    protected static final String START_PARSE_MESSAGE = "Started parsing the selected PDF file ...";
+    protected static final String FINISHED_PARSING_PDF_FILE = "Finished parsing the PDF file: ";
+    
     public PdfParserUICategorizer() {
         userPrefs = preferences.loadUserPreferences();
+        createUI();
     }
 
     protected void loadData(final List<PdfFileParseResponse> parsedTransactions) {
@@ -97,9 +101,8 @@ public class PdfParserUICategorizer extends JFrame {
         }
     }
 
-    public JPanel createContentPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+    private void createUI() {
+        setLayout(new GridBagLayout());
 
         //set up the transaction drop target and computer label.
         createResponseLabels();
@@ -119,12 +122,12 @@ public class PdfParserUICategorizer extends JFrame {
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weighty = 0;
-        panel.add(inResponseLabel, constraints);
+        add(inResponseLabel, constraints);
         constraints.weighty = 1;
         constraints.gridheight = 9;
         constraints.gridy = 1;
         constraints.fill = GridBagConstraints.BOTH;
-        panel.add(scrollPaneIN, constraints);
+        add(scrollPaneIN, constraints);
         constraints.gridx = 2;
         constraints.weighty = 1;
         constraints.weightx = 1;
@@ -132,7 +135,7 @@ public class PdfParserUICategorizer extends JFrame {
         constraints.gridheight = 10;
         constraints.gridwidth = 4;
         constraints.fill = GridBagConstraints.BOTH;
-        panel.add(centerScroll, constraints);
+        add(centerScroll, constraints);
         constraints.weightx = 1;
         constraints.gridx = 6;
         constraints.gridy = 0;
@@ -140,21 +143,14 @@ public class PdfParserUICategorizer extends JFrame {
         constraints.gridwidth = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridheight = 1;
-        panel.add(outResponseLabel, constraints);
+        add(outResponseLabel, constraints);
         constraints.weighty = 1;
         constraints.gridy = 1;
         constraints.gridheight = 9;
         constraints.fill = GridBagConstraints.BOTH;
-        panel.add(scrollPaneOUT, constraints);
-        
-        return panel;
-    }
+        add(scrollPaneOUT, constraints);
 
-    public void createUI() {
-        setTitle("Bank Transactions Merger");
-        setJMenuBar(createMenu());
-        this.setContentPane(createContentPanel());
-        this.setPreferredSize(new Dimension(1000, 600));
+        setPreferredSize(new Dimension(1000, 600));
     }
 
     private void createResponseLabels() {
@@ -171,7 +167,7 @@ public class PdfParserUICategorizer extends JFrame {
         outResponseLabel.setBorder(null);
     }
 
-    private JMenuBar createMenu() {
+    public JMenuBar createMenu() {
         JMenuBar menu = new JMenuBar();
         JMenu file = new JMenu("File");
         file.setMnemonic('f');
@@ -201,15 +197,19 @@ public class PdfParserUICategorizer extends JFrame {
         }
     }
 
-    private void startParsingPdfFile(final File pdfFile) {
-        feedbackPane.setText("Started parsing the selected PDF file ...");
+    protected void startParsingPdfFile(final File pdfFile) {
+        try {
+            feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), START_PARSE_MESSAGE, null);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(PdfParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         SwingUtilities.invokeLater(() -> {
             BankPDFTransactionParser fac = new BankPDFTransactionParser();
             final List<PdfFileParseResponse> res = new ArrayList<>();
             res.add(fac.parseTransactions(pdfFile));
             SwingUtilities.invokeLater(() -> {
                 try {
-                    feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), "Finished parsing the PDF file: " + pdfFile.getAbsolutePath(), null);
+                    feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), FINISHED_PARSING_PDF_FILE + pdfFile.getAbsolutePath(), null);
                     loadData(res);
                     this.parsedTransactionsCopy.clear();
                     this.parsedTransactionsCopy.addAll(res);

@@ -10,8 +10,17 @@ import com.mariangolea.fintracker.banks.pdfparser.api.DefaultTransactionCategori
 import com.mariangolea.fintracker.banks.pdfparser.api.PdfFileParseResponse;
 import com.mariangolea.fintracker.banks.pdfparser.parsers.BankPDFTransactionParser;
 import com.mariangolea.fintracker.banks.pdfparser.ui.PdfParserUICategorizer;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import test.com.mariangolea.fintracker.banks.pdfparser.TestUtilities;
@@ -28,14 +37,69 @@ public class PdfParserUICategorizerTest extends PdfParserUICategorizer {
     public void testSimpleDataING() {
         //Initializes the enum values, helps unit test batch cover the momentarily dumb enum.
         DefaultTransactionCategories category = DefaultTransactionCategories.CAR;
-        
+
         File mockPDF = utils.writeSinglePagePDFFile(Bank.ING);
         assertTrue(mockPDF != null);
         PdfFileParseResponse response = new BankPDFTransactionParser().parseTransactions(mockPDF);
-        createUI();
         //tests in other files ensure response integrity, no need to do that in here.
         loadData(Arrays.asList(response));
         assertTrue(inModel != null);
         assertTrue(outModel != null);
+
+        JMenuBar menu = createMenu();
+        assertTrue(menu != null);
+        
+        final StopCondition stopCondition = new StopCondition();
+        feedbackPane.getDocument().addDocumentListener(new DocumentListener() {
+            int tick = 0;
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if (tick == 0) {
+                    assertTrue(PdfParserUICategorizer.START_PARSE_MESSAGE.equals(getInstertedString(e)));
+                    tick++;
+                } else if (tick == 1) {
+                    assertTrue(getInstertedString(e).startsWith(PdfParserUICategorizer.FINISHED_PARSING_PDF_FILE));
+                    feedbackPane.getDocument().removeDocumentListener(this);
+                    assertTrue(inModel != null && inModel.size() == 1);
+                    assertTrue(outModel != null && outModel.size() == 8);
+                    stopCondition.stop = true;
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                //usless.
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                //useless.
+            }
+
+            private String getInstertedString(DocumentEvent e) {
+                String res = "";
+                try {
+                    res = feedbackPane.getText(e.getOffset(), e.getLength());
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(PdfParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                return res;
+            }
+        });
+        startParsingPdfFile(utils.writeSinglePagePDFFile(Bank.ING));
+        
+        while (!stopCondition.stop){
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(PdfParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private class StopCondition{
+        private boolean stop = false;
     }
 }

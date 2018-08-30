@@ -47,10 +47,11 @@ public class UserPreferencesHandler {
      * @return user preferences
      */
     public UserPreferences loadUserPreferences() {
-        UserPreferences loadedPrefs = new UserPreferences();
+        UserPreferences loadedPrefs = null;
         File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
         try {
             if (propertiesFile.exists()) {
+                loadedPrefs = new UserPreferences();
                 userPrefsFile.load(new FileReader(propertiesFile));
                 loadedPrefs.setPDFInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
                 String categoryNamesString = userPrefsFile.getProperty(CATEGORY_NAMES);
@@ -64,7 +65,7 @@ public class UserPreferencesHandler {
         } catch (IOException ex) {
             Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         return loadedPrefs;
     }
 

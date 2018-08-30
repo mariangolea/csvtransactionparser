@@ -54,11 +54,14 @@ public class PdfParserUICategorizer extends JFrame {
     private JList<BankTransactionGroup> outListView;
     private final List<PdfFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
-    private final UserPreferences userPrefs;
+    private UserPreferences userPrefs;
 
     public PdfParserUICategorizer() {
         createUI();
         userPrefs = preferences.loadUserPreferences();
+        if (userPrefs == null){
+            userPrefs = new UserPreferences();
+        }
     }
 
     protected void loadData(final List<PdfFileParseResponse> parsedTransactions) {

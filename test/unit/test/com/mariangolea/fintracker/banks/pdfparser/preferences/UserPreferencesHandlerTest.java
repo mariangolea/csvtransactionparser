@@ -39,6 +39,7 @@ public class UserPreferencesHandlerTest {
         }
     }
 
+    @Test
     public void testBehaviorStorePreferences() {
         UserPreferences prefs = handler.loadUserPreferences();
         prefs.setPDFInputFolder("useless");

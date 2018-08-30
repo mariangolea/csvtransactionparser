@@ -1,8 +1,9 @@
 package test.com.mariangolea.fintracker.banks.pdfparser.parsers;
 
 import com.mariangolea.fintracker.banks.pdfparser.api.Bank;
+import com.mariangolea.fintracker.banks.pdfparser.api.PdfFileParseResponse;
+import com.mariangolea.fintracker.banks.pdfparser.parsers.BankPDFTransactionParser;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -13,7 +14,9 @@ import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.pdfparser.parsers.INGParser;
 import com.mariangolea.fintracker.banks.pdfparser.parsers.PdfPageParseResponse;
+import java.io.File;
 import java.util.List;
+import static org.junit.Assert.assertTrue;
 import test.com.mariangolea.fintracker.banks.pdfparser.TestUtilities;
 
 /**
@@ -112,7 +115,7 @@ public class INGParserTest extends INGParser {
 
     @Test
     public void testPageResponseGoodSimpleInput() {
-        List<String> simpleInputLines = utils.constructSimplestPositiveLinesInput();
+        List<String> simpleInputLines = utils.constructSimplestPositiveLinesInput(Bank.ING);
         PdfPageParseResponse response = parsePageResponse(simpleInputLines);
 
         //General content validation.
@@ -125,4 +128,17 @@ public class INGParserTest extends INGParser {
         assertTrue("Unrecognized strings should be of size " + 1, 1 == response.unrecognizedStrings.size());
     }
 
+    @Test
+    public void testSupportedTransactionsINGRoundTrip() {
+        File pdfFile = utils.writeSinglePagePDFFile(Bank.ING);
+        assertTrue(null != pdfFile);
+
+        PdfFileParseResponse response = new BankPDFTransactionParser().parseTransactions(pdfFile);
+        assertTrue(null != response);
+
+        //we expect a unrecognized string.
+        assertTrue(!response.allOK);
+        assertTrue(response.pageResponses != null && response.pageResponses.size() == 1);
+        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 9);
+    }
 }

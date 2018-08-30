@@ -10,12 +10,7 @@ import com.mariangolea.fintracker.banks.pdfparser.api.PdfFileParseResponse;
 import com.mariangolea.fintracker.banks.pdfparser.parsers.BankPDFTransactionParser;
 import com.mariangolea.fintracker.banks.pdfparser.ui.PdfParserUICategorizer;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import test.com.mariangolea.fintracker.banks.pdfparser.TestUtilities;
@@ -30,10 +25,11 @@ public class PdfParserUICategorizerTest extends PdfParserUICategorizer {
 
     @Test
     public void testSimpleDataING() {
-        BankPDFTransactionParser fac = new BankPDFTransactionParser();
-        File mockPDF = utils.constructSimplestPositiveLinesInputPDFFile(Bank.ING);
-        PdfFileParseResponse response = fac.parseTransactions(mockPDF);
+        File mockPDF = utils.writeSinglePagePDFFile(Bank.ING);
+        assertTrue(mockPDF != null);
+        PdfFileParseResponse response = new BankPDFTransactionParser().parseTransactions(mockPDF);
         
+        //tests in other files ensure response integrity, no need to do that in here.
         loadData(Arrays.asList(response));
         assertTrue(inModel != null);
         assertTrue(outModel != null);

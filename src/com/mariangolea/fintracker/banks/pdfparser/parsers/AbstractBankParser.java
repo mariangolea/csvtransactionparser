@@ -5,6 +5,7 @@
  */
 package com.mariangolea.fintracker.banks.pdfparser.parsers;
 
+import com.mariangolea.fintracker.banks.pdfparser.api.Bank;
 import com.mariangolea.fintracker.banks.pdfparser.api.BankTextReportParser;
 import com.mariangolea.fintracker.banks.pdfparser.api.BankTransaction;
 import java.text.DateFormat;
@@ -31,16 +32,16 @@ public abstract class AbstractBankParser implements BankTextReportParser{
             .setLanguageTag("ro-RO").build();
     private final DateFormat romanianDateFormat = DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE);
 
+    private final Bank bank;
     private final NumberFormat numberFormat;
     private final DateFormat startDateFormat;
-    private final String relevantContentHeader;
 
-    AbstractBankParser(final String relevantContentHeader, final DateFormat startDateFormat, final NumberFormat numberFormat) {
-        Objects.requireNonNull(relevantContentHeader);
+    AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final NumberFormat numberFormat) {
+        Objects.requireNonNull(bank);
         Objects.requireNonNull(startDateFormat);
         Objects.requireNonNull(numberFormat);
 
-        this.relevantContentHeader = relevantContentHeader;
+        this.bank = bank;
         this.startDateFormat = startDateFormat;
         this.numberFormat = numberFormat;
     }
@@ -52,13 +53,13 @@ public abstract class AbstractBankParser implements BankTextReportParser{
         if (pdfPage == null) {
             return null;
         }
-        int relevantLineIndex = pdfPage.indexOf(relevantContentHeader);
+        int relevantLineIndex = pdfPage.indexOf(bank.relevantContentHeaderLine);
         if (relevantLineIndex < 0) {
             return null;
         }
 
-        String relevant = pdfPage.substring(relevantLineIndex + relevantContentHeader.length());
-        String[] split = relevant.split("\\r\\n");
+        String relevant = pdfPage.substring(relevantLineIndex + bank.relevantContentHeaderLine.length());
+        String[] split = relevant.split(bank.lineSeparator);
         Map<String, List<BankTransaction>> result = new HashMap<>();
         
         PdfPageParseResponse response = parsePageResponse(Arrays.asList(split));

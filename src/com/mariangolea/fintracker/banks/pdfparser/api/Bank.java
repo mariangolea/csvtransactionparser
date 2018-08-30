@@ -11,18 +11,20 @@ import java.util.Locale;
  * @author mariangolea@gmail.com
  */
 public enum Bank {
-    ING("INGBROBU", Locale.ENGLISH,"Debit CreditDetalii tranzactieData"),
-    BRD("BRDEROBU", Locale.ENGLISH,"Debit CreditDetalii tranzactieData"),
-    BT("BTRLRO22", Locale.ENGLISH,"Debit CreditDetalii tranzactieData"),
-    BCR("RNCBROBU", Locale.ENGLISH,"Debit CreditDetalii tranzactieData");
+    ING("INGBROBU", Locale.ENGLISH,"Debit CreditDetalii tranzactieData","\\r\\n"),
+    BRD("BRDEROBU", Locale.ENGLISH,"Debit CreditDetalii tranzactieData","\\r\\n"),
+    BT("BTRLRO22", Locale.ENGLISH,"Debit CreditDetalii tranzactieData","\\r\\n"),
+    BCR("RNCBROBU", Locale.ENGLISH,"Debit CreditDetalii tranzactieData","\\r\\n");
 
     public final String swiftCode;
     public final Locale locale;
     public final String relevantContentHeaderLine;
+    public final String lineSeparator;
 
-    private Bank(final String swiftCode, final Locale locale, final String relevantContentHeaderLine) {
+    private Bank(final String swiftCode, final Locale locale, final String relevantContentHeaderLine, final String lineSeparator) {
         this.swiftCode = swiftCode;
         this.locale = locale;
         this.relevantContentHeaderLine = relevantContentHeaderLine;
+        this.lineSeparator = lineSeparator;
     }
 }

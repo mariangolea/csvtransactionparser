@@ -48,7 +48,7 @@ public class INGParser extends AbstractBankParser {
     }
 
     public INGParser() {
-        super(Bank.ING.relevantContentHeaderLine, new SimpleDateFormat("dd-MM-yyyy"), NumberFormat.getInstance(ROMANIAN_LOCALE));
+        super(Bank.ING, new SimpleDateFormat("dd-MM-yyyy"), NumberFormat.getInstance(ROMANIAN_LOCALE));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class INGParser extends AbstractBankParser {
         List<String> toConsume = new ArrayList<>(split);
         List<String> unrecognizedStrings = new ArrayList<>();
         BankTransaction transaction;
-        int consumedLines = 0;
+        int consumedLines;
         while (!toConsume.isEmpty()) {
             transaction = parseTransaction(toConsume);
             if (transaction == null) {
@@ -77,12 +77,12 @@ public class INGParser extends AbstractBankParser {
         }
 
         List<BankTransactionGroup> groups = new ArrayList<>();
-        for (String operationID : result.keySet()) {
+        result.keySet().forEach((operationID) -> {
             List<BankTransaction> transactions = result.get(operationID);
             if (transactions != null && !transactions.isEmpty()) {
                 groups.add(new BankTransactionGroup(operationID, result.get(operationID)));
             }
-        }
+        });
 
         response.transactionGroups.addAll(groups);
         response.unrecognizedStrings.addAll(unrecognizedStrings);
@@ -99,7 +99,7 @@ public class INGParser extends AbstractBankParser {
                 operationDetails = toConsume.get(0).split("Prima asigurare de viata \\(credite\\)");
             }
             Float amount = OperationID.INCASARE == operation ? null : parseAmount(operationDetails[0]);
-            Date completedDate = OperationID.INCASARE == operation ? null : parseCompletedDate(operationDetails[1]);;
+            Date completedDate = OperationID.INCASARE == operation ? null : parseCompletedDate(operationDetails[1]);
             Date startDate = completedDate;
             String desc = operation.desc;
             Type operationType = Type.OUT;

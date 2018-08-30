@@ -9,7 +9,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 import com.mariangolea.fintracker.banks.pdfparser.api.Bank;
-import com.mariangolea.fintracker.banks.pdfparser.api.BankTransaction;
 import com.mariangolea.fintracker.banks.pdfparser.api.BankTextReportParser;
 import com.mariangolea.fintracker.banks.pdfparser.api.BankTransactionMergeUtils;
 import com.mariangolea.fintracker.banks.pdfparser.api.PdfFileParseResponse;
@@ -22,60 +21,103 @@ import java.util.logging.Logger;
  *
  * @author mariangolea@gmail.com
  */
-public final class BankPDFTransactionParser{
+public final class BankPDFTransactionParser {
+
     private final BankTransactionMergeUtils utils = new BankTransactionMergeUtils();
-    
+
     /**
      * Parse contained bank transactions in associated pdf file object.
      *
      * @param file has to represent the path to a pdf file containing bank
      * generated transactions report.
-     * @return list of all recognized {@linkplain  BankTransaction} objects.
+     * @return parse response, may be null.
      */
     public PdfFileParseResponse parseTransactions(final File file) {
-        List<PdfPageParseResponse> result = new ArrayList<>();
-        PDDocument document = null;
-        try {
-            document = PDDocument.load(file);
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            pdfStripper.setStartPage(1);
-            pdfStripper.setEndPage(1);
-            String firstPage = pdfStripper.getText(document);
-            BankTextReportParser parser = null;
-            for (Bank bank : Bank.values()) {
-                if (firstPage.contains(bank.swiftCode)) {
-                    parser = BankPDFParserFactory.getInstance(bank);
-                    break;
-                }
-            }
-
-            if (parser != null) {
-                PdfPageParseResponse response = parser.parseTransactions(firstPage);
-                response.setPageNumber(1);
-                result.add(response);
-                for (int i = 2; i <= document.getNumberOfPages(); i++) {
-                    pdfStripper.setStartPage(i);
-                    pdfStripper.setEndPage(i);
-                    firstPage = pdfStripper.getText(document);
-                    response = parser.parseTransactions(firstPage);
-                    response.setPageNumber(i);
-                    result.add(response);
-                }
-            } else{
-                Logger.getLogger(BankPDFTransactionParser.class.getName()).log(Level.SEVERE, null, new Exception("No parser defined for file: " + file.getAbsolutePath()));
-            }
-
+        PdfFileParseResponse fileResponse = null;
+        try (PDDocument document = loadPDFDocument(file)) {
+            fileResponse = constructResponse(document, file);
         } catch (IOException ex) {
             Logger.getLogger(BankPDFTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (document != null) {
-                try {
-                    document.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(BankPDFTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        }
+        
+        return fileResponse;
+    }
+
+    protected PdfFileParseResponse constructResponse(final PDDocument document, final File correspondingFile) {
+        PdfFileParseResponse fileResponse = null;
+        if (document == null) {
+            return fileResponse;
+        }
+
+        //page indices start at 1.
+        String firstPage = getText(document, 1);
+        if (firstPage == null) {
+            return fileResponse;
+        }
+
+        BankTextReportParser parser = null;
+        //identify parser based on bank swift code being expected in first page header.
+        for (Bank bank : Bank.values()) {
+            if (firstPage.contains(bank.swiftCode)) {
+                parser = BankPDFParserFactory.getInstance(bank);
+                break;
             }
         }
-        return new PdfFileParseResponse(file, result);
+
+        if (parser != null) {
+            List<PdfPageParseResponse> result = new ArrayList<>();
+            PdfPageParseResponse response = parser.parseTransactions(firstPage);
+            response.setPageNumber(1);
+            result.add(response);
+            for (int i = 2; i <= document.getNumberOfPages(); i++) {
+                firstPage = getText(document, i);
+                response = parser.parseTransactions(firstPage);
+                response.setPageNumber(i);
+                result.add(response);
+            }
+            fileResponse = new PdfFileParseResponse(correspondingFile, result);
+        } else {
+            Logger.getLogger(BankPDFTransactionParser.class.getName()).log(Level.SEVERE, null, new Exception("No parser defined for file: " + correspondingFile.getAbsolutePath()));
+        }
+
+        return fileResponse;
+    }
+
+    /**
+     * Load the pdf document content associated to received file.
+     *
+     * @param file pdf file
+     * @return may be null
+     */
+    public PDDocument loadPDFDocument(final File file) {
+        PDDocument pdfDocument = null;
+        try {
+            pdfDocument = PDDocument.load(file);
+        } catch (IOException ex) {
+            Logger.getLogger(BankPDFTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return pdfDocument;
+    }
+
+    /**
+     * Get the String content from a specific page number in a pdf document.
+     *
+     * @param pdfDocument pdf document content
+     * @param pageNumber page number
+     * @return may be null;
+     */
+    public String getText(PDDocument pdfDocument, int pageNumber) {
+        String text = null;
+        try {
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            pdfStripper.setStartPage(pageNumber);
+            pdfStripper.setEndPage(pageNumber);
+            text = pdfStripper.getText(pdfDocument);
+        } catch (IOException ex) {
+            Logger.getLogger(BankPDFTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return text;
     }
 }

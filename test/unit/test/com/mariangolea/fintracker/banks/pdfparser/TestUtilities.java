@@ -8,24 +8,18 @@ package test.com.mariangolea.fintracker.banks.pdfparser;
 import com.mariangolea.fintracker.banks.pdfparser.api.Bank;
 import com.mariangolea.fintracker.banks.pdfparser.api.BankTransaction;
 import com.mariangolea.fintracker.banks.pdfparser.parsers.INGParser;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.pdfbox.cos.COSStream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDStream;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import static org.junit.Assert.assertTrue;
-import test.com.mariangolea.fintracker.banks.pdfparser.ui.PdfParserUICategorizerTest;
 
 /**
  *
@@ -33,7 +27,128 @@ import test.com.mariangolea.fintracker.banks.pdfparser.ui.PdfParserUICategorizer
  */
 public class TestUtilities {
 
-    public List<String> constructSimplestPositiveLinesInput() {
+    /**
+     * Constructs pdf text content as expected by the parser.
+     * <br> Adds bank swift code, relevant text delimiter, and line separator.
+     *
+     * @param bank bank
+     * @return whole pdf page text content
+     */
+    public String[] constructMockPDFSinglePageTextContentForBank(Bank bank) {
+        List<String> texts = new ArrayList<>();
+        texts.add("Gibberish");
+        texts.add(bank.swiftCode + "More Gibberish");
+        texts.add(bank.relevantContentHeaderLine);
+        List<String> mockData = constructSimplestPositiveLinesInput(bank);
+        for (String line : mockData) {
+            texts.add(line);
+        }
+        texts.add("Gibberish");
+
+        return texts.toArray(new String[texts.size()]);
+    }
+
+    public File writeSinglePagePDFFile(Bank bank) {
+        String[] singlePageTexts = constructMockPDFSinglePageTextContentForBank(bank);
+        return writePDFFile(bank, singlePageTexts);
+    }
+
+    /**
+     * Writes a single page pdf file with received text.
+     *
+     * @param bank bank
+     * @param pagesTexts string for each page
+     * @return pdf file on disk, may be null
+     */
+    public File writePDFFile(Bank bank, final String[]... pagesTexts) {
+        PDDocument doc = constructPDFDocument(bank, pagesTexts);
+
+        //verify that a file can be created in temp folder.
+        File pdf = createTempFile("test", ".pdf");
+        if (pdf == null) {
+            return null;
+        }
+        //delete since it is recreated by pdfbox.
+        pdf.delete();
+
+        boolean success = false;
+        try {
+            doc.save(pdf);
+            doc.close();
+            success = true;
+        } catch (IOException ex) {
+            Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return success ? pdf : null;
+    }
+
+    /**
+     * Creates a sibling PDF file.
+     *
+     * @param text initial text file
+     * @return sibling pdf file, may be null
+     */
+    private PDDocument constructPDFDocument(Bank bank, String[]... pagesTexts) {
+        PDDocument document = new PDDocument();
+        try {
+            for (String[] pageTexts : pagesTexts) {
+                PDPage page = new PDPage();
+                document.addPage(page);
+                PDFont font = PDType1Font.HELVETICA_BOLD;
+                PDPageContentStream contentStream = new PDPageContentStream(document, page);
+                contentStream.setFont(font, 12);
+                int y = 700;
+                int x = 100;
+                contentStream.beginText();
+                contentStream.newLineAtOffset(100, y);
+                //TODO Marian: although new line characters are being written, opening the pdf file for view only shows the first line.
+                //Needs some tweaking so that pdf files can also be inspected visually!
+                for (String line : pageTexts) {
+                    contentStream.showText(line);
+                    y -= 200;
+                    contentStream.newLineAtOffset(100, y);
+                }
+                contentStream.endText();
+                contentStream.close();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return document;
+    }
+
+    private File createTempFile(String name, String extension) {
+        File temp = null;
+        try {
+            temp = File.createTempFile(name, extension);
+            temp.deleteOnExit();
+        } catch (IOException ex) {
+            Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
+            assertTrue("Could not create a temporary file", false);
+        }
+
+        return temp;
+    }
+
+    /**
+     * Creates a standard set of lines corresponding to 1 of each types of
+     * transactions for a specific bank.
+     * <br> These lines can be written to a text file, then attempted to read
+     * from a PDF file.
+     *
+     * @param bank bank
+     * @return list of string lines
+     */
+    public List<String> constructSimplestPositiveLinesInput(final Bank bank) {
+        switch (bank) {
+            case ING:
+                return constructSimplestPositiveLinesInputING();
+            default:
+                throw new RuntimeException("No test support for chosen bank: " + bank.name());
+        }
+    }
+
+    private List<String> constructSimplestPositiveLinesInputING() {
         //length needs to cover for correct header, all operations, and a extra useless string which has to be recognized as such.
         List<String> lines = new ArrayList<>();
         String completedDate = "18 august 2018";
@@ -87,76 +202,5 @@ public class TestUtilities {
 
         lines.add("Pointless");
         return lines;
-    }
-
-    public String constructMockFirstPDFPageContent(Bank bank) {
-        List<String> mock = constructSimplestPositiveLinesInput();
-        String mockPDFPage = "Gibberish\\r\\n";
-        mockPDFPage = mockPDFPage.concat(bank.swiftCode).concat("\\r\\n");
-        mockPDFPage = mockPDFPage.concat(bank.relevantContentHeaderLine).concat("\\r\\n");
-        for (String line : mock) {
-            mockPDFPage = mockPDFPage.concat(line).concat("\\r\\n");
-        }
-        mockPDFPage = mockPDFPage.concat("Gibberish\\r\\n");
-
-        return mockPDFPage;
-    }
-
-    public File constructSimplestPositiveLinesInputPDFFile(Bank bank) {
-        String mock = constructMockFirstPDFPageContent(bank);
-        try {
-            File temp = File.createTempFile("test", "mock");
-            try (FileWriter writer = new FileWriter(temp)) {
-                writer.write(mock);
-            }
-            return constructPDFSinglePageFile(temp);
-
-        } catch (IOException ex) {
-            Logger.getLogger(PdfParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
-            assertTrue("Could not create a temporary file or failed to write file contents", false);
-        }
-
-        return null;
-    }
-
-    /**
-     * Creates a sibling PDF file.
-     *
-     * @param text initial text file
-     * @return sibling pdf file, may be null
-     */
-    public PDDocument constructPDFDocument(String text) {
-        PDDocument document = new PDDocument();
-        PDPage page = new PDPage();
-        COSStream stream = new COSStream();
-        PDStream pdStream = new PDStream(stream);
-        try (PrintWriter os = new PrintWriter(new BufferedOutputStream(stream.createOutputStream()))) {
-            os.print(text);
-        } catch (IOException ex) {
-            Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-        page.setContents(pdStream);
-        document.addPage(page);
-        return document;
-    }
-
-    public File constructPDFSinglePageFile(File textFile) throws IOException, FileNotFoundException {
-        String text;
-        try (BufferedReader reader = new BufferedReader(new FileReader(textFile))) {
-            text = "";
-            String line;
-            while ((line = reader.readLine()) != null) {
-                text += line;
-            }
-        }
-        File pdfLocation;
-        try (PDDocument pdfDoc = constructPDFDocument(text)) {
-            pdfLocation = new File(textFile.getParentFile(), "textFile" + ".pdf");
-            pdfDoc.save(pdfLocation);
-            pdfDoc.close();
-        }
-
-        return pdfLocation;
     }
 }

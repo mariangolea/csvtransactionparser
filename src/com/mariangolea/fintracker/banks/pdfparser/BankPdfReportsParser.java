@@ -12,6 +12,8 @@ public class BankPdfReportsParser {
     public static void main(String[] args) {
         PdfParserUICategorizer ui = new PdfParserUICategorizer();
         ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ui.createUI();
+        ui.pack();;
         ui.setVisible(true);
     }
 }

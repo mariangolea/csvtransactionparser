@@ -82,18 +82,6 @@ public final class BankTransaction implements Serializable {
         return string;
     }
 
-    public String toString(final DateFormat customFormat) {
-        String string = "";
-
-        string = string.concat(title).concat(",");
-        string = string.concat(type.toString()).concat(",");
-        string = string.concat(description).concat(",");
-        string = string.concat(customFormat.format(startDate)).concat(",");
-        string += amount;
-
-        return string;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (null == obj || !(obj instanceof BankTransaction)) {

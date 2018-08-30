@@ -7,7 +7,6 @@ package test.com.mariangolea.fintracker.banks.pdfparser.preferences;
 
 import com.mariangolea.fintracker.banks.pdfparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.pdfparser.preferences.UserPreferencesHandler;
-import java.io.File;
 import java.util.Arrays;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -21,22 +20,12 @@ public class UserPreferencesHandlerTest {
     private final UserPreferencesHandler handler = new UserPreferencesHandler();
 
     @Test
-    public void testLoadPreferences() {
+    public void testFirstLoadPreferences() {
+        //delete preferences file to verify initial app behavior.
+        boolean existed = handler.deletePreferencesFile();
         UserPreferences prefs = handler.loadUserPreferences();
-
-        if (prefs != null) {
-            //if previously set, at least input folder has to be present and represent a valid folder path!
-            assertTrue(prefs.getAllCategories() != null);
-            String path = prefs.getPDFInputFolder();
-            assertTrue(path != null && !path.isEmpty());
-            File file = new File(path);
-            assertTrue(file.isDirectory());
-        } else {
-            prefs = new UserPreferences();
-            //if not previously set, categories are non null and empty, and pdf folder is null.
-            assertTrue(prefs.getAllCategories() != null && prefs.getAllCategories().isEmpty());
-            assertTrue(prefs.getPDFInputFolder() == null);
-        }
+        assertTrue(prefs.getAllCategories() != null && prefs.getAllCategories().isEmpty());
+        assertTrue(prefs.getPDFInputFolder() == null);
     }
 
     @Test
@@ -51,5 +40,8 @@ public class UserPreferencesHandlerTest {
         assertTrue(stored);
         UserPreferences loaded = handler.loadUserPreferences();
         assertTrue(prefs.equals(loaded));
+        
+        prefs.addUpdateCategory("1", Arrays.asList("third"));
+        assertTrue(!prefs.equals(loaded));
     }
 }

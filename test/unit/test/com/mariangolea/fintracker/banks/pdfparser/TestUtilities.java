@@ -64,7 +64,7 @@ public class TestUtilities {
         PDDocument doc = constructPDFDocument(bank, pagesTexts);
 
         //verify that a file can be created in temp folder.
-        File pdf = createTempFile("test", ".pdf");
+        File pdf = createFile("test", ".pdf");
         if (pdf == null) {
             return null;
         }
@@ -117,14 +117,16 @@ public class TestUtilities {
         return document;
     }
 
-    private File createTempFile(String name, String extension) {
+    private File createFile(String name, String extension) {
         File temp = null;
         try {
             temp = File.createTempFile(name, extension);
+            if (!temp.exists()){
+                temp = new File(name + extension);
+            }
             temp.deleteOnExit();
         } catch (IOException ex) {
             Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
-            assertTrue("Could not create a temporary file", false);
         }
 
         return temp;

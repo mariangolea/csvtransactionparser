@@ -21,17 +21,23 @@ public class CmdArgParserTest {
     public void testArgumentParsing() {
         String tmpDir = System.getProperties().get("java.io.tmpdir").toString();
         String userDir = System.getProperties().get("user.home").toString();
-        String[] correctArgs = {"-folder="+tmpDir, "-folder="+userDir};
+        String[] correctArgs = {"-folder=" + tmpDir, "-folder=" + userDir};
         String[] incorrectArgs = {"--folder=one", "-Folder=two"};
-        
+
         CmdArgParser parser = new CmdArgParser();
         List<File> files = parser.getFolderFiles(incorrectArgs);
         assertTrue(files == null);
-        
+
         files = parser.getFolderFiles(correctArgs);
         assertTrue(files != null && files.size() == 2);
-        for (File file : files){
+        for (File file : files) {
             assertTrue(file != null && file.isDirectory());
         }
+
+        files = parser.getPDFFiles(null);
+        assertTrue(files == null);
+        
+        files = parser.getPDFFiles(correctArgs);
+        assertTrue(files != null);
     }
 }

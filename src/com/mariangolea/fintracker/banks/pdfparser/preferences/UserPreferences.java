@@ -1,6 +1,6 @@
 package com.mariangolea.fintracker.banks.pdfparser.preferences;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +26,10 @@ public class UserPreferences {
     public void addUpdateCategory(final String categoryName, final List<String> transactionNames) {
         List<String> existingAssociations = transactionCategories.get(categoryName);
         if (existingAssociations == null) {
-            transactionCategories.put(categoryName, transactionNames);
+            transactionCategories.put(categoryName, new ArrayList<>(transactionNames));
         } else {
-            transactionNames.forEach(transactionName -> {
-                if (!existingAssociations.contains(transactionName)) {
-                    existingAssociations.add(transactionName);
-                }
+            transactionNames.stream().filter((transactionName) -> (!existingAssociations.contains(transactionName))).forEachOrdered((transactionName) -> {
+                existingAssociations.add(transactionName);
             });
         }
     }
@@ -74,11 +72,11 @@ public class UserPreferences {
         for (String key : transactionCategories.keySet()) {
             List<String> firstAssociations = transactionCategories.get(key);
             List<String> secondAssociations = other.transactionCategories.get(key);
-            if (!areListsEqual(firstAssociations, secondAssociations)){
+            if (!areListsEqual(firstAssociations, secondAssociations)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 

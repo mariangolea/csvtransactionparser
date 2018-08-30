@@ -60,12 +60,14 @@ public class UserPreferencesHandler {
                     List<String> subCategories = convertPersistedStringToList(userPrefsFile.getProperty(categoryName));
                     loadedPrefs.addUpdateCategory(categoryName, subCategories);
                 }
+            } else{
+                loadedPrefs = new UserPreferences();
             }
 
         } catch (IOException ex) {
             Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return loadedPrefs;
     }
 
@@ -82,10 +84,10 @@ public class UserPreferencesHandler {
         final Map<String, List<String>> categoryAssociations = userPreferences.getAllCategories();
         final List<String> categoryNames = new ArrayList<>();
         String categoryNamesValue = convertStringsForStorage(categoryAssociations.keySet());
-        if (categoryNamesValue != null && categoryNamesValue.isEmpty()) {
+        if (categoryNamesValue != null && !categoryNamesValue.isEmpty()) {
             userPrefsFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
             for (String categoryName : categoryAssociations.keySet()) {
-                userPrefsFile.setProperty(categoryName, convertStringsForStorage(categoryAssociations.get(categoryNamesValue)));
+                userPrefsFile.setProperty(categoryName, convertStringsForStorage(categoryAssociations.get(categoryName)));
             }
         }
 
@@ -102,6 +104,14 @@ public class UserPreferencesHandler {
         }
 
         return success;
+    }
+
+    public boolean deletePreferencesFile() {
+        File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
+        if (propertiesFile.exists()) {
+            return propertiesFile.delete();
+        }
+        return true;
     }
 
     private String convertStringsForStorage(final Collection<String> strings) {

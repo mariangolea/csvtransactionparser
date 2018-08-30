@@ -57,11 +57,7 @@ public class PdfParserUICategorizer extends JFrame {
     private UserPreferences userPrefs;
 
     public PdfParserUICategorizer() {
-        createUI();
         userPrefs = preferences.loadUserPreferences();
-        if (userPrefs == null){
-            userPrefs = new UserPreferences();
-        }
     }
 
     protected void loadData(final List<PdfFileParseResponse> parsedTransactions) {
@@ -101,9 +97,7 @@ public class PdfParserUICategorizer extends JFrame {
         }
     }
 
-    private void createUI() {
-        setTitle("Bank Transactions Merger");
-        setJMenuBar(createMenu());
+    public JPanel createContentPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
 
@@ -152,9 +146,15 @@ public class PdfParserUICategorizer extends JFrame {
         constraints.gridheight = 9;
         constraints.fill = GridBagConstraints.BOTH;
         panel.add(scrollPaneOUT, constraints);
-        this.setContentPane(panel);
+        
+        return panel;
+    }
+
+    public void createUI() {
+        setTitle("Bank Transactions Merger");
+        setJMenuBar(createMenu());
+        this.setContentPane(createContentPanel());
         this.setPreferredSize(new Dimension(1000, 600));
-        this.pack();
     }
 
     private void createResponseLabels() {

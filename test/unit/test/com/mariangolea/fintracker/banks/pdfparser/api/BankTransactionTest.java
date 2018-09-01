@@ -30,6 +30,15 @@ public class BankTransactionTest {
 				BankTransaction.Type.IN, Arrays.asList("one", "two"));
 		String toString = first.toString();
 		assertTrue(toString != null);
+		assertTrue(first.getAmount() == 0);
+		assertTrue(first.getBankSwiftCode() == Bank.ING.swiftCode);
+		assertTrue(first.getCompletedDate() == date);
+		assertTrue(first.getStartDate() == date);
+		assertTrue(first.getDescription().equals("description"));
+		assertTrue(first.getTitle().equals("title"));
+		assertTrue(first.getType() == BankTransaction.Type.IN);
+		assertTrue(first.getPdfContent().equals(Arrays.asList("one", "two")));
+		assertTrue(first.getOriginalPDFContentLinesNumber() == 2);
 
 		BankTransaction second = new BankTransaction(Bank.ING.swiftCode, "title", date, date, 0, "description",
 				BankTransaction.Type.IN, Arrays.asList("one", "two"));

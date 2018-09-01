@@ -31,6 +31,7 @@ public class UserDefinedTransactionGroup {
 		Set<String> existing = transactionGroupAssociations.get(swiftCode);
 		if (existing == null) {
 			existing = bankOperationDescriptors;
+			transactionGroupAssociations.put(swiftCode, existing);
 		}
 
 		existing.addAll(bankOperationDescriptors);
@@ -44,6 +45,7 @@ public class UserDefinedTransactionGroup {
 		Set<String> existing = transactionGroupAssociations.get(swiftCode);
 		if (existing == null) {
 			existing = new HashSet<>();
+			transactionGroupAssociations.put(swiftCode, existing);
 		}
 
 		existing.add(bankOperationDescriptor);
@@ -69,9 +71,8 @@ public class UserDefinedTransactionGroup {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((groupName == null) ? 0 : groupName.hashCode());
-		result = prime * result
-				+ ((transactionGroupAssociations == null) ? 0 : transactionGroupAssociations.hashCode());
+		result = prime * result + groupName.hashCode();
+		result = prime * result + transactionGroupAssociations.hashCode();
 		return result;
 	}
 
@@ -84,17 +85,9 @@ public class UserDefinedTransactionGroup {
 		if (getClass() != obj.getClass())
 			return false;
 		UserDefinedTransactionGroup other = (UserDefinedTransactionGroup) obj;
-		if (groupName == null) {
-			if (other.groupName != null)
-				return false;
-		} else if (!groupName.equals(other.groupName))
+		if (!groupName.equals(other.groupName))
 			return false;
-		if (transactionGroupAssociations == null) {
-			if (other.transactionGroupAssociations != null)
-				return false;
-		} else if (!transactionGroupAssociations.equals(other.transactionGroupAssociations))
-			return false;
-		return true;
+		return transactionGroupAssociations.equals(other.transactionGroupAssociations);
 	}
 
 }

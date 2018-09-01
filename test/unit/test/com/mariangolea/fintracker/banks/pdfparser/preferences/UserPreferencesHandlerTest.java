@@ -36,17 +36,21 @@ public class UserPreferencesHandlerTest {
 
 	@Test
 	public void testBehaviorStorePreferences() {
+		handler.deletePreferencesFile();
 		UserPreferences prefs = handler.loadUserPreferences();
 		prefs.setPDFInputFolder("useless");
-		UserDefinedTransactionGroup group = new UserDefinedTransactionGroup("useless");
+		UserDefinedTransactionGroup group = new UserDefinedTransactionGroup("category1");
 		group.addAssociations(Bank.ING.swiftCode, new HashSet<>(Arrays.asList("1", "2")));
 		group.addAssociations("swift", new HashSet<>(Arrays.asList("1", "2")));
-
+		prefs.addDefinition("category1", group);
 		// after this store, next load should retrieve a different objects with same
 		// contents.
 		boolean stored = handler.storePreferences(prefs);
 		assertTrue(stored);
 		UserPreferences loaded = handler.loadUserPreferences();
 		assertTrue(prefs.equals(loaded));
+
+		boolean deleted = handler.deletePreferencesFile();
+		assertTrue(deleted);
 	}
 }

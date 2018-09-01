@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -45,21 +47,23 @@ public class UserPreferencesHandler {
 		File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
 		try {
 			if (propertiesFile.exists()) {
-				userPrefsFile.load(new FileReader(propertiesFile));
+				FileReader reader = new FileReader(propertiesFile);
+				userPrefsFile.load(reader);
+				reader.close();
 				loadedPrefs.setPDFInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
 				String categoryNamesString = userPrefsFile.getProperty(CATEGORY_NAMES);
-				Set<String> categoryNames = convertPersistedStringToList(categoryNamesString,
-						SEPARATOR_USER_CATEGORIES);
+				Set<String> categoryNames = new HashSet<String>(
+						convertPersistedStringToList(categoryNamesString, SEPARATOR_USER_CATEGORIES));
 				for (String categoryName : categoryNames) {
-					Set<String> bankGroups = convertPersistedStringToList(userPrefsFile.getProperty(categoryName),
-							SEPARATOR_BANKS);
+					Set<String> bankGroups = new HashSet<String>(
+							convertPersistedStringToList(userPrefsFile.getProperty(categoryName), SEPARATOR_BANKS));
 					UserDefinedTransactionGroup userGroup = new UserDefinedTransactionGroup(categoryName);
 					for (String bankGroup : bankGroups) {
-						Set<String> bankWithTransactions = convertPersistedStringToList(bankGroup,
+						List<String> bankWithTransactions = convertPersistedStringToList(bankGroup,
 								SEPARATOR_TRANSACTIONS);
 						String swiftCode = bankWithTransactions.toArray()[0].toString();
-						Set<String> transactions = convertPersistedStringToList(
-								bankWithTransactions.toArray()[1].toString(), SEPARATOR_USER_CATEGORIES);
+						Set<String> transactions = new HashSet<String>(convertPersistedStringToList(
+								bankWithTransactions.toArray()[1].toString(), SEPARATOR_USER_CATEGORIES));
 						userGroup.addAssociations(swiftCode, transactions);
 					}
 					loadedPrefs.addDefinition(categoryName, userGroup);
@@ -80,7 +84,7 @@ public class UserPreferencesHandler {
 	 * @return true if successfull
 	 */
 	public boolean storePreferences(final UserPreferences userPreferences) {
-		boolean success = true;
+		boolean success = false;
 		userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getPDFInputFolder());
 		final Set<String> categoryNames = userPreferences.getUserDefinedCategoryNames();
 		String categoryNamesValue = convertStringsForStorage(categoryNames, SEPARATOR_USER_CATEGORIES);
@@ -102,13 +106,17 @@ public class UserPreferencesHandler {
 		File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
 		try {
 			if (!propertiesFile.exists()) {
-				propertiesFile.createNewFile();
+				if (!propertiesFile.createNewFile()) {
+					return false;
+				}
 			}
-			userPrefsFile.store(new FileWriter(propertiesFile), COMMENTS);
+			FileWriter writer = new FileWriter(propertiesFile);
+			userPrefsFile.store(writer, COMMENTS);
+			writer.close();
+			success = true;
 
 		} catch (IOException ex) {
 			Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
-			success = false;
 		}
 
 		return success;
@@ -135,8 +143,8 @@ public class UserPreferencesHandler {
 		return soleString;
 	}
 
-	private Set<String> convertPersistedStringToList(final String string, final String separator) {
-		Set<String> strings = new HashSet<>();
+	private List<String> convertPersistedStringToList(final String string, final String separator) {
+		List<String> strings = new ArrayList<>();
 		if (string == null || string.isEmpty()) {
 			return strings;
 		}

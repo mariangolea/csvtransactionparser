@@ -117,10 +117,10 @@ public final class BankTransactionGroup {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((bankSwiftCode == null) ? 0 : bankSwiftCode.hashCode());
-		result = prime * result + ((transactionGroupIdentifier == null) ? 0 : transactionGroupIdentifier.hashCode());
-		result = prime * result + ((transactions == null) ? 0 : transactions.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + bankSwiftCode.hashCode();
+		result = prime * result + transactionGroupIdentifier.hashCode();
+		result = prime * result + transactions.hashCode();
+		result = prime * result + type.hashCode();
 		return result;
 	}
 
@@ -138,24 +138,15 @@ public final class BankTransactionGroup {
 		if (!(obj instanceof BankTransactionGroup))
 			return false;
 		BankTransactionGroup other = (BankTransactionGroup) obj;
-		if (bankSwiftCode == null) {
-			if (other.bankSwiftCode != null)
-				return false;
-		} else if (!bankSwiftCode.equals(other.bankSwiftCode))
+		if (!bankSwiftCode.equals(other.bankSwiftCode))
 			return false;
-		if (transactionGroupIdentifier == null) {
-			if (other.transactionGroupIdentifier != null)
-				return false;
-		} else if (!transactionGroupIdentifier.equals(other.transactionGroupIdentifier))
-			return false;
-		if (transactions == null) {
-			if (other.transactions != null)
-				return false;
-		} else if (!transactions.equals(other.transactions))
+		if (!transactionGroupIdentifier.equals(other.transactionGroupIdentifier))
 			return false;
 		if (type != other.type)
 			return false;
-		return true;
+		if (transactions.size() != other.transactions.size())
+			return false;
+		return transactions.containsAll(other.transactions);
 	}
 
 }

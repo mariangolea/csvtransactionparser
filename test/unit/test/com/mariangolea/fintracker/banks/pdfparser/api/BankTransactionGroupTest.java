@@ -38,9 +38,18 @@ public class BankTransactionGroupTest {
 		firstGroup.addTransaction(first);
 		firstGroup.addTransaction(second);
 
+		BankTransaction illegal = new BankTransaction("BAD_SwiftCode", "title", date, date, 1, "description",
+				BankTransaction.Type.IN, Arrays.asList("one", "two"));
+		boolean success = firstGroup.addTransaction(illegal);
+		assertTrue(!success);
+		List<BankTransaction> badTransactions = firstGroup.addTransactions(Arrays.asList(illegal));
+		assertTrue(badTransactions != null && badTransactions.size() == 1 && badTransactions.get(0) == illegal);
+
 		assertTrue(firstGroup.getType() == BankTransaction.Type.IN);
 		assertTrue(firstGroup.getGroupIdentifier().equals("title"));
 		assertTrue(firstGroup.getTotalAmount() == 2);
+		assertTrue(firstGroup.getBankSwiftCode() == Bank.ING.swiftCode);
+		assertTrue(firstGroup.getTransactions().equals(Arrays.asList(first, second)));
 
 		first = new BankTransaction(Bank.ING.swiftCode, "title", date, date, 1, "description", BankTransaction.Type.IN,
 				Arrays.asList("one", "two"));

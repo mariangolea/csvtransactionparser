@@ -125,13 +125,13 @@ public final class BankTransaction implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + Float.floatToIntBits(amount);
-		result = prime * result + ((bankSwiftCode == null) ? 0 : bankSwiftCode.hashCode());
-		result = prime * result + ((completedDate == null) ? 0 : completedDate.hashCode());
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
-		result = prime * result + ((pdfContent == null) ? 0 : pdfContent.hashCode());
-		result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + bankSwiftCode.hashCode();
+		result = prime * result + completedDate.hashCode();
+		result = prime * result + description.hashCode();
+		result = prime * result + pdfContent.hashCode();
+		result = prime * result + startDate.hashCode();
+		result = prime * result + title.hashCode();
+		result = prime * result + type.hashCode();
 		return result;
 	}
 
@@ -155,52 +155,26 @@ public final class BankTransaction implements Serializable {
 		if (Float.floatToIntBits(amount) != Float.floatToIntBits(other.amount)) {
 			return false;
 		}
-		if (bankSwiftCode == null) {
-			if (other.bankSwiftCode != null) {
-				return false;
-			}
-		} else if (!bankSwiftCode.equals(other.bankSwiftCode)) {
+
+		if (!bankSwiftCode.equals(other.bankSwiftCode)) {
 			return false;
 		}
-		if (completedDate == null) {
-			if (other.completedDate != null) {
-				return false;
-			}
-		} else if (!completedDate.equals(other.completedDate)) {
+		if (!completedDate.equals(other.completedDate)) {
 			return false;
 		}
-		if (description == null) {
-			if (other.description != null) {
-				return false;
-			}
-		} else if (!description.equals(other.description)) {
+		if (!description.equals(other.description)) {
 			return false;
 		}
-		if (pdfContent == null) {
-			if (other.pdfContent != null) {
-				return false;
-			}
-		} else if (!pdfContent.equals(other.pdfContent)) {
+		if (!pdfContent.equals(other.pdfContent)) {
 			return false;
 		}
-		if (startDate == null) {
-			if (other.startDate != null) {
-				return false;
-			}
-		} else if (!startDate.equals(other.startDate)) {
+		if (!startDate.equals(other.startDate)) {
 			return false;
 		}
-		if (title == null) {
-			if (other.title != null) {
-				return false;
-			}
-		} else if (!title.equals(other.title)) {
+		if (!title.equals(other.title)) {
 			return false;
 		}
-		if (type != other.type) {
-			return false;
-		}
-		return true;
+		return type == other.type;
 	}
 
 }

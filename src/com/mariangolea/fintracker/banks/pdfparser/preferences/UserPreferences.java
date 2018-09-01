@@ -72,7 +72,7 @@ public class UserPreferences {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((pdfInputFolder == null) ? 0 : pdfInputFolder.hashCode());
-		result = prime * result + ((transactionCategories == null) ? 0 : transactionCategories.hashCode());
+		result = prime * result + transactionCategories.hashCode();
 		return result;
 	}
 
@@ -90,12 +90,8 @@ public class UserPreferences {
 				return false;
 		} else if (!pdfInputFolder.equals(other.pdfInputFolder))
 			return false;
-		if (transactionCategories == null) {
-			if (other.transactionCategories != null)
-				return false;
-		} else if (!transactionCategories.equals(other.transactionCategories))
-			return false;
-		return true;
+
+		return transactionCategories.equals(other.transactionCategories);
 	}
 
 }

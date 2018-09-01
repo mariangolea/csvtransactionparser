@@ -59,6 +59,11 @@ public class TestUtilities {
 		return writePDFFile(bank, toCreate, singlePageTexts);
 	}
 
+	public File writeTwoPagesPDFFile(Bank bank, File toCreate) {
+		String[] singlePageTexts = constructMockPDFSinglePageTextContentForBank(bank);
+		return writePDFFile(bank, toCreate, singlePageTexts, singlePageTexts);
+	}
+
 	/**
 	 * Writes a single page pdf file with received text.
 	 *

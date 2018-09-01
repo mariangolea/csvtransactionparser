@@ -47,7 +47,7 @@ public class PdfParserUICategorizerTest extends PdfParserUICategorizer {
 		// enum.
 		DefaultTransactionCategories category = DefaultTransactionCategories.CAR;
 
-		File mockPDF = utils.writeSinglePagePDFFile(Bank.ING, folder.newFile("testUI.pdf"));
+		File mockPDF = utils.writeTwoPagesPDFFile(Bank.ING, folder.newFile("testUI.pdf"));
 		assertTrue(mockPDF != null);
 		PdfFileParseResponse response = new BankPDFTransactionParser().parseTransactions(mockPDF);
 		// tests in other files ensure response integrity, no need to do that in here.

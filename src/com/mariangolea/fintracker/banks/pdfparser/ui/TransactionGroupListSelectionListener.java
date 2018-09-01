@@ -17,53 +17,53 @@ import com.mariangolea.fintracker.banks.pdfparser.api.transaction.BankTransactio
  */
 public class TransactionGroupListSelectionListener implements ListDataListener, ListSelectionListener {
 
-    private static final String LABEL_NOTHING_SELECTED = "Total Amount: ";
-    private static final String LABEL_SOMETHING_SELECTED = "Selected Amount: ";
+	private static final String LABEL_NOTHING_SELECTED = "Total Amount: ";
+	private static final String LABEL_SOMETHING_SELECTED = "Selected Amount: ";
 
-    private final JList<BankTransactionGroup> jList;
-    private final JTextPane amountArea;
+	private final JList<BankTransactionGroup> jList;
+	private final JTextPane amountArea;
 
-    public TransactionGroupListSelectionListener(JList<BankTransactionGroup> jList, JTextPane amountArea) {
-        this.jList = jList;
-        this.amountArea = amountArea;
-    }
+	public TransactionGroupListSelectionListener(JList<BankTransactionGroup> jList, JTextPane amountArea) {
+		this.jList = jList;
+		this.amountArea = amountArea;
+	}
 
-    @Override
-    public void intervalAdded(ListDataEvent e) {
-        updateAmount();
-    }
+	@Override
+	public void intervalAdded(ListDataEvent e) {
+		updateAmount();
+	}
 
-    @Override
-    public void intervalRemoved(ListDataEvent e) {
-        updateAmount();
-    }
+	@Override
+	public void intervalRemoved(ListDataEvent e) {
+		updateAmount();
+	}
 
-    @Override
-    public void contentsChanged(ListDataEvent e) {
-        updateAmount();
-    }
+	@Override
+	public void contentsChanged(ListDataEvent e) {
+		updateAmount();
+	}
 
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        updateAmount();
-    }
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		updateAmount();
+	}
 
-    private void updateAmount() {
-        int[] selectedIndices = jList.getSelectedIndices();
-        double amount = 0;
-        if (selectedIndices == null || selectedIndices.length < 1) {
-            int size = jList.getModel().getSize();
-            for (int i = 0; i < size; i++) {
-                amount += jList.getModel().getElementAt(i).getTotalAmount();
-            }
-            amountArea.setText(LABEL_NOTHING_SELECTED + amount);
-        } else {
-            for (int index : selectedIndices) {
-                amount += jList.getModel().getElementAt(index).getTotalAmount();
-            }
-            amountArea.setText(LABEL_SOMETHING_SELECTED + amount);
-        }
+	private void updateAmount() {
+		int[] selectedIndices = jList.getSelectedIndices();
+		float amount = 0;
+		if (selectedIndices == null || selectedIndices.length < 1) {
+			int size = jList.getModel().getSize();
+			for (int i = 0; i < size; i++) {
+				amount += jList.getModel().getElementAt(i).getTotalAmount();
+			}
+			amountArea.setText(LABEL_NOTHING_SELECTED + amount);
+		} else {
+			for (int index : selectedIndices) {
+				amount += jList.getModel().getElementAt(index).getTotalAmount();
+			}
+			amountArea.setText(LABEL_SOMETHING_SELECTED + amount);
+		}
 
-    }
+	}
 
 }

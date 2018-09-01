@@ -1,8 +1,9 @@
 package com.mariangolea.fintracker.banks.pdfparser.parsers;
 
-import com.mariangolea.fintracker.banks.pdfparser.api.BankTransactionGroup;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.mariangolea.fintracker.banks.pdfparser.api.transaction.BankTransactionGroup;
 
 /**
  * Simple container needed to gather reports from various pages.

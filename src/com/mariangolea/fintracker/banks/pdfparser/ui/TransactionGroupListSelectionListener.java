@@ -1,12 +1,13 @@
 package com.mariangolea.fintracker.banks.pdfparser.ui;
 
-import com.mariangolea.fintracker.banks.pdfparser.api.BankTransactionGroup;
 import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.mariangolea.fintracker.banks.pdfparser.api.transaction.BankTransactionGroup;
 
 /**
  * Updates amount based on existing selections. If none are made, all

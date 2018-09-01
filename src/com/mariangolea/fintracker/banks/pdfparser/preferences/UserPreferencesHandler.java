@@ -4,136 +4,144 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.mariangolea.fintracker.banks.pdfparser.api.transaction.UserDefinedTransactionGroup;
+
 /**
- * Stores user preferences: 1. grouping of certain transactions. allows
- * application to automatically group transactions in user defined categories.
- * 2. file containing this information.
- *
- * <br> To allow flexibility, the only fixed property name is the one whose
- * values are all category names.
- * <br> After parsing all category names, each category string will also be a
- * key in the same file, where all similar transaction names are to be found.
- *
+ * Stores user preferences in the following format: <br>
+ * categories=name1,name2,name3 <br>
+ * name1=swiftcode1:transactionid1,transactionid2;swiftcode2:transactionid2,id3,id4
+ * <br>
+ * name2=swiftcode1:transactionid3;swiftcode2:transactionid4
+ * 
  * @author mariangolea@gmail.com
  */
 public class UserPreferencesHandler {
 
-    private static final String COMMENTS = "Automatically generated. DO NOT EDIT YOURSELF!!!";
-    private static final String USER_PREFERENCES_FILE_DEFAULT_NAME = "userprefs.properties";
-    private static final String USER_PREFERENCES_FILE_PATH_DEFAULT = "./" + USER_PREFERENCES_FILE_DEFAULT_NAME;
-    private static final String CATEGORY_NAMES = "categories";
-    private static final String INPUT_FOLDER = "inputFolder";
+	private static final String COMMENTS = "Automatically generated. DO NOT EDIT YOURSELF!!!";
+	private static final String USER_PREFERENCES_FILE_DEFAULT_NAME = "userprefs.properties";
+	private static final String USER_PREFERENCES_FILE_PATH_DEFAULT = "./" + USER_PREFERENCES_FILE_DEFAULT_NAME;
+	private static final String CATEGORY_NAMES = "categories";
+	private static final String INPUT_FOLDER = "inputFolder";
+	private static final String SEPARATOR_BANKS = ";";
+	private static final String SEPARATOR_TRANSACTIONS = ":";
+	private static final String SEPARATOR_USER_CATEGORIES = ",";
 
-    private final Properties userPrefsFile = new Properties();
+	private final Properties userPrefsFile = new Properties();
 
-    /**
-     * Starts up null. If user does not set it, defaults will be used the first
-     * time a store is needed.
-     */
-    private String userPreferencesFilePath;
+	/**
+	 * Get the user preferences.
+	 *
+	 * @return user preferences
+	 */
+	public UserPreferences loadUserPreferences() {
+		UserPreferences loadedPrefs = new UserPreferences();
+		File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
+		try {
+			if (propertiesFile.exists()) {
+				userPrefsFile.load(new FileReader(propertiesFile));
+				loadedPrefs.setPDFInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
+				String categoryNamesString = userPrefsFile.getProperty(CATEGORY_NAMES);
+				Set<String> categoryNames = convertPersistedStringToList(categoryNamesString,
+						SEPARATOR_USER_CATEGORIES);
+				for (String categoryName : categoryNames) {
+					Set<String> bankGroups = convertPersistedStringToList(userPrefsFile.getProperty(categoryName),
+							SEPARATOR_BANKS);
+					UserDefinedTransactionGroup userGroup = new UserDefinedTransactionGroup(categoryName);
+					for (String bankGroup : bankGroups) {
+						Set<String> bankWithTransactions = convertPersistedStringToList(bankGroup,
+								SEPARATOR_TRANSACTIONS);
+						String swiftCode = bankWithTransactions.toArray()[0].toString();
+						Set<String> transactions = convertPersistedStringToList(
+								bankWithTransactions.toArray()[1].toString(), SEPARATOR_USER_CATEGORIES);
+						userGroup.addAssociations(swiftCode, transactions);
+					}
+					loadedPrefs.addDefinition(categoryName, userGroup);
+				}
+			}
+		} catch (IOException ex) {
+			Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
+		}
 
-    /**
-     * Get the user preferences.
-     *
-     * @return user preferences
-     */
-    public UserPreferences loadUserPreferences() {
-        UserPreferences loadedPrefs = null;
-        File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
-        try {
-            if (propertiesFile.exists()) {
-                loadedPrefs = new UserPreferences();
-                userPrefsFile.load(new FileReader(propertiesFile));
-                loadedPrefs.setPDFInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
-                String categoryNamesString = userPrefsFile.getProperty(CATEGORY_NAMES);
-                List<String> categoryNames = convertPersistedStringToList(categoryNamesString);
-                for (String categoryName : categoryNames) {
-                    List<String> subCategories = convertPersistedStringToList(userPrefsFile.getProperty(categoryName));
-                    loadedPrefs.addUpdateCategory(categoryName, subCategories);
-                }
-            } else{
-                loadedPrefs = new UserPreferences();
-            }
+		return loadedPrefs;
+	}
 
-        } catch (IOException ex) {
-            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
+	/**
+	 * Stores user preferences. Depending on user choice, this happens on a default
+	 * location or a user defined one.
+	 *
+	 * @param userPreferences
+	 * @return true if successfull
+	 */
+	public boolean storePreferences(final UserPreferences userPreferences) {
+		boolean success = true;
+		userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getPDFInputFolder());
+		final Set<String> categoryNames = userPreferences.getUserDefinedCategoryNames();
+		String categoryNamesValue = convertStringsForStorage(categoryNames, SEPARATOR_USER_CATEGORIES);
+		if (categoryNamesValue != null && !categoryNamesValue.isEmpty()) {
+			userPrefsFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
+			for (String categoryName : categoryNames) {
+				UserDefinedTransactionGroup userGroup = userPreferences.getDefinition(categoryName);
+				Set<String> swiftCodes = userGroup.getSwiftCodes();
+				Set<String> perBank = new HashSet<>();
+				for (String swiftCode : swiftCodes) {
+					String forSwiftCode = convertStringsForStorage(userGroup.getTransactionsFor(swiftCode),
+							SEPARATOR_USER_CATEGORIES);
+					perBank.add(swiftCode + SEPARATOR_TRANSACTIONS + forSwiftCode);
+				}
+				userPrefsFile.setProperty(categoryName, convertStringsForStorage(perBank, SEPARATOR_BANKS));
+			}
+		}
 
-        return loadedPrefs;
-    }
+		File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
+		try {
+			if (!propertiesFile.exists()) {
+				propertiesFile.createNewFile();
+			}
+			userPrefsFile.store(new FileWriter(propertiesFile), COMMENTS);
 
-    /**
-     * Stores user preferences. Depending on user choice, this happens on a
-     * default location or a user defined one.
-     *
-     * @param userPreferences
-     * @return true if successfull
-     */
-    public boolean storePreferences(final UserPreferences userPreferences) {
-        boolean success = true;
-        userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getPDFInputFolder());
-        final Map<String, List<String>> categoryAssociations = userPreferences.getAllCategories();
-        final List<String> categoryNames = new ArrayList<>();
-        String categoryNamesValue = convertStringsForStorage(categoryAssociations.keySet());
-        if (categoryNamesValue != null && !categoryNamesValue.isEmpty()) {
-            userPrefsFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
-            for (String categoryName : categoryAssociations.keySet()) {
-                userPrefsFile.setProperty(categoryName, convertStringsForStorage(categoryAssociations.get(categoryName)));
-            }
-        }
+		} catch (IOException ex) {
+			Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
+			success = false;
+		}
 
-        File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
-        try {
-            if (!propertiesFile.exists()) {
-                propertiesFile.createNewFile();
-            }
-            userPrefsFile.store(new FileWriter(propertiesFile), COMMENTS);
+		return success;
+	}
 
-        } catch (IOException ex) {
-            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
-            success = false;
-        }
+	public boolean deletePreferencesFile() {
+		File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
+		if (propertiesFile.exists()) {
+			return propertiesFile.delete();
+		}
+		return true;
+	}
 
-        return success;
-    }
+	private String convertStringsForStorage(final Set<String> strings, final String separator) {
+		String soleString = "";
+		if (strings == null || strings.isEmpty()) {
+			return soleString;
+		}
+		for (String categoryName : strings) {
+			soleString += categoryName + separator;
+		}
+		soleString = soleString.substring(0, soleString.length() - 1);
 
-    public boolean deletePreferencesFile() {
-        File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
-        if (propertiesFile.exists()) {
-            return propertiesFile.delete();
-        }
-        return true;
-    }
+		return soleString;
+	}
 
-    private String convertStringsForStorage(final Collection<String> strings) {
-        String soleString = "";
-        if (strings == null || strings.isEmpty()) {
-            return soleString;
-        }
-        for (String categoryName : strings) {
-            soleString += categoryName + ",";
-        }
-        soleString = soleString.substring(0, soleString.length() - 1);
-
-        return soleString;
-    }
-
-    private List<String> convertPersistedStringToList(final String string) {
-        List<String> strings = new ArrayList<>();
-        if (string == null || string.isEmpty()) {
-            return strings;
-        }
-        String[] split = string.split(",");
-        strings.addAll(Arrays.asList(split));
-        return strings;
-    }
+	private Set<String> convertPersistedStringToList(final String string, final String separator) {
+		Set<String> strings = new HashSet<>();
+		if (string == null || string.isEmpty()) {
+			return strings;
+		}
+		String[] split = string.split(separator);
+		strings.addAll(Arrays.asList(split));
+		return strings;
+	}
 }

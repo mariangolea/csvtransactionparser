@@ -1,12 +1,13 @@
 package com.mariangolea.fintracker.banks.pdfparser.ui;
 
-import com.mariangolea.fintracker.banks.pdfparser.api.BankTransactionGroup;
 import java.awt.Component;
 import java.text.SimpleDateFormat;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EtchedBorder;
+
+import com.mariangolea.fintracker.banks.pdfparser.api.transaction.BankTransactionGroup;
 
 /**
  *
@@ -22,7 +23,7 @@ public class TransactionGroupCellRenderer extends JLabel implements ListCellRend
 
     @Override
     public Component getListCellRendererComponent(JList<? extends BankTransactionGroup> list, BankTransactionGroup value, int index, boolean isSelected, boolean cellHasFocus) {
-        String text = "<html><font color=\"blue\">" + value.getTitle() + "</font><br>";
+        String text = "<html><font color=\"blue\">" + value.getGroupIdentifier() + "</font><br>";
         text += value.getTotalAmount() + "<br></html>";
         setText(text);
         if (isSelected) {

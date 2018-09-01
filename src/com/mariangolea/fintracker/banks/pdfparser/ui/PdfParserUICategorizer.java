@@ -1,8 +1,8 @@
 package com.mariangolea.fintracker.banks.pdfparser.ui;
 
-import com.mariangolea.fintracker.banks.pdfparser.api.BankTransaction;
-import com.mariangolea.fintracker.banks.pdfparser.api.BankTransactionGroup;
 import com.mariangolea.fintracker.banks.pdfparser.api.PdfFileParseResponse;
+import com.mariangolea.fintracker.banks.pdfparser.api.transaction.BankTransaction;
+import com.mariangolea.fintracker.banks.pdfparser.api.transaction.BankTransactionGroup;
 import com.mariangolea.fintracker.banks.pdfparser.parsers.BankPDFTransactionParser;
 import com.mariangolea.fintracker.banks.pdfparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.pdfparser.preferences.UserPreferencesHandler;

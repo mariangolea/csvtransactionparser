@@ -6,7 +6,7 @@ userprefs.properties
 *.classpath
 *.project
 *.settings
-
+.idea
 # Log file
 *.log
 

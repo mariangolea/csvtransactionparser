@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package test.com.mariangolea.fintracker.banks.pdfparser.cmdsupport;
+package test.com.mariangolea.fintracker.banks.csvparser.cmdsupport;
 
-import com.mariangolea.fintracker.banks.pdfparser.cmdsupport.CmdArgParser;
+import com.mariangolea.fintracker.banks.csvparser.cmdsupport.CmdArgParser;
 import java.io.File;
 import java.util.List;
 import static org.junit.Assert.assertTrue;
@@ -34,10 +34,10 @@ public class CmdArgParserTest {
             assertTrue(file != null && file.isDirectory());
         }
 
-        files = parser.getPDFFiles(null);
+        files = parser.getCSVFiles(null);
         assertTrue(files == null);
-        
-        files = parser.getPDFFiles(correctArgs);
+
+        files = parser.getCSVFiles(correctArgs);
         assertTrue(files != null);
     }
 }

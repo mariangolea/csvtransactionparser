@@ -1,6 +1,7 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
+import java.math.BigDecimal;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -49,16 +50,16 @@ public class TransactionGroupListSelectionListener implements ListDataListener, 
 
     private void updateAmount() {
         int[] selectedIndices = jList.getSelectedIndices();
-        int amount = 0;
+        BigDecimal amount = BigDecimal.ZERO;
         if (selectedIndices == null || selectedIndices.length < 1) {
             int size = jList.getModel().getSize();
             for (int i = 0; i < size; i++) {
-                amount += jList.getModel().getElementAt(i).getTotalAmount();
+                amount= amount.add(jList.getModel().getElementAt(i).getTotalAmount());
             }
             amountArea.setText(LABEL_NOTHING_SELECTED + amount);
         } else {
             for (int index : selectedIndices) {
-                amount += jList.getModel().getElementAt(index).getTotalAmount();
+                amount= amount.add(jList.getModel().getElementAt(index).getTotalAmount());
             }
             amountArea.setText(LABEL_SOMETHING_SELECTED + amount);
         }

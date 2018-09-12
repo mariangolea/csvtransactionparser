@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
+import java.math.BigDecimal;
 
 /**
  *
@@ -26,11 +27,11 @@ public class BankTransactionTest {
     public void testBankTransaction() {
         BTParser bt = new BTParser();
         Date date = bt.parseCompletedDate("19-08-2018");
-        BankTransaction first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, 0, "description",
+        BankTransaction first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ZERO, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
         String toString = first.toString();
         assertTrue(toString != null);
-        assertTrue(first.getAmount() == 0);
+        assertTrue(first.getAmount() == BigDecimal.ZERO);
         assertTrue(first.getCompletedDate() == date);
         assertTrue(first.getStartDate() == date);
         assertTrue(first.getDescription().equals("description"));
@@ -39,7 +40,7 @@ public class BankTransactionTest {
         assertTrue(first.getCsvContent().equals(Arrays.asList("one", "two")));
         assertTrue(first.getOriginalCSVContentLinesNumber() == 2);
 
-        BankTransaction second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, 0, "description",
+        BankTransaction second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ZERO, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
 
         assertTrue(first.equals(second));

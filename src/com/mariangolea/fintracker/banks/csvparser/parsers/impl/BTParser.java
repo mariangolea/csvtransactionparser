@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.math.BigDecimal;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -55,7 +56,7 @@ public class BTParser extends AbstractBankParser {
     }
 
     private final List<String> operationDescriptionsList = new ArrayList<>();
-    private float amountValidationCounter = 0;
+    private BigDecimal amountValidationCounter = BigDecimal.ZERO;
 
     public BTParser() {
         super(Bank.BT, new SimpleDateFormat("dd-MM-yyyy"), new SimpleDateFormat("dd-MM-yyyy"),
@@ -74,7 +75,7 @@ public class BTParser extends AbstractBankParser {
 
     @Override
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
-        amountValidationCounter = 0;
+        amountValidationCounter = BigDecimal.ZERO;
         return super.parseCsvResponse(split, file); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -103,16 +104,15 @@ public class BTParser extends AbstractBankParser {
         String title = operation == null ? record.get(2) : operation.desc;
 
         int amountIndex = operation == OperationID.INCASARE ? 5 : 4;
-        float amount = parseAmount(record.get(amountIndex).trim());
+        BigDecimal amount = parseAmount(record.get(amountIndex).trim());
         BankTransaction.Type type = OperationID.INCASARE == operation ? BankTransaction.Type.IN : BankTransaction.Type.OUT;
         boolean companyDescFound = false;
         boolean amountValdationSuccess = false;
         String validationAmountString = record.get(6).trim();
         if (validationAmountString != null && !validationAmountString.isEmpty()) {
-            float validationAmount = parseAmount(validationAmountString);
+            BigDecimal validationAmount = parseAmount(validationAmountString);
             amountValdationSuccess = validateAmount(amount, validationAmount);
         }
-        amount = Math.abs(amount);
         String companyDesc = record.get(2);
         int index = companyDesc.indexOf("TID:");
         if (index >= 0) {
@@ -131,33 +131,27 @@ public class BTParser extends AbstractBankParser {
 
         if (companyDescFound) {
             if (amountValdationSuccess) {
-                return createStrictDescriptionTransaction(title, startedDate, completedDate, Math.abs(amount), companyDesc, type, toConsume);
+                return createStrictDescriptionTransaction(title, startedDate, completedDate, amount.abs(), companyDesc, type, toConsume);
             } else {
-                return createCompanyIdDescriptionTransaction(title, startedDate, completedDate, amount, companyDesc, type, toConsume);
+                return createCompanyIdDescriptionTransaction(title, startedDate, completedDate, amount.abs(), companyDesc, type, toConsume);
             }
         } else {
-            return createGeneralTransaction(title, startedDate, completedDate, Math.abs(amount), companyDesc, type, toConsume);
+            return createGeneralTransaction(title, startedDate, completedDate, amount.abs(), companyDesc, type, toConsume);
         }
     }
 
-    private boolean validateAmount(float amount, float expectedTotal) {
-        if (amountValidationCounter == -1){
-            return false;
-        }
-        
-        if (amountValidationCounter == 0) {
+    private boolean validateAmount(BigDecimal amount, BigDecimal expectedTotal) {
+        if (amountValidationCounter == BigDecimal.ZERO) {
             //first transaction parsed since reinitialization of validation
             //first transaction in a document.
             amountValidationCounter = expectedTotal;
             return true;
         } else {
-            if (amountValidationCounter + amount == expectedTotal) {
+            if (amountValidationCounter.add(amount) == expectedTotal) {
                 amountValidationCounter = expectedTotal;
                 return true;
             }
 
-            //if a single amount validation has failed, set to -1 so next validations are not even attempted.
-            amountValidationCounter = -1;
             return false;
         }
     }

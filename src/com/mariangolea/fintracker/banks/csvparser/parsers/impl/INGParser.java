@@ -4,6 +4,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction.Type;
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
+import java.math.BigDecimal;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -80,7 +81,7 @@ public class INGParser extends AbstractBankParser {
             if (operation == OperationID.PRIMA_ASIGURARE_VIATA) {
                 operationDetails = toConsume.get(0).split("Prima asigurare de viata \\(credite\\)");
             }
-            Float amount = OperationID.INCASARE == operation ? null : parseAmount(operationDetails[0]);
+            BigDecimal amount = OperationID.INCASARE == operation ? null : parseAmount(operationDetails[0]);
             Date completedDate = OperationID.INCASARE == operation ? null : parseCompletedDate(operationDetails[1]);
             Date startDate = completedDate;
             String desc = operation.desc;

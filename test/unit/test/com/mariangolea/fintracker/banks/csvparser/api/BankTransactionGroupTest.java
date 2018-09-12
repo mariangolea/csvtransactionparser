@@ -17,6 +17,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
+import java.math.BigDecimal;
 
 /**
  *
@@ -28,9 +29,9 @@ public class BankTransactionGroupTest {
     public void testGroup() {
         BTParser bt = new BTParser();
         Date date = bt.parseCompletedDate("19-08-2018");
-        BankTransaction first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, 0, "description",
+        BankTransaction first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ZERO, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
-        BankTransaction second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, 0, "description",
+        BankTransaction second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ZERO, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
 
         BankTransactionGroup firstGroup = new BankTransactionGroup(BTParser.OperationID.INCASARE.desc,
@@ -38,7 +39,7 @@ public class BankTransactionGroupTest {
         firstGroup.addTransaction(first);
         firstGroup.addTransaction(second);
 
-        BankTransaction illegal = new BankTransaction(true, true, "title", date, date, 1, "description",
+        BankTransaction illegal = new BankTransaction(true, true, "title", date, date, BigDecimal.ONE, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
         boolean success = firstGroup.addTransaction(illegal);
         assertTrue(!success);
@@ -47,12 +48,12 @@ public class BankTransactionGroupTest {
 
         assertTrue(firstGroup.getType() == BankTransaction.Type.IN);
         assertTrue(firstGroup.getGroupIdentifier().equals("title"));
-        assertTrue(firstGroup.getTotalAmount() == 2);
+        assertTrue(firstGroup.getTotalAmount().intValue()== 2);
         assertTrue(firstGroup.getTransactions().equals(Arrays.asList(first, second)));
 
-        first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, 0, "description",
+        first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ZERO, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
-        second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, 0, "description",
+        second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ZERO, "description",
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
         BankTransactionGroup secondGroup = new BankTransactionGroup(BTParser.OperationID.INCASARE.desc,
                 BankTransaction.Type.IN);

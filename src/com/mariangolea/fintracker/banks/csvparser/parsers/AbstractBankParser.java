@@ -12,6 +12,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 import java.io.File;
+import java.math.BigDecimal;
 
 import java.text.DateFormat;
 import java.text.NumberFormat;
@@ -63,9 +64,8 @@ public abstract class AbstractBankParser {
 
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
         Map<String, List<BankTransaction>> result = new HashMap<>();
-        List<BankTransaction> unrecognizedTransactions = new ArrayList<>();
         for (String operation : getListOfSupportedTransactionIDs()) {
-            result.put(operation, unrecognizedTransactions);
+            result.put(operation, new ArrayList<>());
         }
         result.put(UNRECOGNIZED_TRANSACTION, new ArrayList<>());
 
@@ -76,7 +76,7 @@ public abstract class AbstractBankParser {
         }
 
         //find out transactions number if possible.
-        float expectedTransactions = searchTransactionsNumber(transactionsIndex, toConsume);
+        BigDecimal expectedTransactions = searchTransactionsNumber(transactionsIndex, toConsume);
 
         //remove header lines up to first transaction
         toConsume = toConsume.subList(transactionsIndex + 1, toConsume.size());
@@ -99,7 +99,7 @@ public abstract class AbstractBankParser {
                 if (recognized != null) {
                     recognized.add(transaction);
                 } else {
-                    unrecognizedTransactions.add(transaction);
+                    result.get(UNRECOGNIZED_TRANSACTION).add(transaction);
                 }
 
                 consumedLines = transaction.getOriginalCSVContentLinesNumber();
@@ -121,8 +121,8 @@ public abstract class AbstractBankParser {
         return new CsvFileParseResponse(file, groups, unrecognizedStrings);
     }
 
-    private float searchTransactionsNumber(int transactionsIndex, List<String> toConsume) {
-        float expectedTransactions = -1;
+    private BigDecimal searchTransactionsNumber(int transactionsIndex, List<String> toConsume) {
+        BigDecimal expectedTransactions = BigDecimal.ZERO;
         if (!bank.transactionsNumberLabel.isEmpty()) {
             for (int i = 0; i < transactionsIndex; i++) {
                 if (toConsume.get(i).contains(bank.transactionsNumberLabel)) {
@@ -133,12 +133,7 @@ public abstract class AbstractBankParser {
                             transactionsString = transactionsString.substring(0, transactionsString.indexOf(" "));
                         }
                         expectedTransactions = parseAmount(transactionsString);
-                        if (expectedTransactions != 0){
-                            return expectedTransactions;
-                        } else{
-                            return -1;
-                        }
-                        
+                        break;
                     }
                 }
             }
@@ -179,15 +174,15 @@ public abstract class AbstractBankParser {
         return completedDate;
     }
 
-    public Float parseAmount(final String amountString) {
-        float amount = 0;
+    public BigDecimal parseAmount(final String amountString) {
+        BigDecimal amount = BigDecimal.ZERO;
         if (amountString == null) {
             return amount;
         }
         try {
             Number attempt = numberFormat.parse(amountString);
             if (null != attempt) {
-                amount = attempt.floatValue();
+                amount = new BigDecimal(attempt.toString());
             }
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
@@ -197,19 +192,19 @@ public abstract class AbstractBankParser {
     }
 
     public BankTransaction createCompanyIdDescriptionTransaction(final String title, final Date startDate, final Date completedDate,
-            float amount, final String description, final Type type, final List<String> csvContent) {
+            BigDecimal amount, final String description, final Type type, final List<String> csvContent) {
         return new BankTransaction(false, true, title, startDate, completedDate, amount, description, type,
                 csvContent);
     }
 
     public BankTransaction createStrictDescriptionTransaction(final String title, final Date startDate, final Date completedDate,
-            float amount, final String description, final Type type, final List<String> csvContent) {
+            BigDecimal amount, final String description, final Type type, final List<String> csvContent) {
         return new BankTransaction(true, true, title, startDate, completedDate, amount, description, type,
                 csvContent);
     }
 
     public BankTransaction createGeneralTransaction(final String title, final Date startDate, final Date completedDate,
-            float amount, final String description, final Type type, final List<String> csvContent) {
+            BigDecimal amount, final String description, final Type type, final List<String> csvContent) {
         return new BankTransaction(false, false, title, startDate, completedDate, amount, description, type,
                 csvContent);
     }

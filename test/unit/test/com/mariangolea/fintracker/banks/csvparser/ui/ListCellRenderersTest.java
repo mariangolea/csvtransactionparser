@@ -17,6 +17,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
+import java.math.BigDecimal;
 
 public class ListCellRenderersTest {
 
@@ -43,13 +44,13 @@ public class ListCellRenderersTest {
         JList<BankTransactionGroup> test = new JList<>();
         DefaultListModel<BankTransactionGroup> model = new DefaultListModel<>();
         BankTransactionGroup one = new BankTransactionGroup("one",  BankTransaction.Type.IN);
-        one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), 100, "two",
+        one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
         BankTransactionGroup two = new BankTransactionGroup("one", BankTransaction.Type.IN);
-        two.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), 300, "two",
+        two.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(300), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
         BankTransactionGroup three = new BankTransactionGroup("one", BankTransaction.Type.IN);
-        three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), 500, "two",
+        three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(500), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
         model.addElement(one);
         model.addElement(two);

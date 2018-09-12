@@ -1,6 +1,7 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,7 @@ public final class BankTransaction implements Serializable {
     // most cases.
     private final Date completedDate;
     // amount of currency used in this transaction.
-    private final float amount;
+    private final BigDecimal amount;
     // description of the transaction. useful for a client to recategorize a certain
     // transaction.
     private final String description;
@@ -55,7 +56,7 @@ public final class BankTransaction implements Serializable {
      * @param csvContent                               original csv content.
      */
     public BankTransaction(boolean validatedDuringParse, boolean supportsTransactionCompanyIdentification, final String title, final Date startDate,
-                           final Date completedDate, float amount, final String description, final Type type,
+                           final Date completedDate, BigDecimal amount, final String description, final Type type,
                            final List<String> csvContent) {
         super();
         Objects.requireNonNull(title);
@@ -101,7 +102,7 @@ public final class BankTransaction implements Serializable {
         return completedDate;
     }
 
-    public final float getAmount() {
+    public final BigDecimal getAmount() {
         return amount;
     }
 
@@ -130,7 +131,7 @@ public final class BankTransaction implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BankTransaction that = (BankTransaction) o;
-        return Float.compare(that.amount, amount) == 0 &&
+        return Objects.equals(that.amount, amount) &&
                 supportsTransactionCompanyIdentification == that.supportsTransactionCompanyIdentification &&
                 validatedDuringParse == validatedDuringParse &&
                 Objects.equals(startDate, that.startDate) &&

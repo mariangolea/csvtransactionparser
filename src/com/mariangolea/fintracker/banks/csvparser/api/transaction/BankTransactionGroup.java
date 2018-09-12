@@ -1,5 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -80,10 +81,10 @@ public final class BankTransactionGroup {
         return new ArrayList<>(transactions);
     }
 
-    public final float getTotalAmount() {
-        float amount = 0;
+    public final BigDecimal getTotalAmount() {
+        BigDecimal amount = BigDecimal.ZERO;
         for (BankTransaction transaction : transactions) {
-            amount += transaction.getAmount();
+            amount = amount.add(transaction.getAmount());
         }
 
         return amount;

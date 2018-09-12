@@ -20,6 +20,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFi
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
+import java.math.BigDecimal;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
@@ -75,8 +76,8 @@ public class BTParserTest extends BTParser {
     @Test
     public void testAmount() {
         String input = "1.195,60";
-        Float output = parseAmount(input);
-        assertTrue("Amount parsing failed.", (float) 1195.6 == output);
+        BigDecimal output = parseAmount(input);
+        assertTrue("Amount parsing failed.", (float) 1195.6 == output.floatValue());
 
         output = parseAmount("gibberish");
         assertTrue(output == null);

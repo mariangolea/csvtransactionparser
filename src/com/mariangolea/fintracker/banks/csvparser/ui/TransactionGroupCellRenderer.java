@@ -5,14 +5,11 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.text.SimpleDateFormat;
 
 /**
  * @author mariangolea@gmail.com
  */
-public class TransactionGroupCellRenderer extends JLabel implements ListCellRenderer<BankTransactionGroup> {
-
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy");
+public final class TransactionGroupCellRenderer extends JLabel implements ListCellRenderer<BankTransactionGroup> {
 
     public TransactionGroupCellRenderer() {
         setOpaque(true);
@@ -22,7 +19,7 @@ public class TransactionGroupCellRenderer extends JLabel implements ListCellRend
     public Component getListCellRendererComponent(JList<? extends BankTransactionGroup> list,
                                                   BankTransactionGroup value, int index, boolean isSelected, boolean cellHasFocus) {
         String text = "<html><font color=\"blue\">" + value.getGroupIdentifier() + "</font><br>";
-        text += ((int) value.getTotalAmount()) + "<br></html>";
+        text += value.getTotalAmount().floatValue() + "<br></html>";
         setText(text);
         if (isSelected) {
             setBackground(list.getSelectionBackground());

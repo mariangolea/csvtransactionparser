@@ -12,6 +12,9 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 
 import java.text.DateFormat;
@@ -20,6 +23,9 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  * Common behavior of all bank csv parsers.
@@ -37,6 +43,10 @@ public abstract class AbstractBankParser {
     private final DateFormat startDateFormat;
     private final DateFormat completedDateFormat;
     private final Bank bank;
+
+    private final Map<String, Date> parsedCompletedDates = new HashMap<>();
+    private final Map<String, Date> parsedStartedDates = new HashMap<>();
+    private final Map<String, BigDecimal> parsedAmounts = new HashMap<>();
 
     public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final NumberFormat numberFormat) {
         this(bank, startDateFormat, DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE), numberFormat);
@@ -57,8 +67,6 @@ public abstract class AbstractBankParser {
     public abstract List<String> getListOfSupportedTransactionIDs();
 
     public abstract BankTransaction parseTransaction(List<String> toConsume);
-
-    public abstract void resetValidationCounters();
 
     public abstract int findNextTransactionLineIndex(List<String> toConsume);
 
@@ -157,32 +165,45 @@ public abstract class AbstractBankParser {
     }
 
     public Date parseCompletedDate(final String dateString) {
-        Date completedDate = null;
+        Date completedDate = dateString == null ? null : parsedCompletedDates.get(dateString);
+        if (completedDate != null) {
+            return completedDate;
+        }
         try {
             completedDate = completedDateFormat.parse(dateString);
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        if (completedDate != null) {
+            parsedCompletedDates.put(dateString, completedDate);
+        }
         return completedDate;
     }
 
     public Date parseStartDate(final String dateString) {
-        Date completedDate = null;
+        Date startedDate = dateString == null ? null : parsedStartedDates.get(dateString);
+        if (startedDate != null) {
+            return startedDate;
+        }
         try {
-            completedDate = startDateFormat.parse(dateString);
+            startedDate = startDateFormat.parse(dateString);
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return completedDate;
+        if (startedDate != null) {
+            parsedStartedDates.put(dateString, startedDate);
+        }
+        return startedDate;
     }
 
     public BigDecimal parseAmount(final String amountString) {
-        BigDecimal amount = BigDecimal.ZERO;
-        if (amountString == null) {
+        BigDecimal amount = amountString == null ? null : parsedAmounts.get(amountString);
+        if (amount != null){
             return amount;
         }
+        
         try {
             Number attempt = numberFormat.parse(amountString);
             if (null != attempt) {
@@ -191,8 +212,25 @@ public abstract class AbstractBankParser {
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
+        if (amount !=null){
+            parsedAmounts.put(amountString, amount);
+        }
         return amount;
+    }
+
+    public final CSVRecord parseSingleLine(String singleLine) {
+        Reader in = new StringReader(singleLine);
+        CSVRecord record = null;
+        try {
+            CSVParser parser = new CSVParser(in, CSVFormat.EXCEL);
+            List<CSVRecord> list = parser.getRecords();
+            record = list.get(0);
+        } catch (IOException ex) {
+            Logger.getLogger(AbstractBankParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return record;
     }
 
     public BankTransaction createCompanyIdDescriptionTransaction(final String title, final Date startDate, final Date completedDate,

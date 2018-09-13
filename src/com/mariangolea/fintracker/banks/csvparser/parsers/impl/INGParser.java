@@ -2,8 +2,10 @@ package com.mariangolea.fintracker.banks.csvparser.parsers.impl;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction.Type;
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 
 import java.text.NumberFormat;
@@ -11,6 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 /**
  * CSV parser for ING bank.
@@ -19,19 +27,20 @@ import java.util.List;
  */
 public class INGParser extends AbstractBankParser {
 
-    @Override
-    public int findNextTransactionLineIndex(List<String> toConsume) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     public enum OperationID {
-        CASH_WITHDRAWAL("Retragere numerar"), RATE_CREDIT("Rata Credit"), ASIGURARI_GENERALE(
-                "Prima asigurari generale"), INCASARE("Incasare"), COMISION(
-                "Comision plata anticipata"), RECALCULARI_CREDITE(
-                "Recalculari aferente creditului"), TRANSFER_HOMEBANK(
-                "Transfer Home'Bank"), PRIMA_ASIGURARE_ING(
-                "Prima asigurare ING Credit Protect"), PRIMA_ASIGURARE_VIATA(
-                "Prima asigurare de viata (credite)");
+        CASH_WITHDRAWAL("Retragere numerar"),
+        RATE_CREDIT("Rata Credit"),
+        ASIGURARI_GENERALE("Prima asigurari generale"),
+        INCASARE("Incasare"),
+        COMISION("Comision plata anticipata"),
+        RECALCULARI_CREDITE("Recalculari aferente creditului"),
+        TRANSFER_HOMEBANK("Transfer Home'Bank"),
+        PRIMA_ASIGURARE_ING("Prima asigurare ING Credit Protect"),
+        PRIMA_ASIGURARE_VIATA("Prima asigurare de viata (credite)"),
+        CUMPARARE_POS("Cumparare POS"),
+        RAMBURSARE_RATE_CREDIT("Rambursare rata card credit"),
+        REALIMENTARE("Realimentare (debitare directa)"),
+        CUMPARARE_POS_CORECTIE("Cumparare POS corectie");
 
         public final String desc;
 
@@ -67,75 +76,94 @@ public class INGParser extends AbstractBankParser {
     }
 
     @Override
-    public void resetValidationCounters() {
-        //not needed in this parser.
+    public int findNextTransactionLineIndex(List<String> toConsume) {
+        Reader in;
+        CSVRecord record;
+        String test;
+        if (toConsume == null || toConsume.isEmpty()){
+            return -1;
+        }
+        
+        for (int i = 1; i < toConsume.size(); i++) {
+            test = toConsume.get(i);
+            if (test == null || test.isEmpty()) {
+                continue;
+            }
+            in = new StringReader(test);
+            try {
+                CSVParser parser = new CSVParser(in, CSVFormat.EXCEL);
+                List<CSVRecord> list = parser.getRecords();
+                record = list.get(0);
+                if (record == null || record.get(0) == null) {
+                    continue;
+                }
+                Date date = parseCompletedDate(record.get(0));
+                if (date != null) {
+                    return i;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(BTParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return -1;
     }
 
     @Override
     public BankTransaction parseTransaction(List<String> toConsume) {
-        OperationID operation = OperationID.getOperationID(toConsume.get(0));
-        BankTransaction transaction = null;
-        int linesConsumed = 0;
-        if (operation != null) {
-            String[] operationDetails = toConsume.get(0).split(operation.desc);
-            if (operation == OperationID.PRIMA_ASIGURARE_VIATA) {
-                operationDetails = toConsume.get(0).split("Prima asigurare de viata \\(credite\\)");
-            }
-            BigDecimal amount = OperationID.INCASARE == operation ? null : parseAmount(operationDetails[0]);
-            Date completedDate = OperationID.INCASARE == operation ? null : parseCompletedDate(operationDetails[1]);
-            Date startDate = completedDate;
-            String desc = operation.desc;
-            Type operationType = Type.OUT;
-            switch (operation) {
-                case RATE_CREDIT:
-                    linesConsumed = 2;
-                    break;
-                case CASH_WITHDRAWAL:
-                    String thirdLine = toConsume.get(3);
-                    startDate = parseStartDate(thirdLine.split(" ")[1]);
-                    desc = toConsume.get(2);
-                    linesConsumed = 4;
-                    break;
-                case ASIGURARI_GENERALE:
-                    desc = toConsume.get(2) + toConsume.get(3);
-                    linesConsumed = 5;
-                    break;
-                case INCASARE:
-                    String amountString = operationDetails[1].substring(operationDetails[1].lastIndexOf(" ") + 1);
-                    amount = parseAmount(amountString);
-                    String completedDateString = operationDetails[1].substring(0,
-                            operationDetails[1].indexOf(amountString));
-                    completedDate = parseCompletedDate(completedDateString);
-                    startDate = completedDate;
-                    desc = toConsume.get(3);
-                    linesConsumed = 5;
-                    operationType = Type.IN;
-                    break;
-                case COMISION:
-                    linesConsumed = 2;
-                    break;
-                case PRIMA_ASIGURARE_ING:
-                    linesConsumed = 2;
-                    break;
-                case PRIMA_ASIGURARE_VIATA:
-                    linesConsumed = 1;
-                    break;
-                case RECALCULARI_CREDITE:
-                    desc = toConsume.get(2);
-                    linesConsumed = 4;
-                    break;
-                case TRANSFER_HOMEBANK:
-                    desc = toConsume.get(4);
-                    linesConsumed = 6;
-                    break;
-                default:
-                    throw new RuntimeException("Unhandled Operation ID found for ING bank. Please update code!");
-            }
+        Objects.requireNonNull(toConsume);
+        /**
+           Data,,,Detalii tranzactie,,Debit,Credit
+         * 07 septembrie 2018,,,Transfer Home'Bank,,"4.400,00",
+         * ,,,Beneficiar: Marian Golea,,,
+         * ,,,In contul: RO52BTRLRONVGLD120898001,,,
+           ,,,Banca: BTRA CENTRALA,,,
+         * ,,,Detalii: acoperire card credit BT,,,
+         * ,,,Referinta: 233640525,,,
+         */
+        CSVRecord record = parseSingleLine(toConsume.get(0));
 
-            transaction = createGeneralTransaction(operation.desc, startDate, completedDate, amount, desc, operationType,
-                    toConsume.subList(0, linesConsumed));
+        if (record == null || record.size() < 7) {
+            return null;
         }
 
-        return transaction;
+        String temp = record.get(0);
+        if (temp == null) {
+            return null;
+        }
+        Date completedDate = parseCompletedDate(temp.trim());
+        Date startedDate = completedDate;
+        String desc = record.get(3);
+        if (desc == null) {
+            return null;
+        }
+        OperationID operation = OperationID.getOperationID(desc);
+        
+        BankTransaction.Type type = BankTransaction.Type.OUT;
+        int amountIndex = 5;
+        if (record.get(amountIndex) == null || record.get(amountIndex).trim().isEmpty()){
+            amountIndex = 6;
+            type = BankTransaction.Type.IN;
+        }
+        BigDecimal amount =  parseAmount(record.get(amountIndex));
+        if (amount == null) {
+            return null;
+        }
+
+        String title = operation == null ? desc : operation.desc;
+        int detailsLinesNumber = toConsume.size() - 1;
+        String details = "";
+        if (detailsLinesNumber > 0) {
+            for (int i = 0; i < detailsLinesNumber; i++) {
+                record = parseSingleLine(toConsume.get(i + 1));
+                if (record != null && record.size() > 3) {
+                    temp = record.get(3);
+                    if (temp != null && !temp.isEmpty()) {
+                        details += temp + ",";
+                    }
+                }
+            }
+        }
+        return createGeneralTransaction(title, startedDate, completedDate, amount.abs(), details, type, toConsume);
     }
+
 }

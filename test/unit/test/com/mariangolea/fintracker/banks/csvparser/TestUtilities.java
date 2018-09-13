@@ -5,7 +5,6 @@
  */
 package test.com.mariangolea.fintracker.banks.csvparser;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,6 +86,8 @@ public class TestUtilities {
         switch (bank) {
             case BT:
                 return constructSimplestPositiveLinesInputBT();
+            case ING:
+                return constructSimplestPositiveLinesInputING();
             default:
                 throw new RuntimeException("No test support for chosen bank: " + bank.name());
         }
@@ -99,6 +100,31 @@ public class TestUtilities {
         String first = "2018-05-16,2018-05-16,\"Plata la POS non-BT cu card VISA;POS 12/05/2018 320220120000    TID:20221206 ECONOMAT SECTOR 5 NR  BUCURESTI RO 41196811 valoare tranzactie: 19.74 RON RRN:813207877600   comision tranzactie 0.00 RON;\",746NVPO18136001O,\"-19.74\",,\"-439.22\"";
         String second = "2018-06-07,2018-06-07,\"Incasare OP;/ROC/acoperire card credit BT//RFB/;Golea Marian;RO36INGB0000999903905289;INGBROBU\",000IACH18158C1CS,,\"5,600.00\",\"46.80\"";
         String third = "2018-07-06,2018-07-06,\"Transfer pentru recuperare restante la creditele/debitele in sold\",746ZBTR181875579,\"-1.00\",,\"59.18\"";
+        lines.add(first);
+        lines.add(second);
+        lines.add(third);
+        lines.add("Pointless");
+        return lines;
+    }
+
+    private List<String> constructSimplestPositiveLinesInputING() {
+        // length needs to cover for correct header, all operations, and a extra useless
+        // string which has to be recognized as such.
+        List<String> lines = new ArrayList<>();
+        String first = "12 septembrie 2018,,,Cumparare POS,,\"105,00\",\n"
+                + ",,,Nr. card: xxxx xxxx xxxx 3811,,,\n"
+                + ",,,Terminal: CHAMPION OUTLET DEP  RO  DOMNESTI,,,\n"
+                + ",,,Data: 08-09-2018 Autorizare: 001440,,,";
+        String second = "14 iunie 2018,,,Rambursare rata card credit,,,\"255,00\"\n"
+                + ",,,Ordonator: Golea Alexandra,,,\n"
+                + ",,,Din contul: RO43INGB0000999907933185,,,\n"
+                + ",,,Detalii: Plata credit,,,\n"
+                + ",,,Referinta: 46,,,";
+        String third = "15 august 2018,,,Realimentare (debitare directa),,,\"50,00\"\n"
+                + ",,,Ordonator: Golea Alexandra,,,\n"
+                + ",,,Din contul: RO43INGB0000999907933185,,,\n"
+                + ",,,\"Principal: 30,43\",,,\n"
+                + ",,,\"Dobanda: 19,57\",,,";
         lines.add(first);
         lines.add(second);
         lines.add(third);

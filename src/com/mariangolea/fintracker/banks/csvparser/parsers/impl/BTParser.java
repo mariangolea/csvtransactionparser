@@ -5,9 +5,6 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.math.BigDecimal;
 
 import java.text.NumberFormat;
@@ -16,10 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 /**
@@ -28,11 +21,6 @@ import org.apache.commons.csv.CSVRecord;
  * @author mariangolea@gmail.com
  */
 public class BTParser extends AbstractBankParser {
-
-    @Override
-    public void resetValidationCounters() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     public enum OperationID {
         PLATA_POS("Plata la POS"), INCASARE("Incasare"), TRANSFER_RECUPERARE_RESTANTE(
@@ -74,6 +62,11 @@ public class BTParser extends AbstractBankParser {
     }
 
     @Override
+    public int findNextTransactionLineIndex(List<String> toConsume) {
+        return 1;
+    }
+
+    @Override
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
         amountValidationCounter = BigDecimal.ZERO;
         return super.parseCsvResponse(split, file); //To change body of generated methods, choose Tools | Templates.
@@ -88,19 +81,11 @@ public class BTParser extends AbstractBankParser {
         // 2018-05-12,2018-05-12
         //,"Plata la POS non-BT cu card VISA;EPOS 10/05/2018 71003100        TID:71003101 ENEL ENERGIE MUNTENIA  BUCURESTI RO 41196811 valoare tranzactie: 77.06 RON RRN:813009844291   comision tranzactie 0.00 RON;"
         //,746NVPO1813200BQ,"-77.06",,"-396.66"
-        Reader in = new StringReader(toConsume.get(0));
-        CSVRecord record = null;
-        try {
-            CSVParser parser = new CSVParser(in, CSVFormat.EXCEL);
-            List<CSVRecord> list = parser.getRecords();
-            record = list.get(0);
-        } catch (IOException ex) {
-            Logger.getLogger(BTParser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (record == null || record.size() < 6){
+        CSVRecord record = parseSingleLine(toConsume.get(0));
+        if (record == null || record.size() < 6) {
             return null;
         }
-        
+
         String temp = record.get(0);
         if (temp == null) {
             return null;
@@ -129,7 +114,7 @@ public class BTParser extends AbstractBankParser {
         BankTransaction.Type type = OperationID.INCASARE == operation ? BankTransaction.Type.IN : BankTransaction.Type.OUT;
         boolean companyDescFound = false;
         boolean amountValdationSuccess = false;
-        
+
         temp = record.get(6);
         if (temp == null) {
             return null;
@@ -180,10 +165,5 @@ public class BTParser extends AbstractBankParser {
 
             return false;
         }
-    }
-
-    @Override
-    public int findNextTransactionLineIndex(List<String> toConsume) {
-        return 1;
     }
 }

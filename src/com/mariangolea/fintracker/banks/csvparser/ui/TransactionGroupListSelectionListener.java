@@ -1,6 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
 import java.math.BigDecimal;
 
 import javax.swing.*;
@@ -20,10 +20,10 @@ public class TransactionGroupListSelectionListener implements ListDataListener, 
     private static final String LABEL_NOTHING_SELECTED = "Total Amount: ";
     private static final String LABEL_SOMETHING_SELECTED = "Selected Amount: ";
 
-    private final JList<BankTransactionGroup> jList;
+    private final JList<BankTransactionAbstractGroup> jList;
     private final JTextPane amountArea;
 
-    public TransactionGroupListSelectionListener(JList<BankTransactionGroup> jList, JTextPane amountArea) {
+    public TransactionGroupListSelectionListener(JList<BankTransactionAbstractGroup> jList, JTextPane amountArea) {
         this.jList = jList;
         this.amountArea = amountArea;
     }

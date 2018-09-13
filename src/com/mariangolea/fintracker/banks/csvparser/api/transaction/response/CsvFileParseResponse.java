@@ -1,7 +1,8 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction.response;
 
-import com.mariangolea.fintracker.banks.csvparser.api.BankTransactionMergeUtils;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionUtils;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,18 +20,18 @@ public class CsvFileParseResponse {
 
     public final File csvFile;
     public final boolean allOK;
-    public final List<BankTransactionGroup> parsedTransactionGroups = new ArrayList<>();
+    public final List<BankTransactionAbstractGroup> parsedTransactionGroups = new ArrayList<>();
     public final List<String> unprocessedStrings = new ArrayList<>();
 
-    private final BankTransactionMergeUtils utils = new BankTransactionMergeUtils();
+    private final BankTransactionUtils utils = new BankTransactionUtils();
 
-    public CsvFileParseResponse(final File csvFile, final List<BankTransactionGroup> groups, final List<String> unprocessedStrings) {
+    public CsvFileParseResponse(final File csvFile, final List<BankTransactionDefaultGroup> groups, final List<String> unprocessedStrings) {
         Objects.requireNonNull(csvFile);
         Objects.requireNonNull(groups);
         Objects.requireNonNull(unprocessedStrings);
         this.csvFile = csvFile;
         this.unprocessedStrings.addAll(unprocessedStrings);
         allOK = unprocessedStrings == null || unprocessedStrings.isEmpty();
-        parsedTransactionGroups.addAll(utils.mergeGroups(groups));
+        parsedTransactionGroups.addAll(utils.processTransactions(groups));
     }
 }

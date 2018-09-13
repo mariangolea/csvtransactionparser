@@ -14,7 +14,8 @@ import javax.swing.JTextPane;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
 import java.math.BigDecimal;
@@ -23,8 +24,8 @@ public class ListCellRenderersTest {
 
     @Test
     public void testBankTransactionGroupCellRenderer() {
-        JList<BankTransactionGroup> test = new JList<>();
-        BankTransactionGroup one = new BankTransactionGroup("one", BankTransaction.Type.IN);
+        JList<BankTransactionDefaultGroup> test = new JList<>();
+        BankTransactionDefaultGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         TransactionGroupCellRenderer renderer = new TransactionGroupCellRenderer();
         Component comp = renderer.getListCellRendererComponent(test, one, 0, false, true);
         assertTrue(comp instanceof JLabel);
@@ -41,15 +42,15 @@ public class ListCellRenderersTest {
 
     @Test
     public void testBankTransactionGroupListSelectionRenderer() {
-        JList<BankTransactionGroup> test = new JList<>();
-        DefaultListModel<BankTransactionGroup> model = new DefaultListModel<>();
-        BankTransactionGroup one = new BankTransactionGroup("one",  BankTransaction.Type.IN);
+        JList<BankTransactionAbstractGroup> test = new JList<>();
+        DefaultListModel<BankTransactionAbstractGroup> model = new DefaultListModel<>();
+        BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one",  BankTransaction.Type.IN);
         one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        BankTransactionGroup two = new BankTransactionGroup("one", BankTransaction.Type.IN);
+        BankTransactionAbstractGroup two = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         two.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(300), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        BankTransactionGroup three = new BankTransactionGroup("one", BankTransaction.Type.IN);
+        BankTransactionAbstractGroup three = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(500), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
         model.addElement(one);

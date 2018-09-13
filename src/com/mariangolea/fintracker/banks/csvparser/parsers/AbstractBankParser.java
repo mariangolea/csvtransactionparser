@@ -8,7 +8,7 @@ package com.mariangolea.fintracker.banks.csvparser.parsers;
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction.Type;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 import java.io.File;
@@ -80,7 +80,7 @@ public abstract class AbstractBankParser {
 
         //remove header lines up to first transaction
         toConsume = toConsume.subList(transactionsIndex + 1, toConsume.size());
-        
+
         List<String> unrecognizedStrings = new ArrayList<>();
         BankTransaction transaction;
         int consumedLines;
@@ -92,7 +92,11 @@ public abstract class AbstractBankParser {
             }
             transaction = parseTransaction(transactionLines);
             if (transaction == null) {
-                unrecognizedStrings.addAll(transactionLines);
+                for (String transactionString : transactionLines) {
+                    if (transactionString != null && !transactionString.isEmpty()) {
+                        unrecognizedStrings.addAll(transactionLines);
+                    }
+                }
                 consumedLines = transactionLines.size();
             } else {
                 List<BankTransaction> recognized = result.get(transaction.getTitle());
@@ -107,11 +111,11 @@ public abstract class AbstractBankParser {
             toConsume = toConsume.subList(consumedLines, toConsume.size());
         }
 
-        List<BankTransactionGroup> groups = new ArrayList<>();
+        List<BankTransactionDefaultGroup> groups = new ArrayList<>();
         result.keySet().forEach((operationID) -> {
             List<BankTransaction> transactions = result.get(operationID);
             if (transactions != null && !transactions.isEmpty()) {
-                BankTransactionGroup group = new BankTransactionGroup(operationID,
+                BankTransactionDefaultGroup group = new BankTransactionDefaultGroup(operationID,
                         transactions.get(0).getType());
                 group.addTransactions(transactions);
                 groups.add(group);
@@ -138,7 +142,7 @@ public abstract class AbstractBankParser {
                 }
             }
         }
-        
+
         return expectedTransactions;
     }
 

@@ -1,7 +1,8 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
@@ -33,11 +34,10 @@ public class CsvParserUICategorizer extends JPanel {
     protected final JTextPane feedbackPane = new JTextPane();
     private final JTextPane inResponseLabel = new JTextPane();
     private final JTextPane outResponseLabel = new JTextPane();
-    private final DefaultListModel<BankTransactionGroup> computerModel = new DefaultListModel<>();
-    private JList<BankTransactionGroup> inListView;
-    protected final DefaultListModel<BankTransactionGroup> inModel = new DefaultListModel<>();
-    protected final DefaultListModel<BankTransactionGroup> outModel = new DefaultListModel<>();
-    private JList<BankTransactionGroup> outListView;
+    protected final DefaultListModel<BankTransactionAbstractGroup> inModel = new DefaultListModel<>();
+    protected final DefaultListModel<BankTransactionAbstractGroup> outModel = new DefaultListModel<>();
+    private JList<BankTransactionAbstractGroup> inListView;
+    private JList<BankTransactionAbstractGroup> outListView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
     private UserPreferences userPrefs;
@@ -208,7 +208,7 @@ public class CsvParserUICategorizer extends JPanel {
     }
 
     private JScrollPane createTransactionView(BankTransaction.Type type) {
-        JList<BankTransactionGroup> listView = new JList<>(BankTransaction.Type.IN == type ? inModel : outModel);
+        JList<BankTransactionAbstractGroup> listView = new JList<>(BankTransaction.Type.IN == type ? inModel : outModel);
         listView.setOpaque(true);
         listView.setCellRenderer(new TransactionGroupCellRenderer());
         listView.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

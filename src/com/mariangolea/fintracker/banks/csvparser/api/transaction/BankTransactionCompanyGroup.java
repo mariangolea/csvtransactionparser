@@ -39,10 +39,32 @@ public final class BankTransactionCompanyGroup extends BankTransactionAbstractGr
         return companyDesc;
     }
 
+    public List<BankTransaction> getTransactions() {
+        return new ArrayList<>(list);
+    }
+
     @Override
     public String toString() {
-        return companyDesc + "\n" + super.toString(); 
+        return companyDesc + "\n" + super.toString();
     }
-    
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        BankTransactionCompanyGroup that = (BankTransactionCompanyGroup) o;
+        return super.equals(that)
+                && Objects.equals(companyDesc, that.companyDesc) 
+                && Objects.equals(list, that.list);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), companyDesc, list);
+    }
+
 }

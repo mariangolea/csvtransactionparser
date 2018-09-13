@@ -34,7 +34,7 @@ public class BankCSVTransactionParserTest {
         assertTrue(csvFile != null);
 
         List<String> readString = parser.loadCSVFile(csvFile);
-        String[] expected = {Bank.BT.relevantContentHeaderLine, "One", "Two"};
+        String[] expected = {"One", "Two"};
         assertTrue(areStringArraysEqual(readString.toArray(new String[readString.size()]), expected));
     }
 

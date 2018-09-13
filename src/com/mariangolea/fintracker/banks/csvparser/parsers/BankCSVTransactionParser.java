@@ -58,8 +58,9 @@ public final class BankCSVTransactionParser {
      */
     public List<String> loadCSVFile(final File csvFile) {
         List<String> response = null;
+        BufferedReader csvReader = null;
         try {
-            BufferedReader csvReader = new BufferedReader(new FileReader(csvFile));
+            csvReader = new BufferedReader(new FileReader(csvFile));
             response = new ArrayList<>();
             String tempLine;
             while ((tempLine = csvReader.readLine()) != null) {
@@ -67,6 +68,13 @@ public final class BankCSVTransactionParser {
             }
         } catch (IOException ex) {
             Logger.getLogger(BankCSVTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
+            
+        } finally{
+            try {
+                if (csvReader != null) csvReader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(BankCSVTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         return response;

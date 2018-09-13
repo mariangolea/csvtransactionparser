@@ -51,9 +51,6 @@ public class BankTransactionDefaultGroup extends BankTransactionAbstractGroup {
     public String toString() {
         return "This type should never be displayed :)";
     }
-
-    
-
     
     @Override
     public boolean equals(Object o) {

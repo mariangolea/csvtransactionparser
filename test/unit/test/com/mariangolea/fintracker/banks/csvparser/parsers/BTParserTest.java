@@ -7,9 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,7 +15,6 @@ import org.junit.rules.TemporaryFolder;
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
 import java.math.BigDecimal;
 
@@ -37,55 +33,47 @@ public class BTParserTest extends BTParser {
 
     @Test
     public void testCompleteDateParser() {
-        String input;
-        Date output;
-        Calendar calendar = Calendar.getInstance(INGParser.ROMANIAN_LOCALE);
-        Map<String, Integer> monthNames = calendar.getDisplayNames(Calendar.MONTH, Calendar.LONG,
-                INGParser.ROMANIAN_LOCALE);
-        for (Entry<String, Integer> entry : monthNames.entrySet()) {
-            // try to verify day, month and year based on month values.
-            int year = 2000 + entry.getValue();
-            int day = 1 + entry.getValue(); // Month indices start with 0, sa when constructing days add 1.
-            int month = entry.getValue();
-            input = day + " " + entry.getKey() + " " + year;
-            output = parseCompletedDate(input);
-            calendar.setTime(output);
-            assertEquals("Month value not as expected.", month, calendar.get(Calendar.MONTH));
-            assertEquals("Day value not as expected.", day, calendar.get(Calendar.DAY_OF_MONTH));
-            assertEquals("Year value not as expected.", year, calendar.get(Calendar.YEAR));
-        }
 
-        output = parseCompletedDate("gibberish");
+        Date output = parseCompletedDate("gibberish");
         assertTrue(output == null);
+
+        output = parseCompletedDate("12-08-2018");
+        assertTrue(output != null);
+        Calendar calendar = Calendar.getInstance(Bank.BT.locale);
+        calendar.setTime(output);
+        assertTrue(calendar.get(Calendar.DAY_OF_MONTH) == 12);
+        assertTrue(calendar.get(Calendar.MONTH) == 7);
+        assertTrue(calendar.get(Calendar.YEAR) == 2018);
     }
 
     @Test
     public void testStartedDateParser() {
-        String input = "14-08-2018";
-        Date output = parseStartDate(input);
-        Calendar c = Calendar.getInstance();
-        c.setTime(output);
-        assertEquals("Day value not as expected.", 14, c.get(Calendar.DAY_OF_MONTH));
-        assertEquals("Month value not as expected.", 7, c.get(Calendar.MONTH)); // Months start from 0, so Agust is 7!
-        assertEquals("Year value not as expected.", 2018, c.get(Calendar.YEAR));
-
-        output = parseStartDate("gibberish");
+        Date output = parseStartDate("gibberish");
         assertTrue(output == null);
+
+        output = parseStartDate("12-08-2018");
+        assertTrue(output != null);
+        Calendar calendar = Calendar.getInstance(Bank.BT.locale);
+        calendar.setTime(output);
+        assertTrue(calendar.get(Calendar.DAY_OF_MONTH) == 12);
+        assertTrue(calendar.get(Calendar.MONTH) == 7);
+        assertTrue(calendar.get(Calendar.YEAR) == 2018);
     }
 
     @Test
     public void testAmount() {
-        String input = "1.195,60";
+        String input = "1,195.60";
         BigDecimal output = parseAmount(input);
         assertTrue("Amount parsing failed.", (float) 1195.6 == output.floatValue());
 
         output = parseAmount("gibberish");
-        assertTrue(output == null);
+        assertTrue(output == BigDecimal.ZERO);
     }
 
     @Test
-    public void testSupportedTransactionsINGRoundTrip() throws IOException {
-        File csvFile = utils.writeCSVFile(Bank.BT, folder.newFile("test.csv"));
+    public void testSupportedTransactionsBTRoundTrip() throws IOException {
+        String[] mockData = utils.constructMockCSVContentForBank(Bank.BT);
+        File csvFile = utils.writeCSVFile(Bank.BT, folder.newFile("test.csv"), mockData);
         assertTrue(null != csvFile);
 
         CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(csvFile);
@@ -93,6 +81,12 @@ public class BTParserTest extends BTParser {
 
         // we expect a unrecognized string.
         assertTrue(!response.allOK);
-        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 9);
+        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
+    }
+
+    @Test
+    public void testMethodsBasic() {
+        assertTrue(getListOfSupportedTransactionIDs() != null);
+        assertTrue(findNextTransactionLineIndex(null) == 1);
     }
 }

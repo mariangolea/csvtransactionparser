@@ -97,18 +97,44 @@ public class BTParser extends AbstractBankParser {
         } catch (IOException ex) {
             Logger.getLogger(BTParser.class.getName()).log(Level.SEVERE, null, ex);
         }
+        if (record == null || record.size() < 6){
+            return null;
+        }
+        
+        String temp = record.get(0);
+        if (temp == null) {
+            return null;
+        }
+        Date startedDate = parseStartDate(temp.trim());
 
-        Date startedDate = parseStartDate(record.get(0).trim());
-        Date completedDate = parseCompletedDate(record.get(1).trim());
-        OperationID operation = OperationID.getOperationID(record.get(2));
-        String title = operation == null ? record.get(2) : operation.desc;
+        temp = record.get(1);
+        if (temp == null) {
+            return null;
+        }
+        Date completedDate = parseCompletedDate(temp.trim());
+
+        temp = record.get(2);
+        if (temp == null) {
+            return null;
+        }
+        OperationID operation = OperationID.getOperationID(temp.trim());
+        String title = operation == null ? temp.trim() : operation.desc;
 
         int amountIndex = operation == OperationID.INCASARE ? 5 : 4;
-        BigDecimal amount = parseAmount(record.get(amountIndex).trim());
+        temp = record.get(amountIndex);
+        if (temp == null) {
+            return null;
+        }
+        BigDecimal amount = parseAmount(temp.trim());
         BankTransaction.Type type = OperationID.INCASARE == operation ? BankTransaction.Type.IN : BankTransaction.Type.OUT;
         boolean companyDescFound = false;
         boolean amountValdationSuccess = false;
-        String validationAmountString = record.get(6).trim();
+        
+        temp = record.get(6);
+        if (temp == null) {
+            return null;
+        }
+        String validationAmountString = temp.trim();
         if (validationAmountString != null && !validationAmountString.isEmpty()) {
             BigDecimal validationAmount = parseAmount(validationAmountString);
             amountValdationSuccess = validateAmount(amount, validationAmount);

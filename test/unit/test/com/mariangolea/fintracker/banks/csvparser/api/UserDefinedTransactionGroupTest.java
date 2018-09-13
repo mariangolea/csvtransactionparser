@@ -13,7 +13,7 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserDefinedTransac
 public class UserDefinedTransactionGroupTest {
 
     @Test
-    public void testSImpleGroup() {
+    public void testSimpleGroup() {
         UserDefinedTransactionGroup group1 = new UserDefinedTransactionGroup("useless");
         group1.addAssociation("swift", "one");
         group1.addAssociations("swift", new HashSet<>(Arrays.asList("three", "two")));
@@ -28,6 +28,9 @@ public class UserDefinedTransactionGroupTest {
         group2.addAssociations("swift", new HashSet<>(Arrays.asList("three", "one")));
 
         assertTrue(group1.equals(group2));
-
+        assertTrue(group1.hashCode() == group2.hashCode());
+        
+        assertTrue(group1.removeAssociation("swift"));
+        assertTrue(group1.getTransactionsFor("swift") == null);
     }
 }

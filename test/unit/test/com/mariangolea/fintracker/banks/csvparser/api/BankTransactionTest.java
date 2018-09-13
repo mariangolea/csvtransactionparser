@@ -12,7 +12,6 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
 import java.math.BigDecimal;
@@ -31,12 +30,14 @@ public class BankTransactionTest {
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
         String toString = first.toString();
         assertTrue(toString != null);
-        assertTrue(first.getAmount() == BigDecimal.ZERO);
-        assertTrue(first.getCompletedDate() == date);
+        assertTrue(first.isValidatedDuringParse());
+        assertTrue(first.isSupportsTransactionCompanyIdentification());
         assertTrue(first.getStartDate() == date);
+        assertTrue(first.getCompletedDate() == date);
+        assertTrue(first.getAmount() == BigDecimal.ZERO);
         assertTrue(first.getDescription().equals("description"));
-        assertTrue(first.getTitle().equals(BTParser.OperationID.INCASARE.desc));
         assertTrue(first.getType() == BankTransaction.Type.IN);
+        assertTrue(first.getTitle().equals(BTParser.OperationID.INCASARE.desc));
         assertTrue(first.getCsvContent().equals(Arrays.asList("one", "two")));
         assertTrue(first.getOriginalCSVContentLinesNumber() == 2);
 
@@ -44,5 +45,8 @@ public class BankTransactionTest {
                 BankTransaction.Type.IN, Arrays.asList("one", "two"));
 
         assertTrue(first.equals(second));
+        assertTrue(first.hashCode() == second.hashCode());
+        second.getCsvContent().add("hello");
+        assertTrue(!first.equals(second));
     }
 }

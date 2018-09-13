@@ -64,25 +64,21 @@ public class UserDefinedTransactionGroup {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + groupName.hashCode();
-        result = prime * result + transactionGroupAssociations.hashCode();
-        return result;
+        return Objects.hash(groupName, transactionGroupAssociations);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj){
             return true;
-        if (obj == null)
+        }
+        if (obj == null || getClass() != obj.getClass()){
             return false;
-        if (getClass() != obj.getClass())
-            return false;
+        }
+        
         UserDefinedTransactionGroup other = (UserDefinedTransactionGroup) obj;
-        if (!groupName.equals(other.groupName))
-            return false;
-        return transactionGroupAssociations.equals(other.transactionGroupAssociations);
+        return Objects.equals(groupName, other.groupName) 
+                && Objects.equals(transactionGroupAssociations, other.transactionGroupAssociations);
     }
 
 }

@@ -82,14 +82,6 @@ public final class BankTransaction implements Serializable {
         return supportsTransactionCompanyIdentification;
     }
 
-    public void setSupportsTransactionCompanyIdentification(boolean supportsTransactionCompanyIdentification) {
-        this.supportsTransactionCompanyIdentification = supportsTransactionCompanyIdentification;
-    }
-
-    public void setValidatedDuringParse(boolean validatedDuringParse) {
-        this.validatedDuringParse = validatedDuringParse;
-    }
-
     public boolean isValidatedDuringParse() {
         return validatedDuringParse;
     }
@@ -133,7 +125,7 @@ public final class BankTransaction implements Serializable {
         BankTransaction that = (BankTransaction) o;
         return Objects.equals(that.amount, amount) &&
                 supportsTransactionCompanyIdentification == that.supportsTransactionCompanyIdentification &&
-                validatedDuringParse == validatedDuringParse &&
+                validatedDuringParse == that.validatedDuringParse &&
                 Objects.equals(startDate, that.startDate) &&
                 Objects.equals(completedDate, that.completedDate) &&
                 Objects.equals(description, that.description) &&

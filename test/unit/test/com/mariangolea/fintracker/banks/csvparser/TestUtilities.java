@@ -5,7 +5,6 @@
  */
 package test.com.mariangolea.fintracker.banks.csvparser;
 
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,11 +16,10 @@ import java.util.logging.Logger;
 import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.FileWriter;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
 /**
  *
@@ -61,10 +59,11 @@ public class TestUtilities {
      * @return csv file on disk, may be null
      */
     public File writeCSVFile(Bank bank, File csv, final String... records) {
-        try (CSVPrinter printer = new CSVPrinter(new PrintWriter(csv), CSVFormat.DEFAULT)) {
-            printer.printRecord(bank.relevantContentHeaderLine);
+        try (BufferedWriter printer = new BufferedWriter(new FileWriter(csv))) {
             for (String record : records) {
-                printer.printRecord(record);
+                printer.write(record);
+                CSVFormat.EXCEL.getRecordSeparator();
+                printer.write(CSVFormat.EXCEL.getRecordSeparator());
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
@@ -97,9 +96,12 @@ public class TestUtilities {
         // length needs to cover for correct header, all operations, and a extra useless
         // string which has to be recognized as such.
         List<String> lines = new ArrayList<>();
-        String first = "2018-05-12,2018-05-12,\"Plata la POS non-BT cu card VISA;EPOS 10/05/2018 71003100        TID:71003101 ENEL ENERGIE MUNTENIA  BUCURESTI RO 41196811 valoare tranzactie: 77.06 RON RRN:813009844291   comision tranzactie 0.00 RON;\",746NVPO1813200BQ,\"-77.06\",,\"-396.66\"";
+        String first = "2018-05-16,2018-05-16,\"Plata la POS non-BT cu card VISA;POS 12/05/2018 320220120000    TID:20221206 ECONOMAT SECTOR 5 NR  BUCURESTI RO 41196811 valoare tranzactie: 19.74 RON RRN:813207877600   comision tranzactie 0.00 RON;\",746NVPO18136001O,\"-19.74\",,\"-439.22\"";
         String second = "2018-06-07,2018-06-07,\"Incasare OP;/ROC/acoperire card credit BT//RFB/;Golea Marian;RO36INGB0000999903905289;INGBROBU\",000IACH18158C1CS,,\"5,600.00\",\"46.80\"";
         String third = "2018-07-06,2018-07-06,\"Transfer pentru recuperare restante la creditele/debitele in sold\",746ZBTR181875579,\"-1.00\",,\"59.18\"";
+        lines.add(first);
+        lines.add(second);
+        lines.add(third);
         lines.add("Pointless");
         return lines;
     }

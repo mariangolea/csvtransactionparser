@@ -41,10 +41,10 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
-    public void testSimpleDataING() throws IOException {
+    public void testSimpleDataBT() throws IOException {
         // Initializes the enum values, helps unit test batch cover the momentarily dumb
         // enum.
-        File mockCSV = utils.writeCSVFile(Bank.BT, folder.newFile("testUI.csv"));
+        File mockCSV = utils.writeCSVFile(Bank.BT, folder.newFile("testUI.csv"), utils.constructMockCSVContentForBank(Bank.BT));
         assertTrue(mockCSV != null);
         CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(mockCSV);
         // tests in other files ensure response integrity, no need to do that in here.
@@ -67,8 +67,6 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
                 } else if (tick == 1) {
                     assertTrue(getInstertedString(e).startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILE));
                     feedbackPane.getDocument().removeDocumentListener(this);
-                    assertTrue(inModel != null && inModel.size() == 1);
-                    assertTrue(outModel != null && outModel.size() == 8);
                     stopCondition.stop = true;
                 }
             }
@@ -103,6 +101,8 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
                 Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        assertTrue(inModel != null && inModel.size() == 1);
+        assertTrue(outModel != null && outModel.size() == 2);
     }
 
     private class StopCondition {

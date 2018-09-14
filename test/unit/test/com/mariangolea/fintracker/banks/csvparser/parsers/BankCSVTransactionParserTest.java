@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import java.util.List;
 
@@ -28,6 +29,9 @@ public class BankCSVTransactionParserTest {
 
     @Test
     public void testBasicRoundTripText() throws IOException {
+        CsvFileParseResponse response = parser.parseTransactions(null);
+        assertTrue(response == null);
+        
         // will be written to and read from a csv file.
         String[] mockLines = {"One", "Two"};
         File csvFile = utils.writeCSVFile(Bank.BT, folder.newFile("file.csv"), mockLines);

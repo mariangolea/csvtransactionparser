@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
@@ -29,11 +28,11 @@ public final class BankCSVTransactionParser {
      * @return parse response, may be null.
      */
     public CsvFileParseResponse parseTransactions(final File file) {
-        List<String> lines = loadCSVFile(file);
         CsvFileParseResponse fileResponse = null;
-        if (lines == null) {
+        if (file == null){
             return fileResponse;
         }
+        List<String> lines = loadCSVFile(file);
 
         Bank bank = recognizeBank(lines);
         if (bank != null) {

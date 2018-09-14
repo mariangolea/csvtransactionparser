@@ -149,7 +149,7 @@ public class INGParser extends AbstractBankParser {
             return null;
         }
 
-        String title = operation == null ? desc : operation.desc;
+        String title = operation.desc;
         int detailsLinesNumber = toConsume.size() - 1;
         String details = "";
         if (detailsLinesNumber > 0) {

@@ -39,6 +39,7 @@ public class TestUtilities {
         List<String> texts = new ArrayList<>();
         texts.add("Gibberish");
         texts.add("More Gibberish");
+        texts.add(bank.transactionsNumberLabel + "," + 2 + " Tranzactii.");
         texts.add(bank.relevantContentHeaderLine);
         List<String> mockData = constructSimplestPositiveLinesInput(bank);
         for (String line : mockData) {

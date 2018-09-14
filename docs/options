@@ -1,23 +1,23 @@
 -classpath
-'C:/Users/m15743/.m2/repository/org/apache/commons/commons-csv/1.5/commons-csv-1.5.jar'
+'C:/Users/Marian/.m2/repository/org/apache/commons/commons-csv/1.5/commons-csv-1.5.jar'
 -encoding
 'Cp1252'
 -protected
 -sourcepath
-'C:/Personal/Programming/PDF_Parser/pdfparsergithub/pdftransactionparser/src'
+'D:/Projects/GIT_Repos/pdftransactionparser/src'
 -author
 -bottom
 'Copyright &#169; 2018. All rights reserved.'
 -charset
 'UTF-8'
 -d
-'C:/Personal/Programming/PDF_Parser/pdfparsergithub/pdftransactionparser/docs'
+'D:/Projects/GIT_Repos/pdftransactionparser/docs'
 -docencoding
 'UTF-8'
 -doctitle
 'BankCsvParser 0.0.1-SNAPSHOT API'
 -linkoffline
-'https://docs.oracle.com/javase/8/docs/api' 'C:/Personal/Programming/PDF_Parser/pdfparsergithub/pdftransactionparser/target/javadoc-bundle-options'
+'https://docs.oracle.com/javase/8/docs/api' 'D:/Projects/GIT_Repos/pdftransactionparser/target/javadoc-bundle-options'
 -use
 -version
 -windowtitle

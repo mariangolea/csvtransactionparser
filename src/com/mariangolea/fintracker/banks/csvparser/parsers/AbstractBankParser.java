@@ -200,10 +200,10 @@ public abstract class AbstractBankParser {
 
     public BigDecimal parseAmount(final String amountString) {
         BigDecimal amount = amountString == null ? null : parsedAmounts.get(amountString);
-        if (amount != null){
+        if (amount != null) {
             return amount;
         }
-        
+
         try {
             Number attempt = numberFormat.parse(amountString);
             if (null != attempt) {
@@ -212,10 +212,8 @@ public abstract class AbstractBankParser {
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if (amount !=null){
-            parsedAmounts.put(amountString, amount);
-        }
+
+        parsedAmounts.put(amountString, amount == null ? BigDecimal.ZERO : amount);
         return amount;
     }
 

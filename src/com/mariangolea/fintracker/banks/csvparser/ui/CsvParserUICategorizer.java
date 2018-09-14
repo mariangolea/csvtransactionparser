@@ -42,8 +42,8 @@ public class CsvParserUICategorizer extends JPanel {
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
     private UserPreferences userPrefs;
 
-    protected static final String START_PARSE_MESSAGE = "Started parsing the selected CSV file ...";
-    protected static final String FINISHED_PARSING_CSV_FILE = "Finished parsing the CSV file: ";
+    protected static final String START_PARSE_MESSAGE = "Started parsing the selected CSV files ...";
+    protected static final String FINISHED_PARSING_CSV_FILES = "Finished parsing the CSV files: ";
 
     public CsvParserUICategorizer() {
         userPrefs = preferences.loadUserPreferences();
@@ -171,19 +171,20 @@ public class CsvParserUICategorizer extends JPanel {
     private void popCSVFileChooser() {
         String inputFolder = userPrefs.getCSVInputFolder();
         JFileChooser chooser = new JFileChooser(inputFolder);
+        chooser.setMultiSelectionEnabled(true);
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "CSV file extensions only", "csv", "ps");
         chooser.setFileFilter(filter);
         int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File csvFile = chooser.getSelectedFile();
-            userPrefs.setCSVInputFolder(csvFile.getParent());
+            File[] csvFiles = chooser.getSelectedFiles();
+            userPrefs.setCSVInputFolder(csvFiles[0].getParent());
             preferences.storePreferences(userPrefs);
-            startParsingCsvFile(csvFile);
+            startParsingCsvFile(csvFiles);
         }
     }
 
-    protected void startParsingCsvFile(final File csvFile) {
+    protected void startParsingCsvFile(final File[] csvFiles) {
         try {
             feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), START_PARSE_MESSAGE, null);
         } catch (BadLocationException ex) {
@@ -192,10 +193,16 @@ public class CsvParserUICategorizer extends JPanel {
         SwingUtilities.invokeLater(() -> {
             BankCSVTransactionParser fac = new BankCSVTransactionParser();
             final List<CsvFileParseResponse> res = new ArrayList<>();
-            res.add(fac.parseTransactions(csvFile));
+            for (File csvFile : csvFiles) {
+                res.add(fac.parseTransactions(csvFile));
+            }
             SwingUtilities.invokeLater(() -> {
                 try {
-                    feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), FINISHED_PARSING_CSV_FILE + csvFile.getAbsolutePath(), null);
+                    String endParseMessage = FINISHED_PARSING_CSV_FILES;
+                    for (File parsed : csvFiles){
+                        endParseMessage += "\t" + parsed.getAbsolutePath() + "\n";
+                    }
+                    feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), endParseMessage, null);
                     loadData(res);
                     this.parsedTransactionsCopy.clear();
                     this.parsedTransactionsCopy.addAll(res);

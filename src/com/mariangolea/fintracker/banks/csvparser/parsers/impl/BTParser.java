@@ -105,13 +105,16 @@ public class BTParser extends AbstractBankParser {
         OperationID operation = OperationID.getOperationID(temp.trim());
         String title = operation == null ? temp.trim() : operation.desc;
 
-        int amountIndex = operation == OperationID.INCASARE ? 5 : 4;
-        temp = record.get(amountIndex);
-        if (temp == null) {
-            return null;
+        BankTransaction.Type type = BankTransaction.Type.OUT;
+        temp = record.get(4);
+        if (temp == null || temp.isEmpty()) {
+            temp = record.get(5);
+            type = BankTransaction.Type.IN;
         }
         BigDecimal amount = parseAmount(temp.trim());
-        BankTransaction.Type type = OperationID.INCASARE == operation ? BankTransaction.Type.IN : BankTransaction.Type.OUT;
+        if (amount == null){
+            return null;
+        }
         boolean companyDescFound = false;
         boolean amountValdationSuccess = false;
 

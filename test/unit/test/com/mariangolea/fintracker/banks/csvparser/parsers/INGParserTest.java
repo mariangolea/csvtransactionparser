@@ -66,7 +66,7 @@ public class INGParserTest extends INGParser{
         assertTrue("Amount parsing failed.", (float) 1195.6 == output.floatValue());
 
         output = parseAmount("gibberish");
-        assertTrue(output == null);
+        assertTrue(output == BigDecimal.ZERO);
     }
 
     @Test

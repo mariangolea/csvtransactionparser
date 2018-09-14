@@ -127,16 +127,16 @@ public class INGParser extends AbstractBankParser {
         }
 
         String temp = record.get(0);
-        if (temp == null) {
+        Date completedDate = parseCompletedDate(temp.trim());
+        if (completedDate == null){
             return null;
         }
-        Date completedDate = parseCompletedDate(temp.trim());
         Date startedDate = completedDate;
         String desc = record.get(3);
-        if (desc == null) {
+        OperationID operation = OperationID.getOperationID(desc);
+        if (operation == null){
             return null;
         }
-        OperationID operation = OperationID.getOperationID(desc);
         
         BankTransaction.Type type = BankTransaction.Type.OUT;
         int amountIndex = 5;

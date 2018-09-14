@@ -6,14 +6,17 @@
 package test.com.mariangolea.fintracker.banks.csvparser.parsers;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,6 +90,34 @@ public class INGParserTest extends INGParser{
     public void testMethodsBasic() {
         assertTrue(getListOfSupportedTransactionIDs() != null);
         assertTrue(findNextTransactionLineIndex(null) == -1);
+        
+        List<String> impropper = new ArrayList<>();
+        impropper.add("12 septembrie 2018,,,Cumparare POS,,\"\",");
+        
+        BankTransaction trans = parseTransaction(impropper);
+        assertTrue(trans == null);
+        
+        impropper.clear();
+        impropper.add("12 septembrie 2018,,,,,\"\",");
+        trans = parseTransaction(impropper);
+        assertTrue(trans == null);
+        
+        impropper.clear();
+        impropper.add("12 kashmir 2018,,,,,\"\",");
+        trans = parseTransaction(impropper);
+        assertTrue(trans == null);
+
+
+        impropper.clear();
+        impropper.add(",,,\"\",");
+        trans = parseTransaction(impropper);
+        assertTrue(trans == null);
+
+                impropper.clear();
+        impropper.add("12 kashmir 2018,,,,,\"\",");
+        trans = parseTransaction(impropper);
+        assertTrue(trans == null);
+
     }
 
 }

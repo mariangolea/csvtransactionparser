@@ -65,7 +65,7 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
                     assertTrue(CsvParserUICategorizer.START_PARSE_MESSAGE.equals(getInstertedString(e)));
                     tick++;
                 } else if (tick == 1) {
-                    assertTrue(getInstertedString(e).startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILE));
+                    assertTrue(getInstertedString(e).startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILES));
                     feedbackPane.getDocument().removeDocumentListener(this);
                     stopCondition.stop = true;
                 }
@@ -92,7 +92,7 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
                 return res;
             }
         });
-        startParsingCsvFile(utils.writeCSVFile(Bank.BT, folder.newFile("test.csv")));
+        startParsingCsvFiles(new File[]{utils.writeCSVFile(Bank.BT, folder.newFile("test.csv"))});
 
         while (!stopCondition.stop) {
             try {

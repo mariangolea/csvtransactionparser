@@ -2,7 +2,6 @@ package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
@@ -180,11 +179,11 @@ public class CsvParserUICategorizer extends JPanel {
             File[] csvFiles = chooser.getSelectedFiles();
             userPrefs.setCSVInputFolder(csvFiles[0].getParent());
             preferences.storePreferences(userPrefs);
-            startParsingCsvFile(csvFiles);
+            startParsingCsvFiles(csvFiles);
         }
     }
 
-    protected void startParsingCsvFile(final File[] csvFiles) {
+    protected void startParsingCsvFiles(final File[] csvFiles) {
         try {
             feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), START_PARSE_MESSAGE, null);
         } catch (BadLocationException ex) {

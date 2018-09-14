@@ -170,7 +170,7 @@ public class UserPreferencesHandler {
                 }
             }
             FileWriter writer = new FileWriter(propertiesFile);
-            userPrefsFile.store(writer, COMMENTS);
+            companyNamesFile.store(writer, COMMENTS);
             writer.close();
             success.set(true);
 

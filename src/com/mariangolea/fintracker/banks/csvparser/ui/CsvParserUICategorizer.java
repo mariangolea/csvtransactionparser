@@ -55,19 +55,21 @@ public class CsvParserUICategorizer extends JPanel {
         outModel.addListDataListener(new TransactionGroupListSelectionListener(outListView, outResponseLabel));
         outListView.addListSelectionListener(new TransactionGroupListSelectionListener(outListView, outResponseLabel));
 
-        parsedTransactions.forEach(csvFileResponse -> {
-            csvFileResponse.parsedTransactionGroups.forEach(transactionGroup -> {
-                switch (transactionGroup.getType()) {
-                    case IN:
-                        inModel.addElement(transactionGroup);
-                        break;
-                    case OUT:
-                        outModel.addElement(transactionGroup);
-                        break;
-                }
+        if (parsedTransactions != null) {
+            parsedTransactions.forEach(csvFileResponse -> {
+                csvFileResponse.parsedTransactionGroups.forEach(transactionGroup -> {
+                    switch (transactionGroup.getType()) {
+                        case IN:
+                            inModel.addElement(transactionGroup);
+                            break;
+                        case OUT:
+                            outModel.addElement(transactionGroup);
+                            break;
+                    }
+                });
+                appendReportText(csvFileResponse);
             });
-            appendReportText(csvFileResponse);
-        });
+        }
     }
 
     private void appendReportText(CsvFileParseResponse fileResponse) {
@@ -193,12 +195,15 @@ public class CsvParserUICategorizer extends JPanel {
             BankCSVTransactionParser fac = new BankCSVTransactionParser();
             final List<CsvFileParseResponse> res = new ArrayList<>();
             for (File csvFile : csvFiles) {
-                res.add(fac.parseTransactions(csvFile));
+                CsvFileParseResponse response = fac.parseTransactions(csvFile);
+                if (response != null) {
+                    res.add(response);
+                }
             }
             SwingUtilities.invokeLater(() -> {
                 try {
                     String endParseMessage = FINISHED_PARSING_CSV_FILES;
-                    for (File parsed : csvFiles){
+                    for (File parsed : csvFiles) {
                         endParseMessage += "\t" + parsed.getAbsolutePath() + "\n";
                     }
                     feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), endParseMessage, null);

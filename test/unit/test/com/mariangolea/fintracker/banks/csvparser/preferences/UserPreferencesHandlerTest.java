@@ -42,6 +42,7 @@ public class UserPreferencesHandlerTest {
         group.addAssociations("first", new HashSet<>(Arrays.asList("1", "2")));
         group.addAssociations("swift", new HashSet<>(Arrays.asList("1", "2")));
         prefs.addDefinition("category1", group);
+        prefs.setTransactionDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.
         boolean stored = handler.storePreferences(prefs);

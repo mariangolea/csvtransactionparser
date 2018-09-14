@@ -29,6 +29,14 @@ public class BankTransactionDefaultGroup extends BankTransactionAbstractGroup {
         super(transactionGroupIdentifier, type);
     }
 
+        @Override
+    public int getTransactionsNumber() {
+        int number = 0;
+        
+        number = transactions.values().stream().map((list) -> list.size()).reduce(number, Integer::sum);
+        return number;
+    }
+    
     @Override
     public final void addTransactionImpl(final BankTransaction parsedTransaction) {
         List<BankTransaction> existing = transactions.get(parsedTransaction.getDescription());

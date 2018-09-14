@@ -26,6 +26,11 @@ public final class BankTransactionCompanyGroup extends BankTransactionAbstractGr
     }
 
     @Override
+    public int getTransactionsNumber() {
+        return list.size();
+    }
+
+    @Override
     public void addTransactionImpl(final BankTransaction transaction) {
         list.add(transaction);
     }

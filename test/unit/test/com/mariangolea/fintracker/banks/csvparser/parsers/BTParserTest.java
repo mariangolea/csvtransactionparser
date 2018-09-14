@@ -66,7 +66,7 @@ public class BTParserTest extends BTParser {
         assertTrue("Amount parsing failed.", (float) 1195.6 == output.floatValue());
 
         output = parseAmount("gibberish");
-        assertTrue(output == null);
+        assertTrue(output == BigDecimal.ZERO);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class BTParserTest extends BTParser {
         assertTrue(null != response);
 
         // we expect a unrecognized string.
-        assertTrue(!response.allOK);
+        assertTrue(!response.allCsvContentProcessed);
         assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
     }
 

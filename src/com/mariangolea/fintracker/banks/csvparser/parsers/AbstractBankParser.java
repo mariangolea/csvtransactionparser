@@ -37,7 +37,7 @@ public abstract class AbstractBankParser {
     public static final Locale ROMANIAN_LOCALE = new Locale.Builder().setLanguage("ro").setRegion("RO")
             .setLanguageTag("ro-RO").build();
 
-    public static String UNRECOGNIZED_TRANSACTION = "Unrecognized Transaction";
+    public static final String UNRECOGNIZED_TRANSACTION = "Unrecognized Transaction";
 
     private final NumberFormat numberFormat;
     private final DateFormat startDateFormat;
@@ -69,7 +69,11 @@ public abstract class AbstractBankParser {
     public abstract BankTransaction parseTransaction(List<String> toConsume);
 
     public abstract int findNextTransactionLineIndex(List<String> toConsume);
-
+    
+    public Bank getBank(){
+        return bank;
+    }
+    
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
         Map<String, List<BankTransaction>> result = new HashMap<>();
         for (String operation : getListOfSupportedTransactionIDs()) {
@@ -84,7 +88,7 @@ public abstract class AbstractBankParser {
         }
 
         //find out transactions number if possible.
-        BigDecimal expectedTransactions = searchTransactionsNumber(transactionsIndex, toConsume);
+        final BigDecimal expectedTransactions = searchTransactionsNumber(transactionsIndex, toConsume);
 
         //remove header lines up to first transaction
         toConsume = toConsume.subList(transactionsIndex + 1, toConsume.size());
@@ -92,6 +96,7 @@ public abstract class AbstractBankParser {
         List<String> unrecognizedStrings = new ArrayList<>();
         BankTransaction transaction;
         int consumedLines;
+        int foundTransactionsNumber = 0;
         while (!toConsume.isEmpty()) {
             int nextTransactionIndex = findNextTransactionLineIndex(toConsume);
             List<String> transactionLines = toConsume;
@@ -107,6 +112,7 @@ public abstract class AbstractBankParser {
                 }
                 consumedLines = transactionLines.size();
             } else {
+                foundTransactionsNumber++;
                 List<BankTransaction> recognized = result.get(transaction.getTitle());
                 if (recognized != null) {
                     recognized.add(transaction);
@@ -129,8 +135,8 @@ public abstract class AbstractBankParser {
                 groups.add(group);
             }
         });
-
-        return new CsvFileParseResponse(file, groups, unrecognizedStrings);
+        
+        return new CsvFileParseResponse(this, expectedTransactions.intValue(), foundTransactionsNumber, file, groups, unrecognizedStrings);
     }
 
     private BigDecimal searchTransactionsNumber(int transactionsIndex, List<String> toConsume) {
@@ -212,8 +218,11 @@ public abstract class AbstractBankParser {
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        parsedAmounts.put(amountString, amount == null ? BigDecimal.ZERO : amount);
+        
+        if (amount == null){
+            amount = BigDecimal.ZERO;
+        }
+        parsedAmounts.put(amountString, amount);
         return amount;
     }
 

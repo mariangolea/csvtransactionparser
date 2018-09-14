@@ -145,7 +145,7 @@ public class INGParser extends AbstractBankParser {
             type = BankTransaction.Type.IN;
         }
         BigDecimal amount =  parseAmount(record.get(amountIndex));
-        if (amount == null) {
+        if (amount == BigDecimal.ZERO) {
             return null;
         }
 

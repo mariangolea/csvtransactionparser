@@ -48,7 +48,9 @@ public abstract class BankTransactionAbstractGroup {
     public BigDecimal getTotalAmount() {
         return amount;
     }
-
+    
+    public abstract int getTransactionsNumber();
+    
     public BankTransaction.Type getType() {
         return type;
     }

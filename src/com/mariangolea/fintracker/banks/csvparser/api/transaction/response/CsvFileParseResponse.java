@@ -3,6 +3,7 @@ package com.mariangolea.fintracker.banks.csvparser.api.transaction.response;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionUtils;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
+import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,19 +20,34 @@ import java.util.Objects;
 public class CsvFileParseResponse {
 
     public final File csvFile;
-    public final boolean allOK;
+    //true if there are no unprocessed strings.
+    public final boolean allCsvContentProcessed;
+    public final int expectedTransactionsNumber;
+    public final int foundTransactionsNumber;
     public final List<BankTransactionAbstractGroup> parsedTransactionGroups = new ArrayList<>();
     public final List<String> unprocessedStrings = new ArrayList<>();
+    public final AbstractBankParser parserUsed;
 
     private final BankTransactionUtils utils = new BankTransactionUtils();
 
-    public CsvFileParseResponse(final File csvFile, final List<BankTransactionDefaultGroup> groups, final List<String> unprocessedStrings) {
+    public CsvFileParseResponse(
+            AbstractBankParser parserUsed, 
+            int expectedTransactionsNumber,
+            int foundTransactionsNumber,
+            final File csvFile,
+            final List<BankTransactionDefaultGroup> groups,
+            final List<String> unprocessedStrings) {
         Objects.requireNonNull(csvFile);
         Objects.requireNonNull(groups);
         Objects.requireNonNull(unprocessedStrings);
+        Objects.requireNonNull(parserUsed);
+        this.parserUsed = parserUsed;
         this.csvFile = csvFile;
         this.unprocessedStrings.addAll(unprocessedStrings);
-        allOK = unprocessedStrings == null || unprocessedStrings.isEmpty();
         parsedTransactionGroups.addAll(utils.processTransactions(groups));
+        this.expectedTransactionsNumber = expectedTransactionsNumber;
+        this.foundTransactionsNumber = foundTransactionsNumber;
+
+        allCsvContentProcessed = unprocessedStrings == null || unprocessedStrings.isEmpty();
     }
 }

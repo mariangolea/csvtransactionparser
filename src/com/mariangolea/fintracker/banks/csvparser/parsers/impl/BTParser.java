@@ -112,7 +112,7 @@ public class BTParser extends AbstractBankParser {
             type = BankTransaction.Type.IN;
         }
         BigDecimal amount = parseAmount(temp.trim());
-        if (amount == null){
+        if (amount == BigDecimal.ZERO){
             return null;
         }
         boolean companyDescFound = false;

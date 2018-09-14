@@ -61,11 +61,12 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
 
             @Override
             public void insertUpdate(DocumentEvent e) {
+                String insertedString = getInstertedString(e);
                 if (tick == 0) {
-                    assertTrue(CsvParserUICategorizer.START_PARSE_MESSAGE.equals(getInstertedString(e)));
+                    assertTrue(insertedString.contains(CsvParserUICategorizer.START_PARSE_MESSAGE));
                     tick++;
                 } else if (tick == 1) {
-                    assertTrue(getInstertedString(e).startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILES));
+                    assertTrue(insertedString.startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILES));
                     feedbackPane.getDocument().removeDocumentListener(this);
                     stopCondition.stop = true;
                 }

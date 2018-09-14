@@ -69,7 +69,7 @@ public class INGParserTest extends INGParser{
         assertTrue("Amount parsing failed.", (float) 1195.6 == output.floatValue());
 
         output = parseAmount("gibberish");
-        assertTrue(output == null);
+        assertTrue(output == BigDecimal.ZERO);
     }
 
     @Test
@@ -81,8 +81,8 @@ public class INGParserTest extends INGParser{
         CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(csvFile);
         assertTrue(null != response);
 
-        // ING CSV files are dumber than BT ones. They end with a signature text whic is irrelevant, but no way of taking it out programtically...
-        assertTrue(response.allOK);
+        // ING CSV files are dumber than BT ones. They end with a signature text which is irrelevant, but no way of taking it out programtically...
+        assertTrue(response.unprocessedStrings.isEmpty());
         assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
     }
 

@@ -14,12 +14,22 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.HTML;
 
 /**
  * Adding up countless small time transactions in a single category is boring.
@@ -30,7 +40,7 @@ import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED;
  */
 public class CsvParserUICategorizer extends JPanel {
 
-    protected final JTextPane feedbackPane = new JTextPane();
+    protected final JEditorPane feedbackPane = new JTextPane();
     private final JTextPane inResponseLabel = new JTextPane();
     private final JTextPane outResponseLabel = new JTextPane();
     protected final DefaultListModel<BankTransactionAbstractGroup> inModel = new DefaultListModel<>();
@@ -39,7 +49,8 @@ public class CsvParserUICategorizer extends JPanel {
     private JList<BankTransactionAbstractGroup> outListView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
-    private UserPreferences userPrefs;
+    private final UserPreferences userPrefs;
+    private final List<File> parsedCsvFiles = new ArrayList<>();
 
     protected static final String START_PARSE_MESSAGE = "Started parsing the selected CSV files ...";
     protected static final String FINISHED_PARSING_CSV_FILES = "Finished parsing the CSV files: ";
@@ -67,24 +78,7 @@ public class CsvParserUICategorizer extends JPanel {
                             break;
                     }
                 });
-                appendReportText(csvFileResponse);
             });
-        }
-    }
-
-    private void appendReportText(CsvFileParseResponse fileResponse) {
-        if (fileResponse.allOK) {
-            return;
-        }
-        String multiLine = "Found errors when parsing file: \r\n" + fileResponse.csvFile.getAbsolutePath() + "\r\n";
-        for (String line : fileResponse.unprocessedStrings) {
-            multiLine += line + "\r\n";
-        }
-
-        try {
-            feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), multiLine, null);
-        } catch (BadLocationException ex) {
-            Logger.getLogger(CsvParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -182,15 +176,12 @@ public class CsvParserUICategorizer extends JPanel {
             userPrefs.setCSVInputFolder(csvFiles[0].getParent());
             preferences.storePreferences(userPrefs);
             startParsingCsvFiles(csvFiles);
+            parsedCsvFiles.addAll(Arrays.asList(csvFiles));
         }
     }
 
     protected void startParsingCsvFiles(final File[] csvFiles) {
-        try {
-            feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), START_PARSE_MESSAGE, null);
-        } catch (BadLocationException ex) {
-            Logger.getLogger(CsvParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        appendReportMessage(START_PARSE_MESSAGE);
         SwingUtilities.invokeLater(() -> {
             BankCSVTransactionParser fac = new BankCSVTransactionParser();
             final List<CsvFileParseResponse> res = new ArrayList<>();
@@ -201,19 +192,14 @@ public class CsvParserUICategorizer extends JPanel {
                 }
             }
             SwingUtilities.invokeLater(() -> {
-                try {
-                    String endParseMessage = FINISHED_PARSING_CSV_FILES;
-                    for (File parsed : csvFiles) {
-                        endParseMessage += "\t" + parsed.getAbsolutePath() + "\n";
-                    }
-                    feedbackPane.getStyledDocument().insertString(feedbackPane.getStyledDocument().getLength(), endParseMessage, null);
-                    loadData(res);
-                    this.parsedTransactionsCopy.clear();
-                    this.parsedTransactionsCopy.addAll(res);
-
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(CsvParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                String endParseMessage = FINISHED_PARSING_CSV_FILES;
+                appendReportMessage(FINISHED_PARSING_CSV_FILES);
+                loadData(res);
+                res.forEach((response) -> {
+                    appendReportText(response);
+                });
+                this.parsedTransactionsCopy.clear();
+                this.parsedTransactionsCopy.addAll(res);
             });
         });
     }
@@ -240,6 +226,79 @@ public class CsvParserUICategorizer extends JPanel {
         JScrollPane scrollPane = new JScrollPane(feedbackPane);
         scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Feedback", TitledBorder.CENTER, TitledBorder.TOP));
+        feedbackPane.addHyperlinkListener((final HyperlinkEvent e) -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
+                try {
+                    File localFile = new File(e.getURL().toURI());
+                    java.awt.Desktop.getDesktop().open(localFile);
+                } catch (IOException | URISyntaxException ex) {
+                    Logger.getLogger(CsvParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
         return scrollPane;
+    }
+
+    private void appendReportText(CsvFileParseResponse fileResponse) {
+        appendHyperlinkToFile("\n", fileResponse.csvFile, ": ");
+        if (fileResponse.allCsvContentProcessed && fileResponse.expectedTransactionsNumber == fileResponse.foundTransactionsNumber) {
+            appendReportMessage("ALL OK!");
+        } else if (!fileResponse.allCsvContentProcessed) {
+            String message = "Find below CSV content lines unprocessed.\n";
+            for (String line : fileResponse.unprocessedStrings) {
+                message += "\t" + line;
+            }
+            appendReportMessage(message);
+        } else {
+            if (fileResponse.expectedTransactionsNumber == 0) {
+                //coould not validate because CSV content did not specify an expected amount.
+                appendReportMessage("CSV content did not specify a expected amount. Parser found " + fileResponse.foundTransactionsNumber + " transactions.");
+            } else {
+                appendReportMessage("Mismatch between expected and found transaction numbers (expected: " + fileResponse.expectedTransactionsNumber + ", found: " + fileResponse.foundTransactionsNumber + ").");
+            }
+        }
+    }
+
+    private boolean appendHyperlinkToFile(final String pre, final File sourceFile, final String post) {
+        if (sourceFile == null) {
+            return true;
+        }
+        Document doc = feedbackPane.getDocument();
+        try {
+            if (pre != null && !pre.isEmpty()) {
+                doc.insertString(doc.getLength(), pre, null);
+            }
+
+            SimpleAttributeSet attrs = new SimpleAttributeSet();
+            StyleConstants.setUnderline(attrs, true);
+            StyleConstants.setForeground(attrs, Color.BLUE);
+            attrs.addAttribute(sourceFile.getAbsolutePath(), parsedCsvFiles.indexOf(sourceFile));
+            attrs.addAttribute(HTML.Attribute.HREF, sourceFile.toURI().toURL());
+            doc.insertString(doc.getLength(), sourceFile.getName(), attrs);
+
+            if (post != null && !post.isEmpty()) {
+                doc.insertString(doc.getLength(), post, null);
+            }
+
+            return true;
+        } catch (MalformedURLException | BadLocationException ex) {
+            Logger.getLogger(CsvParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    private boolean appendReportMessage(final String message) {
+        if (message == null) {
+            return true;
+        }
+        Document doc = feedbackPane.getDocument();
+        try {
+            doc.insertString(doc.getLength(), message + "\n", null);
+            return true;
+        } catch (BadLocationException ex) {
+            Logger.getLogger(CsvParserUICategorizer.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
     }
 }

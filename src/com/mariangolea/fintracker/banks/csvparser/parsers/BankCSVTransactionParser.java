@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
@@ -57,31 +58,21 @@ public final class BankCSVTransactionParser {
      * @return may be null;
      */
     public List<String> loadCSVFile(final File csvFile) {
-        List<String> response = null;
-        BufferedReader csvReader = null;
-        try {
-            csvReader = new BufferedReader(new FileReader(csvFile));
-            response = new ArrayList<>();
+        final List<String> response= new ArrayList<>();
+        try (BufferedReader csvReader = new BufferedReader(new FileReader(csvFile))){
             String tempLine;
             while ((tempLine = csvReader.readLine()) != null) {
                 response.add(tempLine);
             }
-        } catch (IOException ex) {
+        } catch (IOException ex) { 
             Logger.getLogger(BankCSVTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
-            
-        } finally{
-            try {
-                if (csvReader != null) csvReader.close();
-            } catch (IOException ex) {
-                Logger.getLogger(BankCSVTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
-
+        
         return response;
     }
 
     public Bank recognizeBank(List<String> fileLines) {
-        int index = 0;
+        int index;
         for (Bank bank : Bank.values()) {
             index = fileLines.indexOf(bank.relevantContentHeaderLine);
             if (index >= 0) {

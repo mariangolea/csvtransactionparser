@@ -10,9 +10,9 @@ import javax.swing.*;
  * @author mariangolea@gmail.com
  */
 public class BankCsvReportsParser {
-
-    public static void main(String[] args) {
-        CsvParserUICategorizer panel = new CsvParserUICategorizer();
+    private final CsvParserUICategorizer panel = new CsvParserUICategorizer();
+    
+    public JFrame initFrame(){
         JFrame frame = new JFrame();
         frame.setTitle("Bank Transactions Merger");
         frame.setJMenuBar(panel.createMenu());
@@ -20,6 +20,13 @@ public class BankCsvReportsParser {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+        
+        return frame;
+    }
+    
+    public static void main(String[] args) {
+        BankCsvReportsParser parser = new BankCsvReportsParser();
+        JFrame frame = parser.initFrame();
         frame.setVisible(true);
     }
 }

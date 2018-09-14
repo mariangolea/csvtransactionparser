@@ -7,7 +7,6 @@ package test.com.mariangolea.fintracker.banks.csvparser.api;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -83,7 +82,8 @@ public class BankTransactionCompanyGroupTest {
         second.getCsvContent().add("hello");
         assertTrue(!secondGroup.equals(firstGroup));
         assertTrue(secondGroup.hashCode() != firstGroup.hashCode());
-
+        assertTrue(secondGroup.equals(secondGroup));
+        assertTrue(!secondGroup.equals(null));
     }
 
 }

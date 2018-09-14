@@ -1,6 +1,6 @@
-[![CircleCI](https://circleci.com/gh/mariangolea/csvtransactionparser/tree/master.svg?style=svg)](https://circleci.com/gh/mariangolea/csvtransactionparser/tree/master)
-[![SonarCloud](https://sonarcloud.io/api/project_badges/quality_gate?project=BankCsvParser%3ABankCsvParser)](https://sonarcloud.io/dashboard?id=BankCsvParser%3ABankCsvParser)
-[![JavaDoc](/docs/javadoc.png)](https://mariangolea.github.io/csvtransactionparser/)
+&emsp;[![JavaDoc](docs/javadoc.png)](https://mariangolea.github.io/csvtransactionparser/)
+&emsp;[![CircleCI](https://circleci.com/gh/mariangolea/csvtransactionparser/tree/master.svg?style=svg)](https://circleci.com/gh/mariangolea/csvtransactionparser/tree/master)
+&emsp;[![SonarCloud](https://sonarcloud.io/api/project_badges/quality_gate?project=BankCsvParser%3ABankCsvParser)](https://sonarcloud.io/dashboard?id=BankCsvParser%3ABankCsvParser)
 
 
 # csvtransactionparser

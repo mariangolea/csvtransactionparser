@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mariangolea.fintracker.banks.csvparser.parsers;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
@@ -28,15 +23,21 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 /**
- * Common behavior of all bank csv parsers.
+ * Parent of all bank CSV report parsers.
  *
  * @author Marian Golea <mariangolea@gmail.com>
  */
 public abstract class AbstractBankParser {
 
+    /**
+    Romanian is not a Locale offered by default. This is how it can be obtained.
+     */
     public static final Locale ROMANIAN_LOCALE = new Locale.Builder().setLanguage("ro").setRegion("RO")
             .setLanguageTag("ro-RO").build();
 
+    /**
+    Identifier string for unrecognised transactions. Used as a key in constructed transaction groups.
+     */
     public static final String UNRECOGNIZED_TRANSACTION = "Unrecognized Transaction";
 
     private final NumberFormat numberFormat;
@@ -48,10 +49,23 @@ public abstract class AbstractBankParser {
     private final Map<String, Date> parsedStartedDates = new HashMap<>();
     private final Map<String, BigDecimal> parsedAmounts = new HashMap<>();
 
+    /**
+    Construct a instance of this class.
+    @param bank bank data used to identify transactions.
+    @param startDateFormat start dates vary in their string representation, especially for romanian locale.
+    @param numberFormat number format, also weird for Romanian.
+     */
     public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final NumberFormat numberFormat) {
         this(bank, startDateFormat, DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE), numberFormat);
     }
 
+    /**
+    Construct a instance of this class.
+    @param bank bank data used to identify transactions.
+    @param startDateFormat start dates vary in their string representation, especially for romanian locale.
+    @param completedDateFormat completed date format
+    @param numberFormat number format, also weird for Romanian.
+     */
     public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final DateFormat completedDateFormat,
             final NumberFormat numberFormat) {
         Objects.requireNonNull(startDateFormat);
@@ -64,16 +78,41 @@ public abstract class AbstractBankParser {
         this.completedDateFormat = completedDateFormat;
     }
 
+    /**
+    Each parser has a hard coded list of transaction descriptions it can use to help it know what and where to parse from.
+    @return list of transaction descriptions that only inheritors are aware of.
+     */
     public abstract List<String> getListOfSupportedTransactionIDs();
 
+    /**
+    Parse a {@link BankTransaction} instance out of the received list of CSV record strings.
+    @param toConsume string list representation of this transaction in CSV file.
+    @return 
+     */
     public abstract BankTransaction parseTransaction(List<String> toConsume);
 
+    /**
+    Look ahead in the remaining list of CSV strings and identify the starting index of next transaction.
+    @param toConsume rest of CSV data for this file.
+    @return 
+     */
     public abstract int findNextTransactionLineIndex(List<String> toConsume);
-    
-    public Bank getBank(){
+
+    /**
+    Get the Bank data that this parser works with.
+    @return 
+     */
+    public Bank getBank() {
         return bank;
     }
-    
+
+    /**
+    Read the whole list of strings which represent the File object next to it,
+    and create a response containing all parsed transactions.
+    @param split
+    @param file
+    @return 
+     */
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
         Map<String, List<BankTransaction>> result = new HashMap<>();
         for (String operation : getListOfSupportedTransactionIDs()) {
@@ -135,7 +174,7 @@ public abstract class AbstractBankParser {
                 groups.add(group);
             }
         });
-        
+
         return new CsvFileParseResponse(this, expectedTransactions.intValue(), foundTransactionsNumber, file, groups, unrecognizedStrings);
     }
 
@@ -170,6 +209,12 @@ public abstract class AbstractBankParser {
         return -1;
     }
 
+    /**
+    Parse the completed date for a transaction.
+    <br> Method uses a cache to prevent parsing when not needed.
+    @param dateString
+    @return 
+     */
     public Date parseCompletedDate(final String dateString) {
         Date completedDate = dateString == null ? null : parsedCompletedDates.get(dateString);
         if (completedDate != null) {
@@ -187,6 +232,12 @@ public abstract class AbstractBankParser {
         return completedDate;
     }
 
+    /**
+    Parse the started date for a transaction.
+    <br> Method uses a cache to prevent parsing when not needed.
+    @param dateString
+    @return 
+     */
     public Date parseStartDate(final String dateString) {
         Date startedDate = dateString == null ? null : parsedStartedDates.get(dateString);
         if (startedDate != null) {
@@ -204,6 +255,12 @@ public abstract class AbstractBankParser {
         return startedDate;
     }
 
+    /**
+    Parse the amount for a transaction.
+    <br> Method uses a cache to prevent parsing when not needed.
+    @param amountString 
+    @return never null
+     */
     public BigDecimal parseAmount(final String amountString) {
         BigDecimal amount = amountString == null ? null : parsedAmounts.get(amountString);
         if (amount != null) {
@@ -218,14 +275,19 @@ public abstract class AbstractBankParser {
         } catch (ParseException ex) {
             Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if (amount == null){
+
+        if (amount == null) {
             amount = BigDecimal.ZERO;
         }
         parsedAmounts.put(amountString, amount);
         return amount;
     }
 
+    /**
+    Transform a whole String text line into a {@link CSVRecord} from apache library.
+    @param singleLine
+    @return 
+     */
     public final CSVRecord parseSingleLine(String singleLine) {
         Reader in = new StringReader(singleLine);
         CSVRecord record = null;
@@ -240,18 +302,54 @@ public abstract class AbstractBankParser {
         return record;
     }
 
+    /**
+    Create a {@link BankTransaction} instance where company id was
+    recognised but no other validations could be made.
+    @param title transaction descriptor
+    @param startDate start date
+    @param completedDate completed date
+    @param amount currency amount
+    @param description company id
+    @param type type
+    @param csvContent all original csv string lines used to identify this transaction.
+    @return 
+     */
     public BankTransaction createCompanyIdDescriptionTransaction(final String title, final Date startDate, final Date completedDate,
             BigDecimal amount, final String description, final Type type, final List<String> csvContent) {
         return new BankTransaction(false, true, title, startDate, completedDate, amount, description, type,
                 csvContent);
     }
 
+    /**
+    Create a {@link BankTransaction} instance where company id was
+    recognised and other validations were possible and OK.
+    @param title transaction descriptor
+    @param startDate start date
+    @param completedDate completed date
+    @param amount currency amount
+    @param description company id
+    @param type type
+    @param csvContent all original csv string lines used to identify this transaction.
+    @return 
+     */
     public BankTransaction createStrictDescriptionTransaction(final String title, final Date startDate, final Date completedDate,
             BigDecimal amount, final String description, final Type type, final List<String> csvContent) {
         return new BankTransaction(true, true, title, startDate, completedDate, amount, description, type,
                 csvContent);
     }
 
+    /**
+    Create a {@link BankTransaction} instance where company id was
+    not recognised and no other validations could be made.
+    @param title transaction descriptor
+    @param startDate start date
+    @param completedDate completed date
+    @param amount currency amount
+    @param description company id
+    @param type type
+    @param csvContent all original csv string lines used to identify this transaction.
+    @return 
+     */
     public BankTransaction createGeneralTransaction(final String title, final Date startDate, final Date completedDate,
             BigDecimal amount, final String description, final Type type, final List<String> csvContent) {
         return new BankTransaction(false, false, title, startDate, completedDate, amount, description, type,

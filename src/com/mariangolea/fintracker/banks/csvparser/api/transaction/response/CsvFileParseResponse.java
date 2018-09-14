@@ -12,26 +12,56 @@ import java.util.Objects;
 
 /**
  * Response after a whole CSV file is parsed.
- * <br> Contains full list of detected transactions, a allOK boolean, and a list
- * of unidentified Strings if any.
+ * <br> Contains all data needed by upper layer of the application.
  *
  * @author mariangolea@gmail.com
  */
 public class CsvFileParseResponse {
 
+    /**
+    Original csv file.
+     */
     public final File csvFile;
-    //true if there are no unprocessed strings.
+    /**
+    Whether no unexpected strings were found.
+     */
     public final boolean allCsvContentProcessed;
+    /**
+    If the CSV file contained a special record for stating number of
+    contained transactions, and if the {@link com.mariangolea.fintracker.banks.csvparser.api.Bank}
+    object is aware of it.
+     */
     public final int expectedTransactionsNumber;
+    /**
+    Number of identified transactions.
+     */
     public final int foundTransactionsNumber;
+    /**
+    List of groups of similar transactions found within the csv file.
+     */
     public final List<BankTransactionAbstractGroup> parsedTransactionGroups = new ArrayList<>();
+    /**
+    Not recognised strings, if any.
+     */
     public final List<String> unprocessedStrings = new ArrayList<>();
+    /**
+    Parser used during identification.
+     */
     public final AbstractBankParser parserUsed;
 
     private final BankTransactionUtils utils = new BankTransactionUtils();
 
+    /**
+    Construct a instance of this class,
+    @param parserUsed used parser
+    @param expectedTransactionsNumber if stated in csv file, 0 otherwise.
+    @param foundTransactionsNumber number of identified transactions.
+    @param csvFile csv file reference
+    @param groups parsed transaction groups.
+    @param unprocessedStrings list of not recognised strings.
+     */
     public CsvFileParseResponse(
-            AbstractBankParser parserUsed, 
+            AbstractBankParser parserUsed,
             int expectedTransactionsNumber,
             int foundTransactionsNumber,
             final File csvFile,

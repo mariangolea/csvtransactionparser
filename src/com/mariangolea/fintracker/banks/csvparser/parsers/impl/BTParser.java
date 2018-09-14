@@ -21,7 +21,10 @@ import org.apache.commons.csv.CSVRecord;
  * @author mariangolea@gmail.com
  */
 public class BTParser extends AbstractBankParser {
-
+    
+    /**
+    Enum of all known transaction identifier strings.
+    */
     public enum OperationID {
         PLATA_POS("Plata la POS"), INCASARE("Incasare"), TRANSFER_RECUPERARE_RESTANTE(
                 "Transfer pentru recuperare restante");

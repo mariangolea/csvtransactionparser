@@ -27,6 +27,9 @@ import org.apache.commons.csv.CSVRecord;
  */
 public class INGParser extends AbstractBankParser {
 
+    /**
+    Enum of all known transaction identifier strings.
+    */
     public enum OperationID {
         CASH_WITHDRAWAL("Retragere numerar"),
         RATE_CREDIT("Rata Credit"),

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mariangolea.fintracker.banks.csvparser.cmdsupport;
 
 import java.io.File;
@@ -17,9 +12,21 @@ import java.util.List;
  */
 public class CmdArgParser {
 
+    /**
+    Option to specify a input folder.
+     */
     public static final String INPUT_FOLDER_ARG = "-folder";
+    /**
+    Option/value separator.
+     */
     public static final String FOLDER_NAME_SEPARATOR = "=";
+    /**
+    Paths may be escaped if they contain empty spaces.
+     */
     public static final String FOLDER_PATH_ESCAPE = "\"";
+    /**
+    Supported file extension. All files contained in input folders will be parsed.
+     */
     public static final String SUPPORTED_FILE_EXTENSION = ".csv";
 
     /**
@@ -31,7 +38,7 @@ public class CmdArgParser {
      * @param args list of strings each depicting one single folder definition.
      * @return all csv files found in all received folders.
      */
-    public List<File> getCSVFiles(String[] args) {
+    public List<File> getCSVFiles(final String[] args) {
         if (args == null || args.length < 1) {
             printError();
             return null;
@@ -61,6 +68,11 @@ public class CmdArgParser {
         System.out.println("-inputFolder can be used multiple times to designate more folders: -folder=\"sss\" -folder=\"fff\"");
     }
 
+    /**
+    Get the File instances corresponding to all folders specified in this arg array.
+    @param args arg array received by the cmd entry point.
+    @return 
+     */
     public List<File> getFolderFiles(String[] args) {
         final List<File> folderFiles = new ArrayList<>();
         for (String arg : args) {

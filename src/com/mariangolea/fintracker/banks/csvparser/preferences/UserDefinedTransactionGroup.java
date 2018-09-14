@@ -5,28 +5,35 @@ import java.util.*;
 /**
  * Container of user defined associations between transaction groups. <br>
  * This is the highest level of containment. Groups from different banks can be
- * joined together under a common name which only has meaning for the user.
+ * joined together under a common name which only has meaning to the user.
  *
  * @author Marian Golea <mariangolea@gmail.com>
  */
 public class UserDefinedTransactionGroup{
-
+    
+    /**
+    Group identifier.
+    */
     public final String groupName;
     private final Map<String, Set<String>> transactionGroupAssociations = new HashMap<>();
-
+    
+    /**
+    
+    @param groupName 
+    */
     public UserDefinedTransactionGroup(final String groupName) {
         Objects.requireNonNull(groupName);
         this.groupName = groupName;
     }
 
-    public void addAssociations(final String swiftCode, final Set<String> bankOperationDescriptors) {
-        Objects.requireNonNull(swiftCode);
+    public void addAssociations(final String bankString, final Set<String> bankOperationDescriptors) {
+        Objects.requireNonNull(bankString);
         Objects.requireNonNull(bankOperationDescriptors);
 
-        Set<String> existing = transactionGroupAssociations.get(swiftCode);
+        Set<String> existing = transactionGroupAssociations.get(bankString);
         if (existing == null) {
             existing = bankOperationDescriptors;
-            transactionGroupAssociations.put(swiftCode, existing);
+            transactionGroupAssociations.put(bankString, existing);
         }
 
         existing.addAll(bankOperationDescriptors);

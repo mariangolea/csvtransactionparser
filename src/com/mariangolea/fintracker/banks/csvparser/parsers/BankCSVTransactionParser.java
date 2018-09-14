@@ -29,7 +29,7 @@ public final class BankCSVTransactionParser {
      */
     public CsvFileParseResponse parseTransactions(final File file) {
         CsvFileParseResponse fileResponse = null;
-        if (file == null){
+        if (file == null) {
             return fileResponse;
         }
         List<String> lines = loadCSVFile(file);
@@ -57,20 +57,26 @@ public final class BankCSVTransactionParser {
      * @return may be null;
      */
     public List<String> loadCSVFile(final File csvFile) {
-        final List<String> response= new ArrayList<>();
-        try (BufferedReader csvReader = new BufferedReader(new FileReader(csvFile))){
+        final List<String> response = new ArrayList<>();
+        try (BufferedReader csvReader = new BufferedReader(new FileReader(csvFile))) {
             String tempLine;
             while ((tempLine = csvReader.readLine()) != null) {
                 response.add(tempLine);
             }
-        } catch (IOException ex) { 
+        } catch (IOException ex) {
             Logger.getLogger(BankCSVTransactionParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return response;
     }
 
-    public Bank recognizeBank(List<String> fileLines) {
+    /**
+    Look ahead in all CSV file content and match strings against
+    all Bank instances relevant content header line fields.
+    @param fileLines
+    @return may return null if bank not supported yet
+     */
+    public Bank recognizeBank(final List<String> fileLines) {
         int index;
         for (Bank bank : Bank.values()) {
             index = fileLines.indexOf(bank.relevantContentHeaderLine);

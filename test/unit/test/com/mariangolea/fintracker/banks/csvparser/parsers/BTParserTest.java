@@ -66,7 +66,7 @@ public class BTParserTest extends BTParser {
         assertTrue("Amount parsing failed.", (float) 1195.6 == output.floatValue());
 
         output = parseAmount("gibberish");
-        assertTrue(output == BigDecimal.ZERO);
+        assertTrue(output == null);
     }
 
     @Test

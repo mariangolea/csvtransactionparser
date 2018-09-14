@@ -62,14 +62,23 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 String insertedString = getInstertedString(e);
-                if (tick == 0) {
-                    assertTrue(insertedString.contains(CsvParserUICategorizer.START_PARSE_MESSAGE));
-                    tick++;
-                } else if (tick == 1) {
-                    assertTrue(insertedString.startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILES));
-                    feedbackPane.getDocument().removeDocumentListener(this);
-                    stopCondition.stop = true;
+                switch (tick) {
+                    case 0:
+                        assertTrue(insertedString.contains(CsvParserUICategorizer.START_PARSE_MESSAGE));
+                        break;
+                    case 1:
+                        assertTrue(insertedString.startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILES));
+                        break;
+                    case 5:
+                        //2 more ticks expected for a single file.
+                        feedbackPane.getDocument().removeDocumentListener(this);
+                        stopCondition.stop = true;
+                        break;
+                    default:
+                        break;
                 }
+                
+                tick++;
             }
 
             @Override
@@ -93,8 +102,9 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
                 return res;
             }
         });
-        startParsingCsvFiles(new File[]{utils.writeCSVFile(Bank.BT, folder.newFile("test.csv"))});
-
+        int initialParsedCSVFiles = parsedCsvFiles.size();
+        mockCSV = utils.writeCSVFile(Bank.ING, folder.newFile("test.csv"), utils.constructMockCSVContentForBank(Bank.ING));
+        parseUserSelectedCSVFiles(new File[]{mockCSV});
         while (!stopCondition.stop) {
             try {
                 Thread.sleep(20);
@@ -102,12 +112,15 @@ public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
                 Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        assertTrue(inModel != null && inModel.size() == 1);
-        assertTrue(outModel != null && outModel.size() == 2);
+        
+        //test parsed the same file content twice, so double expected values.
+        assertTrue(inModel != null && inModel.size() == 3);
+        assertTrue(outModel != null && outModel.size() == 3);
+        
+        assertTrue(parsedCsvFiles.size() == initialParsedCSVFiles + 1);
     }
 
     private class StopCondition {
-
         private boolean stop = false;
     }
 }

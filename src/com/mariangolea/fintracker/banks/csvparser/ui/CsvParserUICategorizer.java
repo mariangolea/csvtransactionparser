@@ -50,7 +50,7 @@ public class CsvParserUICategorizer extends JPanel {
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
     private final UserPreferences userPrefs;
-    private final List<File> parsedCsvFiles = new ArrayList<>();
+    protected final List<File> parsedCsvFiles = new ArrayList<>();
 
     protected static final String START_PARSE_MESSAGE = "Started parsing the selected CSV files ...";
     protected static final String FINISHED_PARSING_CSV_FILES = "Finished parsing the CSV files: ";
@@ -173,11 +173,15 @@ public class CsvParserUICategorizer extends JPanel {
         int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File[] csvFiles = chooser.getSelectedFiles();
-            userPrefs.setCSVInputFolder(csvFiles[0].getParent());
-            preferences.storePreferences(userPrefs);
-            startParsingCsvFiles(csvFiles);
-            parsedCsvFiles.addAll(Arrays.asList(csvFiles));
+            parseUserSelectedCSVFiles(csvFiles);
         }
+    }
+
+    protected void parseUserSelectedCSVFiles(File[] csvFiles) {
+        userPrefs.setCSVInputFolder(csvFiles[0].getParent());
+        preferences.storePreferences(userPrefs);
+        parsedCsvFiles.addAll(Arrays.asList(csvFiles));
+        startParsingCsvFiles(csvFiles);
     }
 
     protected void startParsingCsvFiles(final File[] csvFiles) {
@@ -227,7 +231,7 @@ public class CsvParserUICategorizer extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Feedback", TitledBorder.CENTER, TitledBorder.TOP));
         feedbackPane.addHyperlinkListener((final HyperlinkEvent e) -> {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 try {
                     File localFile = new File(e.getURL().toURI());
                     java.awt.Desktop.getDesktop().open(localFile);

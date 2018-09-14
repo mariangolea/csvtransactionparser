@@ -4,23 +4,37 @@ import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
 import java.util.Locale;
 
 /**
- * Enum of major banks (Romania for now). <br>
- * Each enum contains links to bank's swift code (needed to identify which bank
- * generated the csv report), a dedicated parser object, and the locale used to
- * generate the report (impacts the way dates and currency amounts are parsed).
+ * Enum of supported banks (Romania).
  *
  * @author mariangolea@gmail.com
  */
 public enum Bank {
-    ING(AbstractBankParser.ROMANIAN_LOCALE, 
+    ING(AbstractBankParser.ROMANIAN_LOCALE,
             "Data,,,Detalii tranzactie,,Debit,Credit",
             ""),
-    BT(Locale.ENGLISH, 
-            "Data tranzactie,Data valuta,Descriere,Referinta tranzactiei,Debit,Credit,Sold contabil", 
+    BT(Locale.ENGLISH,
+            "Data tranzactie,Data valuta,Descriere,Referinta tranzactiei,Debit,Credit,Sold contabil",
             "Gasit/e:");
 
+    /**
+     * Default locale for this bank.
+     * <br> Used to parse certain date strings.
+     */
     public final Locale locale;
+    /**
+     * Each CSV file has a header that the parser needs to skip when looking for
+     * transactions.
+     * <br>This represents a perfect match of what the header line string looks
+     * like in a CSV report file for this bank.
+     */
     public final String relevantContentHeaderLine;
+    /**
+     * Some banks add CSV content to specify the generated transactions number.
+     * <br> If a certain bank does not provide one, this field will be a empty
+     * string.
+     * <br> It represents the label that associated parser needs to look for in
+     * order to next parse the transactions number, for validation purposes.
+     */
     public final String transactionsNumberLabel;
 
     private Bank(final Locale locale, final String relevantContentHeaderLine, final String transactionsNumberLabel) {

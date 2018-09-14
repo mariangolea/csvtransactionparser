@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author Marian Golea <mariangolea@gmail.com>
  */
-public class UserDefinedTransactionGroup {
+public class UserDefinedTransactionGroup{
 
     public final String groupName;
     private final Map<String, Set<String>> transactionGroupAssociations = new HashMap<>();

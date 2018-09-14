@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Utility to call the bank report CSV parser functionality using command line.
- * <br> Will later be used in black box automated tests.
+ * CMD Utility to call the bank report CSV parser functionality using command line.
+ * <br> Useful in basic validations of expected behavior.
  *
  * @author mariangolea@gmail.com
  */
@@ -18,7 +18,12 @@ public class BankCSVReportsCmdParser {
 
     private final CmdArgParser cmdParser = new CmdArgParser();
 
-    public List<CsvFileParseResponse> parseInput(String[] args) {
+    /**
+     * 
+     * @param args
+     * @return 
+     */
+    public List<CsvFileParseResponse> parseInput(final String[] args) {
         List<File> inputFiles = cmdParser.getCSVFiles(args);
         BankCSVTransactionParser fac = new BankCSVTransactionParser();
         List<CsvFileParseResponse> res = new ArrayList<>();
@@ -45,9 +50,9 @@ public class BankCSVReportsCmdParser {
             System.out.println("\t\t - expected transactions number: " + response.expectedTransactionsNumber);
             System.out.println("\t\t - found transactions number: " + response.foundTransactionsNumber);
             System.out.println("\t\t - Unprocessed Strings: ");
-            for (String unprocessed : response.unprocessedStrings) {
+            response.unprocessedStrings.forEach((unprocessed) -> {
                 System.out.println("\t\t\t - " + unprocessed);
-            }
+            });
             System.out.println("\t\t - Unprocessed Strings: ");
         }
     }

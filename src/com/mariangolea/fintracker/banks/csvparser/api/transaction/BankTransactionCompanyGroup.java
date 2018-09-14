@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
 import java.util.ArrayList;
@@ -10,21 +5,27 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
- * @author Marian
+ * Group of transactions which were made with the same "target" entity.
+ * @author mariangolea@gmail.com
  */
 public final class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
     private final List<BankTransaction> list = new ArrayList<>();
     private final String companyDesc;
-
+    
+    /**
+     * Create a instance of this class.
+     * @param transactionGroupIdentifier group identifier
+     * @param companyDesc company descriptor string
+     * @param type outgoing or incoming
+     */
     public BankTransactionCompanyGroup(String transactionGroupIdentifier, String companyDesc, BankTransaction.Type type) {
         super(transactionGroupIdentifier, type);
         Objects.requireNonNull(companyDesc);
 
         this.companyDesc = companyDesc;
     }
-
+    
     @Override
     public int getTransactionsNumber() {
         return list.size();
@@ -39,11 +40,19 @@ public final class BankTransactionCompanyGroup extends BankTransactionAbstractGr
     public boolean matchesTransaction(final BankTransaction transaction) {
         return super.matchesTransaction(transaction) && Objects.equals(companyDesc, transaction.getDescription());
     }
-
+    
+    /**
+     * Get the company descriptor string.
+     * @return 
+     */
     public String getCompanyDesc() {
         return companyDesc;
     }
-
+    
+    /**
+     * Get a copy of the transactions as a list.
+     * @return 
+     */
     public List<BankTransaction> getTransactions() {
         return new ArrayList<>(list);
     }

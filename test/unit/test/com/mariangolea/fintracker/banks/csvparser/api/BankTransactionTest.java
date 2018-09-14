@@ -31,7 +31,7 @@ public class BankTransactionTest {
         String toString = first.toString();
         assertTrue(toString != null);
         assertTrue(first.isValidatedDuringParse());
-        assertTrue(first.isSupportsTransactionCompanyIdentification());
+        assertTrue(first.transactionTargetIdentified());
         assertTrue(first.getStartDate() == date);
         assertTrue(first.getCompletedDate() == date);
         assertTrue(first.getAmount() == BigDecimal.ZERO);

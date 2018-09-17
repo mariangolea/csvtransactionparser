@@ -2,42 +2,37 @@ package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
 
-import javax.swing.*;
-import javax.swing.border.EtchedBorder;
-import java.awt.*;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 
 /**
  * @author mariangolea@gmail.com
  */
-public final class TransactionGroupCellRenderer extends JLabel implements ListCellRenderer<BankTransactionAbstractGroup> {
+public final class TransactionGroupCellRenderer extends ListCell<BankTransactionAbstractGroup> {
 
-    public TransactionGroupCellRenderer() {
-        setOpaque(true);
+    private final ListView<BankTransactionAbstractGroup> param;
+
+    public TransactionGroupCellRenderer(ListView<BankTransactionAbstractGroup> param) {
+        this.param = param;
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends BankTransactionAbstractGroup> list,
-            BankTransactionAbstractGroup value, int index, boolean isSelected, boolean cellHasFocus) {
+    protected void updateItem(BankTransactionAbstractGroup value, boolean empty) {
+        super.updateItem(value, empty); 
+        if (empty) {
+            return;
+        }
         String[] split = value.toString().split("\n");
-
-        String text = "<html>";
+        String text = "";
         for (int i = 0; i < split.length; i++) {
             if (i == 0) {
-                text += "<font color=\"blue\">" + split[i] + "</font>";
+                text += split[i];
             } else {
-                text += "<br>" + split[i] + "<br>";
+                text += split[i];
             }
         }
-        text += "</html>";
         setText(text);
-        if (isSelected) {
-            setBackground(list.getSelectionBackground());
-            setForeground(list.getSelectionForeground());
-        } else {
-            setBackground(list.getBackground());
-            setForeground(list.getForeground());
-        }
-        setBorder(new EtchedBorder());
-        return this;
+        
+        setStyle("-fx-background-color: lavender; selected: skyblue");
     }
 }

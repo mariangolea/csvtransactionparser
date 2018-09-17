@@ -19,31 +19,24 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
 import java.math.BigDecimal;
+import javafx.collections.FXCollections;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.text.Text;
 
 public class ListCellRenderersTest {
 
     @Test
     public void testBankTransactionGroupCellRenderer() {
-        JList<BankTransactionDefaultGroup> test = new JList<>();
         BankTransactionDefaultGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
-        TransactionGroupCellRenderer renderer = new TransactionGroupCellRenderer();
-        Component comp = renderer.getListCellRendererComponent(test, one, 0, false, true);
-        assertTrue(comp instanceof JLabel);
-        JLabel label = (JLabel) comp;
-        assertTrue(label.getText() != null && !label.getText().isEmpty());
-        assertTrue(label.getBackground() == test.getBackground());
-        assertTrue(label.getForeground() == test.getForeground());
-
-        comp = renderer.getListCellRendererComponent(test, one, 0, true, true);
-        label = (JLabel) comp;
-        assertTrue(label.getBackground() == test.getSelectionBackground());
-        assertTrue(label.getForeground() == test.getSelectionForeground());
+        ListView<BankTransactionDefaultGroup> test = new ListView<>(FXCollections.observableArrayList(one));
+        ListCell<BankTransactionDefaultGroup> cell = test.getCellFactory().call(test);
+        assertTrue(cell.getText() != null && !cell.getText().isEmpty());
     }
 
     @Test
     public void testBankTransactionGroupListSelectionRenderer() {
-        JList<BankTransactionAbstractGroup> test = new JList<>();
-        DefaultListModel<BankTransactionAbstractGroup> model = new DefaultListModel<>();
         BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one",  BankTransaction.Type.IN);
         one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
@@ -53,22 +46,15 @@ public class ListCellRenderersTest {
         BankTransactionAbstractGroup three = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(500), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        model.addElement(one);
-        model.addElement(two);
-        model.addElement(three);
-        test.setModel(model);
+        ListView<BankTransactionAbstractGroup> test = new ListView<>(FXCollections.observableArrayList(one, two, three));
 
-        JTextPane pane = new JTextPane();
+        Label pane = new Label();
         TransactionGroupListSelectionListener renderer = new TransactionGroupListSelectionListener(test, pane);
 
-        renderer.intervalRemoved(null);
-        renderer.valueChanged(null);
-        renderer.contentsChanged(null);
         // calling with no indices selected should compute total amount.
         assertTrue(pane.getText() != null && pane.getText().contains("900"));
 
-        test.setSelectedIndices(new int[]{0, 1});
-        renderer.intervalAdded(null);
+        test.getSelectionModel().selectIndices(0, 1);
         // calling with first 2 selected should compute only for those.
         assertTrue(pane.getText() != null && pane.getText().contains("400"));
     }

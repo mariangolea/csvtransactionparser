@@ -16,18 +16,21 @@ import org.junit.BeforeClass;
  * @author Marian Golea <mariangolea@gmail.com>
  */
 public class FXUITest {
-    
+
     @BeforeClass
     public static void initToolkit()
             throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
-        SwingUtilities.invokeLater(() -> {
-            new JFXPanel();
-            latch.countDown();
-        });
+        String headless = System.getProperty("java.awt.headless", "false");
+        if (!Boolean.parseBoolean(headless)) {
+            final CountDownLatch latch = new CountDownLatch(1);
+            SwingUtilities.invokeLater(() -> {
+                new JFXPanel();
+                latch.countDown();
+            });
 
-        fxInitialized = latch.await(10L, TimeUnit.SECONDS);
+            fxInitialized = latch.await(10L, TimeUnit.SECONDS);
+        }
     }
-    
-    static boolean fxInitialized; 
+
+    static boolean fxInitialized = false;
 }

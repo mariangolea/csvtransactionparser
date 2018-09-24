@@ -13,8 +13,10 @@ import org.junit.rules.TemporaryFolder;
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVParserFactory;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
@@ -24,6 +26,7 @@ import javafx.scene.Node;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -42,8 +45,6 @@ public class CsvParserUICategorizerTest extends FXUITest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private final LocalUI local = new LocalUI();
-
     @Test
     public void testSimpleDataBT() throws IOException {
         if (!fxInitialized) {
@@ -56,6 +57,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         assertTrue(mockCSV != null);
         CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(mockCSV);
         // tests in other files ensure response integrity, no need to do that in here.
+        LocalUI local = new LocalUI();
         local.loadData(Arrays.asList(response));
         assertTrue(local.getInModel() != null);
         assertTrue(local.getOutModel() != null);
@@ -86,6 +88,47 @@ public class CsvParserUICategorizerTest extends FXUITest {
         assertTrue(local.getOutModel() != null && local.getOutModel().size() == 3);
 
         assertTrue(local.getParsedCsvFiles().size() == initialParsedCSVFiles + 1);
+    }
+
+    @Test
+    public void testAppendMessages() {
+        if (!fxInitialized) {
+            assertTrue("Useless in headless mode", true);
+            return;
+        }
+
+        boolean result;
+        LocalUI local = new LocalUI();
+        local.createFeedbackView();
+        try {
+            result = local.appendHyperlinkToFile("a", null, "b");
+            assertTrue(!result);
+            result = local.appendHyperlinkToFile("a", folder.newFile(), "b");
+            assertTrue(result);
+            assertTrue(local.getFeedbackPane().getChildren().size() == 3);
+        } catch (IOException ex) {
+            Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        assertTrue(!local.appendReportMessage(null));
+        assertTrue(local.appendReportMessage(""));
+
+        local.getFeedbackPane().getChildren().clear();
+        CsvFileParseResponse res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 1, 1, new File("mock"), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        local.appendReportText(res);
+        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        local.getFeedbackPane().getChildren().clear();
+        res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 1, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
+        local.appendReportText(res);
+        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        local.getFeedbackPane().getChildren().clear();
+        res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 0, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
+        local.appendReportText(res);
+        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        local.getFeedbackPane().getChildren().clear();
+        res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 1, 0, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
+        local.appendReportText(res);
+        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
     }
 
     private class LocalListChangeListener implements ListChangeListener<Node> {
@@ -146,5 +189,26 @@ public class CsvParserUICategorizerTest extends FXUITest {
         public List<File> getParsedCsvFiles() {
             return parsedCsvFiles;
         }
+
+        @Override
+        public void start(Stage primaryStage) throws Exception {
+            super.start(primaryStage);
+        }
+
+        @Override
+        protected void appendReportText(CsvFileParseResponse fileResponse) {
+            super.appendReportText(fileResponse); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        protected boolean appendReportMessage(String message) {
+            return super.appendReportMessage(message); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        protected boolean appendHyperlinkToFile(String pre, File sourceFile, String post) {
+            return super.appendHyperlinkToFile(pre, sourceFile, post); //To change body of generated methods, choose Tools | Templates.
+        }
+
     }
 }

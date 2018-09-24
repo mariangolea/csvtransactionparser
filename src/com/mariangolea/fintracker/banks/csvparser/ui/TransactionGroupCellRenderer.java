@@ -18,21 +18,17 @@ public class TransactionGroupCellRenderer extends ListCell<BankTransactionAbstra
 
     @Override
     protected void updateItem(BankTransactionAbstractGroup value, boolean empty) {
-        super.updateItem(value, empty); 
+        super.updateItem(value, empty);
         if (empty) {
             return;
         }
         String[] split = value.toString().split("\n");
         String text = "";
-        for (int i = 0; i < split.length; i++) {
-            if (i == 0) {
-                text += split[i];
-            } else {
-                text += split[i];
-            }
+        for (String split1 : split) {
+            text += split1;
         }
         setText(text);
-        
+
         setStyle("-fx-background-color: lavender; selected: skyblue");
     }
 }

@@ -9,7 +9,6 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHan
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.FutureTask;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -51,14 +50,11 @@ public class CsvParserUI extends Application {
     private Label outResponseLabel;
     protected final ObservableList<BankTransactionAbstractGroup> inModel = FXCollections.observableArrayList();
     protected final ObservableList<BankTransactionAbstractGroup> outModel = FXCollections.observableArrayList();
-    private ListView<BankTransactionAbstractGroup> inListView;
-    private ListView<BankTransactionAbstractGroup> outListView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = new UserPreferencesHandler();
     private final UserPreferences userPrefs;
     protected final List<File> parsedCsvFiles = new ArrayList<>();
-    public Stage primaryStage;
-    private MenuBar menuBar;
+    private Stage primaryStage;
     private BorderPane root;
 
     protected static final String START_PARSE_MESSAGE = "Started parsing the selected CSV files ...";
@@ -72,7 +68,7 @@ public class CsvParserUI extends Application {
     public void init() throws Exception {
         inResponseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
         outResponseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
-        menuBar = createMenu();
+        MenuBar menuBar = createMenu();
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -154,11 +150,11 @@ public class CsvParserUI extends Application {
         return new MenuBar();
     }
 
-    private void popCSVFileChooser() {
+    protected void popCSVFileChooser() {
         String inputFolder = userPrefs.getCSVInputFolder();
         FileChooser chooser = new FileChooser();
         File inputFolderFile = inputFolder == null ? null : new File(inputFolder);
-        chooser.setInitialDirectory(inputFolderFile.exists() ? inputFolderFile : null);
+        chooser.setInitialDirectory(inputFolderFile == null ? null : inputFolderFile.exists() ? inputFolderFile : null);
         ExtensionFilter filter = new ExtensionFilter(
                 "CSV files only", "*.csv");
         chooser.getExtensionFilters().add(filter);
@@ -218,12 +214,6 @@ public class CsvParserUI extends Application {
         ScrollPane scrollPane = new ScrollPane(listView);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        if (BankTransaction.Type.IN == type) {
-            inListView = listView;
-        } else {
-            outListView = listView;
-        }
-//        scrollPane.setStyle("-fx-background-color: darkslateblue; -fx-text-fill: white;");
 
         return scrollPane;
     }
@@ -241,7 +231,7 @@ public class CsvParserUI extends Application {
         return new TextFlow();
     }
     
-    private void appendReportText(CsvFileParseResponse fileResponse) {
+    protected void appendReportText(CsvFileParseResponse fileResponse) {
         appendHyperlinkToFile("\n", fileResponse.csvFile, ": ");
         if (fileResponse.allCsvContentProcessed && fileResponse.expectedTransactionsNumber == fileResponse.foundTransactionsNumber) {
             appendReportMessage("ALL OK!");
@@ -261,7 +251,7 @@ public class CsvParserUI extends Application {
         }
     }
 
-    private boolean appendHyperlinkToFile(final String pre, final File sourceFile, final String post) {
+    protected boolean appendHyperlinkToFile(final String pre, final File sourceFile, final String post) {
         if (sourceFile == null) {
             return false;
         }
@@ -283,7 +273,7 @@ public class CsvParserUI extends Application {
         return true;
     }
 
-    private boolean appendReportMessage(final String message) {
+    protected boolean appendReportMessage(final String message) {
         if (message == null) {
             return false;
         }

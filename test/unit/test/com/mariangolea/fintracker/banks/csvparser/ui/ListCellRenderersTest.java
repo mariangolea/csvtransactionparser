@@ -24,6 +24,7 @@ public class ListCellRenderersTest extends FXUITest {
     public void testBankTransactionGroupCellRenderer() {
         if (!fxInitialized) {
             assertTrue("Useless in headless mode", true);
+            return;
         }
 
         BankTransactionDefaultGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
@@ -41,7 +42,7 @@ public class ListCellRenderersTest extends FXUITest {
         if (!fxInitialized) {
             assertTrue("Useless in headless mode", true);
             return;
-        }
+        } 
         
         BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",

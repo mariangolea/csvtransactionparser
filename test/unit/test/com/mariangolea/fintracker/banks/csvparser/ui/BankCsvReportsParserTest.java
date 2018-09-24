@@ -7,19 +7,15 @@ package test.com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.BankCsvReportsParser;
 import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
-import java.awt.HeadlessException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.stage.Stage;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
  *
- * @author Marian
+ * @author Marian Golea <mariangolea@gmail.com>
  */
-public class BankCsvReportsParserTest {
-
+public class BankCsvReportsParserTest extends FXUITest{
+    
     @Test
     public void testFrame() {
         BankCsvReportsParser parser = new BankCsvReportsParser();

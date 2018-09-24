@@ -9,10 +9,12 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHan
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -89,7 +91,7 @@ public class CsvParserUI extends Application {
         row.setVgrow(Priority.ALWAYS);
         grid.getRowConstraints().add(row);
         grid.getRowConstraints().add(row);
-        
+
         ScrollPane centerScroll = createFeedbackView();
 
         ScrollPane scrollPaneIN = createTransactionView(BankTransaction.Type.IN);
@@ -133,7 +135,7 @@ public class CsvParserUI extends Application {
     }
 
     public MenuBar createMenu() {
-        MenuBar menu = new MenuBar();
+        MenuBar menu = constructSimpleMenuBar();
         Menu file = new Menu("File");
         file.setAccelerator(KeyCombination.keyCombination("Alt+f"));
         MenuItem load = new MenuItem("Load data from CSV file.");
@@ -148,10 +150,15 @@ public class CsvParserUI extends Application {
         return menu;
     }
 
+    public MenuBar constructSimpleMenuBar() {
+        return new MenuBar();
+    }
+
     private void popCSVFileChooser() {
         String inputFolder = userPrefs.getCSVInputFolder();
         FileChooser chooser = new FileChooser();
-        chooser.setInitialDirectory(inputFolder == null ? null : new File(inputFolder));
+        File inputFolderFile = inputFolder == null ? null : new File(inputFolder);
+        chooser.setInitialDirectory(inputFolderFile.exists() ? inputFolderFile : null);
         ExtensionFilter filter = new ExtensionFilter(
                 "CSV files only", "*.csv");
         chooser.getExtensionFilters().add(filter);
@@ -171,25 +178,32 @@ public class CsvParserUI extends Application {
 
     protected void startParsingCsvFiles(final List<File> csvFiles) {
         appendReportMessage(START_PARSE_MESSAGE);
-
-        Platform.runLater(() -> {
-            BankCSVTransactionParser fac = new BankCSVTransactionParser();
-            final List<CsvFileParseResponse> res = new ArrayList<>();
-            for (File csvFile : csvFiles) {
-                CsvFileParseResponse response = fac.parseTransactions(csvFile);
-                if (response != null) {
+        Task<List<CsvFileParseResponse>> parseResponse = new Task<List<CsvFileParseResponse>>() {
+            @Override
+            protected List<CsvFileParseResponse> call() throws Exception {
+                BankCSVTransactionParser fac = new BankCSVTransactionParser();
+                final List<CsvFileParseResponse> res = new ArrayList<>();
+                csvFiles.stream().map((csvFile) -> fac.parseTransactions(csvFile)).filter((response) -> (response != null)).forEachOrdered((response) -> {
                     res.add(response);
-                }
+                });
+                return res;
             }
-            String endParseMessage = FINISHED_PARSING_CSV_FILES;
-            appendReportMessage(FINISHED_PARSING_CSV_FILES);
-            loadData(res);
-            res.forEach((response) -> {
-                appendReportText(response);
+        };
+
+        parseResponse.setOnSucceeded(e -> {
+            Platform.runLater(() -> {
+                appendReportMessage(FINISHED_PARSING_CSV_FILES);
+                List<CsvFileParseResponse> values = (List<CsvFileParseResponse>) e.getSource().getValue();
+                loadData(values);
+                values.forEach((response) -> {
+                    appendReportText(response);
+                });
+                parsedTransactionsCopy.clear();
+                parsedTransactionsCopy.addAll(values);
             });
-            parsedTransactionsCopy.clear();
-            parsedTransactionsCopy.addAll(res);
         });
+        Thread runThread = new Thread(parseResponse);
+        runThread.start();
     }
 
     private ScrollPane createTransactionView(BankTransaction.Type type) {
@@ -214,8 +228,8 @@ public class CsvParserUI extends Application {
         return scrollPane;
     }
 
-    private ScrollPane createFeedbackView() {
-        feedbackPane = new TextFlow();
+    protected ScrollPane createFeedbackView() {
+        feedbackPane = constructFeedbackPane();
         ScrollPane scrollPane = new ScrollPane(feedbackPane);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setFitToHeight(true);
@@ -223,6 +237,10 @@ public class CsvParserUI extends Application {
         return scrollPane;
     }
 
+    protected TextFlow constructFeedbackPane(){
+        return new TextFlow();
+    }
+    
     private void appendReportText(CsvFileParseResponse fileResponse) {
         appendHyperlinkToFile("\n", fileResponse.csvFile, ": ");
         if (fileResponse.allCsvContentProcessed && fileResponse.expectedTransactionsNumber == fileResponse.foundTransactionsNumber) {

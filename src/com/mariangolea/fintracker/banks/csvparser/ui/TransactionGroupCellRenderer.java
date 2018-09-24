@@ -8,7 +8,7 @@ import javafx.scene.control.ListView;
 /**
  * @author mariangolea@gmail.com
  */
-public final class TransactionGroupCellRenderer extends ListCell<BankTransactionAbstractGroup> {
+public class TransactionGroupCellRenderer extends ListCell<BankTransactionAbstractGroup> {
 
     private final ListView<BankTransactionAbstractGroup> param;
 

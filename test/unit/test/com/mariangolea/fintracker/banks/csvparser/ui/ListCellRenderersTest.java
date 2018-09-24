@@ -2,14 +2,8 @@ package test.com.mariangolea.fintracker.banks.csvparser.ui;
 
 import static org.junit.Assert.assertTrue;
 
-import java.awt.Component;
 import java.util.Arrays;
 import java.util.Date;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JTextPane;
 
 import org.junit.Test;
 
@@ -19,32 +13,28 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
 import java.math.BigDecimal;
+import javafx.collections.FXCollections;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 
-public class ListCellRenderersTest {
+public class ListCellRenderersTest extends FXUITest {
 
     @Test
     public void testBankTransactionGroupCellRenderer() {
-        JList<BankTransactionDefaultGroup> test = new JList<>();
         BankTransactionDefaultGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
-        TransactionGroupCellRenderer renderer = new TransactionGroupCellRenderer();
-        Component comp = renderer.getListCellRendererComponent(test, one, 0, false, true);
-        assertTrue(comp instanceof JLabel);
-        JLabel label = (JLabel) comp;
-        assertTrue(label.getText() != null && !label.getText().isEmpty());
-        assertTrue(label.getBackground() == test.getBackground());
-        assertTrue(label.getForeground() == test.getForeground());
-
-        comp = renderer.getListCellRendererComponent(test, one, 0, true, true);
-        label = (JLabel) comp;
-        assertTrue(label.getBackground() == test.getSelectionBackground());
-        assertTrue(label.getForeground() == test.getSelectionForeground());
+        ListView<BankTransactionAbstractGroup> test = new ListView<>(FXCollections.observableArrayList(one));
+        LocalExtensionGroupRenderer renderer = new LocalExtensionGroupRenderer(test);
+        assertTrue(renderer.getText()== null);
+        renderer.updateItem(one, true);
+        assertTrue(renderer.getText()== null);
+        renderer.updateItem(one, false);
+        assertTrue(!renderer.getText().isEmpty());
     }
 
     @Test
     public void testBankTransactionGroupListSelectionRenderer() {
-        JList<BankTransactionAbstractGroup> test = new JList<>();
-        DefaultListModel<BankTransactionAbstractGroup> model = new DefaultListModel<>();
-        BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one",  BankTransaction.Type.IN);
+        BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
         BankTransactionAbstractGroup two = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
@@ -53,23 +43,34 @@ public class ListCellRenderersTest {
         BankTransactionAbstractGroup three = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(500), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        model.addElement(one);
-        model.addElement(two);
-        model.addElement(three);
-        test.setModel(model);
+        ListView<BankTransactionAbstractGroup> test = new ListView<>(FXCollections.observableArrayList(one, two, three));
+        test.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        JTextPane pane = new JTextPane();
+        Label pane = new Label();
         TransactionGroupListSelectionListener renderer = new TransactionGroupListSelectionListener(test, pane);
+        renderer.onChanged(null);
 
-        renderer.intervalRemoved(null);
-        renderer.valueChanged(null);
-        renderer.contentsChanged(null);
         // calling with no indices selected should compute total amount.
-        assertTrue(pane.getText() != null && pane.getText().contains("900"));
+        String text = pane.getText();
+        assertTrue(text != null && text.contains("900"));
 
-        test.setSelectedIndices(new int[]{0, 1});
-        renderer.intervalAdded(null);
+        test.getSelectionModel().selectIndices(0, 1);
+        renderer.onChanged(null);
         // calling with first 2 selected should compute only for those.
-        assertTrue(pane.getText() != null && pane.getText().contains("400"));
+        text = pane.getText();
+        assertTrue(text != null && text.contains("400"));
+    }
+
+    private class LocalExtensionGroupRenderer extends TransactionGroupCellRenderer {
+
+        public LocalExtensionGroupRenderer(ListView<BankTransactionAbstractGroup> param) {
+            super(param);
+        }
+
+        @Override
+        protected void updateItem(BankTransactionAbstractGroup value, boolean empty) {
+            super.updateItem(value, empty); //To change body of generated methods, choose Tools | Templates.
+        }
+
     }
 }

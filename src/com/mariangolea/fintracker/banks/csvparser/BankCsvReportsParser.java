@@ -1,8 +1,8 @@
 package com.mariangolea.fintracker.banks.csvparser;
 
-import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUICategorizer;
-
-import javax.swing.*;
+import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import javafx.application.Application;
+import javafx.embed.swing.JFXPanel;
 
 /**
  * UI component for parsing bank csv transaction reports parser.
@@ -10,22 +10,10 @@ import javax.swing.*;
  * @author mariangolea@gmail.com
  */
 public class BankCsvReportsParser {
-    private final CsvParserUICategorizer panel = new CsvParserUICategorizer();
-    
-    /**
-     * Creates the JFrame of this application.
-     * @return {@link JFrame}
-     */
-    public JFrame initFrame(){
-        JFrame frame = new JFrame();
-        frame.setTitle("Bank Transactions Merger");
-        frame.setJMenuBar(panel.createMenu());
-        frame.setContentPane(panel);
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        
-        return frame;
+    public CsvParserUI initApplication(){
+        CsvParserUI application = new CsvParserUI();
+        return application;
     }
     
     /**
@@ -33,8 +21,6 @@ public class BankCsvReportsParser {
      * @param args irrelevant
      */
     public static void main(String[] args) {
-        BankCsvReportsParser parser = new BankCsvReportsParser();
-        JFrame frame = parser.initFrame();
-        frame.setVisible(true);
+        Application.launch(CsvParserUI.class, args);
     }
 }

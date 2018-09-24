@@ -1,11 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser.ui;
-
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,19 +6,27 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JMenuBar;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
-import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUICategorizer;
+import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.text.TextFlow;
+import static org.junit.Assert.assertTrue;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
@@ -33,94 +34,112 @@ import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
  *
  * @author Marian Golea <mariangolea@gmail.com>
  */
-public class CsvParserUICategorizerTest extends CsvParserUICategorizer {
+@RunWith(MockitoJUnitRunner.class)
+public class CsvParserUICategorizerTest extends FXUITest {
 
     private final TestUtilities utils = new TestUtilities();
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-
+    
+    private final LocalUI local = new LocalUI();
+    
     @Test
     public void testSimpleDataBT() throws IOException {
-        // Initializes the enum values, helps unit test batch cover the momentarily dumb
-        // enum.
+        Platform.setImplicitExit(false);
         File mockCSV = utils.writeCSVFile(Bank.BT, folder.newFile("testUI.csv"), utils.constructMockCSVContentForBank(Bank.BT));
         assertTrue(mockCSV != null);
         CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(mockCSV);
         // tests in other files ensure response integrity, no need to do that in here.
-        loadData(Arrays.asList(response));
-        assertTrue(inModel != null);
-        assertTrue(outModel != null);
-
-        JMenuBar menu = createMenu();
+        local.loadData(Arrays.asList(response));
+        assertTrue(local.getInModel() != null);
+        assertTrue(local.getOutModel() != null);
+        
+        MenuBar menu = local.createMenu();
         assertTrue(menu != null);
 
-        final StopCondition stopCondition = new StopCondition();
-        feedbackPane.getDocument().addDocumentListener(new DocumentListener() {
-            int tick = 0;
+        ScrollPane feedbackScroll = local.createFeedbackView();
+        assertTrue(feedbackScroll != null);
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                String insertedString = getInstertedString(e);
-                switch (tick) {
-                    case 0:
-                        assertTrue(insertedString.contains(CsvParserUICategorizer.START_PARSE_MESSAGE));
-                        break;
-                    case 1:
-                        assertTrue(insertedString.startsWith(CsvParserUICategorizer.FINISHED_PARSING_CSV_FILES));
-                        break;
-                    case 5:
-                        //2 more ticks expected for a single file.
-                        feedbackPane.getDocument().removeDocumentListener(this);
-                        stopCondition.stop = true;
-                        break;
-                    default:
-                        break;
-                }
-                
-                tick++;
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                // usless.
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                // useless.
-            }
-
-            private String getInstertedString(DocumentEvent e) {
-                String res = "";
-                try {
-                    res = feedbackPane.getText(e.getOffset(), e.getLength());
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                return res;
-            }
+        final CountDownLatch latch = new CountDownLatch(6);
+        Platform.runLater(() -> {
+            local.getFeedbackPane().getChildren().addListener(new LocalListChangeListener(latch));
         });
-        int initialParsedCSVFiles = parsedCsvFiles.size();
-        mockCSV = utils.writeCSVFile(Bank.ING, folder.newFile("test.csv"), utils.constructMockCSVContentForBank(Bank.ING));
-        parseUserSelectedCSVFiles(new File[]{mockCSV});
-        while (!stopCondition.stop) {
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        int initialParsedCSVFiles = local.getParsedCsvFiles().size();
+        final File mockCSV2 = utils.writeCSVFile(Bank.ING, folder.newFile("test.csv"), utils.constructMockCSVContentForBank(Bank.ING));
+        Platform.runLater(() -> {
+            local.parseUserSelectedCSVFiles(Arrays.asList(mockCSV2));
+        });
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         //test parsed the same file content twice, so double expected values.
-        assertTrue(inModel != null && inModel.size() == 3);
-        assertTrue(outModel != null && outModel.size() == 3);
-        
-        assertTrue(parsedCsvFiles.size() == initialParsedCSVFiles + 1);
+        assertTrue(local.getInModel() != null && local.getInModel().size() == 3);
+        assertTrue(local.getOutModel() != null && local.getOutModel().size() == 3);
+
+        assertTrue(local.getParsedCsvFiles().size() == initialParsedCSVFiles + 1);
     }
 
-    private class StopCondition {
-        private boolean stop = false;
+    private class LocalListChangeListener implements ListChangeListener<Node> {
+
+        private final CountDownLatch latch;
+
+        public LocalListChangeListener(final CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        @Override
+        public void onChanged(Change<? extends Node> c) {
+            c.next();
+            assertTrue(c.wasAdded() && c.getAddedSize() == 1 && c.getAddedSubList().size() == 1);
+            Node addedNode = c.getAddedSubList().get(0);
+            assertTrue(addedNode != null);
+            latch.countDown();
+        }
+    }
+    
+    /**
+    Allows accessing several protected fields and methods.
+    */
+    private class LocalUI extends CsvParserUI{
+
+        @Override
+        protected void loadData(List<CsvFileParseResponse> parsedTransactions) {
+            super.loadData(parsedTransactions); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public MenuBar createMenu() {
+            return super.createMenu(); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        protected ScrollPane createFeedbackView() {
+            return super.createFeedbackView(); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        public TextFlow getFeedbackPane() {
+            return feedbackPane;
+        }
+
+        @Override
+        protected void parseUserSelectedCSVFiles(List<File> csvFiles) {
+            super.parseUserSelectedCSVFiles(csvFiles); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        public ObservableList<BankTransactionAbstractGroup> getInModel() {
+            return inModel;
+        }
+
+        public ObservableList<BankTransactionAbstractGroup> getOutModel() {
+            return outModel;
+        }
+
+        public List<File> getParsedCsvFiles() {
+            return parsedCsvFiles;
+        }
     }
 }

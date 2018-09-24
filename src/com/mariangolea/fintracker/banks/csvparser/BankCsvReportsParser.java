@@ -2,7 +2,6 @@ package com.mariangolea.fintracker.banks.csvparser;
 
 import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
 import javafx.application.Application;
-import javafx.embed.swing.JFXPanel;
 
 /**
  * UI component for parsing bank csv transaction reports parser.

@@ -22,18 +22,26 @@ public class ListCellRenderersTest extends FXUITest {
 
     @Test
     public void testBankTransactionGroupCellRenderer() {
+        if (!fxInitialized) {
+            assertTrue("Useless in headless mode", true);
+        }
+
         BankTransactionDefaultGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         ListView<BankTransactionAbstractGroup> test = new ListView<>(FXCollections.observableArrayList(one));
         LocalExtensionGroupRenderer renderer = new LocalExtensionGroupRenderer(test);
-        assertTrue(renderer.getText()== null);
+        assertTrue(renderer.getText() == null);
         renderer.updateItem(one, true);
-        assertTrue(renderer.getText()== null);
+        assertTrue(renderer.getText() == null);
         renderer.updateItem(one, false);
         assertTrue(!renderer.getText().isEmpty());
     }
 
     @Test
     public void testBankTransactionGroupListSelectionRenderer() {
+        if (!fxInitialized) {
+            assertTrue("Useless in headless mode", true);
+        }
+        
         BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
         one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));

@@ -14,8 +14,8 @@ import org.junit.Test;
  *
  * @author Marian Golea <mariangolea@gmail.com>
  */
-public class BankCsvReportsParserTest extends FXUITest{
-    
+public class BankCsvReportsParserTest extends FXUITest {
+
     @Test
     public void testFrame() {
         BankCsvReportsParser parser = new BankCsvReportsParser();
@@ -23,7 +23,12 @@ public class BankCsvReportsParserTest extends FXUITest{
             //POM file enforced headless to false, to allow calling this JFrame constructor only.
             CsvParserUI frame = parser.initApplication();
             assertTrue(frame != null);
-            frame.init();
+
+            if (!fxInitialized) {
+                assertTrue("Useless in headless mode", true);
+            } else {
+                frame.init();
+            }
         } catch (Exception ex) {
             //Current CircleCI support enforces headless mode.
             //if met, just carry on since this unit test is only here for coverage really...

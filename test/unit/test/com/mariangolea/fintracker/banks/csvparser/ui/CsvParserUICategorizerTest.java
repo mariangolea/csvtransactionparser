@@ -41,11 +41,15 @@ public class CsvParserUICategorizerTest extends FXUITest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-    
+
     private final LocalUI local = new LocalUI();
-    
+
     @Test
     public void testSimpleDataBT() throws IOException {
+        if (!fxInitialized) {
+            assertTrue("Useless in headless mode", true);
+        }
+
         Platform.setImplicitExit(false);
         File mockCSV = utils.writeCSVFile(Bank.BT, folder.newFile("testUI.csv"), utils.constructMockCSVContentForBank(Bank.BT));
         assertTrue(mockCSV != null);
@@ -54,7 +58,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         local.loadData(Arrays.asList(response));
         assertTrue(local.getInModel() != null);
         assertTrue(local.getOutModel() != null);
-        
+
         MenuBar menu = local.createMenu();
         assertTrue(menu != null);
 
@@ -100,11 +104,11 @@ public class CsvParserUICategorizerTest extends FXUITest {
             latch.countDown();
         }
     }
-    
+
     /**
     Allows accessing several protected fields and methods.
-    */
-    private class LocalUI extends CsvParserUI{
+     */
+    private class LocalUI extends CsvParserUI {
 
         @Override
         protected void loadData(List<CsvFileParseResponse> parsedTransactions) {

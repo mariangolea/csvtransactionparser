@@ -16,18 +16,18 @@ import org.junit.BeforeClass;
  * @author Marian Golea <mariangolea@gmail.com>
  */
 public class FXUITest {
-
+    
     @BeforeClass
     public static void initToolkit()
             throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
         SwingUtilities.invokeLater(() -> {
-            new JFXPanel(); 
+            new JFXPanel();
             latch.countDown();
         });
 
-        if (!latch.await(5L, TimeUnit.SECONDS)) {
-            throw new ExceptionInInitializerError();
-        }
+        fxInitialized = latch.await(10L, TimeUnit.SECONDS);
     }
+    
+    static boolean fxInitialized; 
 }

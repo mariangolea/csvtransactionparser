@@ -48,6 +48,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
     public void testSimpleDataBT() throws IOException {
         if (!fxInitialized) {
             assertTrue("Useless in headless mode", true);
+            return;
         }
 
         Platform.setImplicitExit(false);

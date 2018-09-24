@@ -40,6 +40,7 @@ public class ListCellRenderersTest extends FXUITest {
     public void testBankTransactionGroupListSelectionRenderer() {
         if (!fxInitialized) {
             assertTrue("Useless in headless mode", true);
+            return;
         }
         
         BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);

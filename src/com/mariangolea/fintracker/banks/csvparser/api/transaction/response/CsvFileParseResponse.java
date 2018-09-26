@@ -1,6 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction.response;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionUtils;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
@@ -39,7 +39,7 @@ public class CsvFileParseResponse {
     /**
     List of groups of similar transactions found within the csv file.
      */
-    public final List<BankTransactionAbstractGroup> parsedTransactionGroups = new ArrayList<>();
+    public final List<BankTransactionCompanyGroup> parsedTransactionGroups = new ArrayList<>();
     /**
     Not recognised strings, if any.
      */

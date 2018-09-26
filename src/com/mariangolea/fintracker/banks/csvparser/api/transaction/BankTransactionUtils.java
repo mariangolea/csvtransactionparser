@@ -25,8 +25,8 @@ public class BankTransactionUtils {
      * @param list parse resulted groups.
      * @return
      */
-    public List<BankTransactionAbstractGroup> processTransactions(List<BankTransactionDefaultGroup> list) {
-        List<BankTransactionAbstractGroup> results = new ArrayList<>();
+    public List<BankTransactionCompanyGroup> processTransactions(List<BankTransactionDefaultGroup> list) {
+        List<BankTransactionCompanyGroup> results = new ArrayList<>();
         if (list == null) {
             return results;
         }

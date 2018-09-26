@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
@@ -27,8 +28,8 @@ public class ListCellRenderersTest extends FXUITest {
             return;
         }
 
-        BankTransactionDefaultGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
-        ListView<BankTransactionAbstractGroup> test = new ListView<>(FXCollections.observableArrayList(one));
+        BankTransactionCompanyGroup one = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
+        ListView<BankTransactionCompanyGroup> test = new ListView<>(FXCollections.observableArrayList(one));
         LocalExtensionGroupRenderer renderer = new LocalExtensionGroupRenderer(test);
         assertTrue(renderer.getText() == null);
         renderer.updateItem(one, true);
@@ -44,16 +45,16 @@ public class ListCellRenderersTest extends FXUITest {
             return;
         } 
         
-        BankTransactionAbstractGroup one = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
+        BankTransactionCompanyGroup one = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
         one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        BankTransactionAbstractGroup two = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
+        BankTransactionCompanyGroup two = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
         two.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(300), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        BankTransactionAbstractGroup three = new BankTransactionDefaultGroup("one", BankTransaction.Type.IN);
+        BankTransactionCompanyGroup three = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
         three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(500), "two",
                 BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        ListView<BankTransactionAbstractGroup> test = new ListView<>(FXCollections.observableArrayList(one, two, three));
+        ListView<BankTransactionCompanyGroup> test = new ListView<>(FXCollections.observableArrayList(one, two, three));
         test.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         Label pane = new Label();
@@ -73,12 +74,12 @@ public class ListCellRenderersTest extends FXUITest {
 
     private class LocalExtensionGroupRenderer extends TransactionGroupCellRenderer {
 
-        public LocalExtensionGroupRenderer(ListView<BankTransactionAbstractGroup> param) {
+        public LocalExtensionGroupRenderer(ListView<BankTransactionCompanyGroup> param) {
             super(param);
         }
 
         @Override
-        protected void updateItem(BankTransactionAbstractGroup value, boolean empty) {
+        protected void updateItem(BankTransactionCompanyGroup value, boolean empty) {
             super.updateItem(value, empty); //To change body of generated methods, choose Tools | Templates.
         }
 

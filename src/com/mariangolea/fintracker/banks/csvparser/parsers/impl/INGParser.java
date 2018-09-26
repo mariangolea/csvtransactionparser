@@ -43,7 +43,9 @@ public class INGParser extends AbstractBankParser {
         CUMPARARE_POS("Cumparare POS"),
         RAMBURSARE_RATE_CREDIT("Rambursare rata card credit"),
         REALIMENTARE("Realimentare (debitare directa)"),
-        CUMPARARE_POS_CORECTIE("Cumparare POS corectie");
+        CUMPARARE_POS_CORECTIE("Cumparare POS corectie"),
+        ALIMENTARE_CREDIT("Alimentare Credit"),
+        TAXA_EMITERE_CARD("Taxa emitere card");
 
         public final String desc;
 

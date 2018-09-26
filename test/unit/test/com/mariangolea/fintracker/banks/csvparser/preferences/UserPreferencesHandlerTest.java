@@ -22,13 +22,13 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHan
  */
 public class UserPreferencesHandlerTest {
 
-    private final UserPreferencesHandler handler = new UserPreferencesHandler();
+    private final UserPreferencesHandler handler = UserPreferencesHandler.getInstance();
 
     @Test
     public void testFirstLoadPreferences() {
         // delete preferences file to verify initial app behavior.
         handler.deletePreferencesFile();
-        UserPreferences prefs = handler.loadUserPreferences();
+        UserPreferences prefs = handler.getPreferences();
         assertTrue(prefs.getUserDefinitions() != null && prefs.getUserDefinitions().isEmpty());
         assertTrue(prefs.getCSVInputFolder() == null);
     }
@@ -36,7 +36,7 @@ public class UserPreferencesHandlerTest {
     @Test
     public void testBehaviorStorePreferences() {
         handler.deletePreferencesFile();
-        UserPreferences prefs = handler.loadUserPreferences();
+        UserPreferences prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
         UserDefinedTransactionGroup group = new UserDefinedTransactionGroup("category1");
         group.addAssociations("first", new HashSet<>(Arrays.asList("1", "2")));
@@ -45,9 +45,9 @@ public class UserPreferencesHandlerTest {
         prefs.setTransactionDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.
-        boolean stored = handler.storePreferences(prefs);
+        boolean stored = handler.storePreferences();
         assertTrue(stored);
-        UserPreferences loaded = handler.loadUserPreferences();
+        UserPreferences loaded = handler.getPreferences();
         assertTrue(prefs.equals(loaded));
 
         boolean deleted = handler.deletePreferencesFile();

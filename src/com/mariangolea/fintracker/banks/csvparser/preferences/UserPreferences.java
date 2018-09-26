@@ -1,6 +1,9 @@
 package com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import java.util.*;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 
 /**
  * Container of user preferences:
@@ -12,9 +15,9 @@ import java.util.*;
  */
 public class UserPreferences {
 
-    private final Map<String, UserDefinedTransactionGroup> transactionCategories = new HashMap<>();
+    private final ObservableMap<String, UserDefinedTransactionGroup> transactionCategories = FXCollections.observableMap(new HashMap<>());
     private String csvInputFolder;
-    private final Map<String, String> transactionDisplayNames = new HashMap<>();
+    private final ObservableMap<String, String> transactionDisplayNames = FXCollections.observableMap(new HashMap<>());
 
     /**
      * Get a ordered set of available user defined categories.
@@ -23,6 +26,42 @@ public class UserPreferences {
      */
     public Set<String> getUserDefinedCategoryNames() {
         return transactionCategories.keySet();
+    }
+
+    public boolean addTransactionCategoriesMapListener(MapChangeListener<String, UserDefinedTransactionGroup> listener) {
+        if (listener == null) {
+            return false;
+        }
+
+        transactionCategories.addListener(listener);
+        return true;
+    }
+
+    public boolean removeTransactionCategoriesMapListener(MapChangeListener<String, UserDefinedTransactionGroup> listener) {
+        if (listener == null) {
+            return false;
+        }
+
+        transactionCategories.removeListener(listener);
+        return true;
+    }
+
+    public boolean addTransactionDisplayNamesMapListener(MapChangeListener<String, String> listener) {
+        if (listener == null) {
+            return false;
+        }
+
+        transactionDisplayNames.addListener(listener);
+        return true;
+    }
+
+    public boolean removeTransactionDisplayNamesMapListener(MapChangeListener<String, String> listener) {
+        if (listener == null) {
+            return false;
+        }
+
+        transactionDisplayNames.removeListener(listener);
+        return true;
     }
 
     /**
@@ -35,7 +74,6 @@ public class UserPreferences {
     public Set<String> getUserDefinedCompanyNames() {
         return transactionDisplayNames.keySet();
     }
-
 
     /**
      * Get the user defined transaction group associated to specified user defined category name.
@@ -64,6 +102,17 @@ public class UserPreferences {
         transactionDisplayNames.put(transactionDesc, displayName);
     }
 
+    public String getCompanyDescriptionShortFor(final String companyDescriptionLong){
+        Objects.requireNonNull(companyDescriptionLong);
+        for (String shortDesc : transactionDisplayNames.keySet()){
+            if (companyDescriptionLong.contains(shortDesc)){
+                return shortDesc;
+            }
+        }
+        
+        return null;
+    }
+    
     /**
      * Get the display name corresponding to received transaction description relevant sub string.
      * <br>A good example is providing simple strings like "LIDL" or "SC NEPTUN SA".</br>
@@ -76,7 +125,6 @@ public class UserPreferences {
         Objects.requireNonNull(transactionDesc);
         return transactionDisplayNames.get(transactionDesc);
     }
-
 
     /**
      * Add a user defined category name for corresponding transaction group.
@@ -157,12 +205,16 @@ public class UserPreferences {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         UserPreferences that = (UserPreferences) o;
-        return Objects.equals(transactionCategories, that.transactionCategories) &&
-                Objects.equals(csvInputFolder, that.csvInputFolder) &&
-                Objects.equals(transactionDisplayNames, that.transactionDisplayNames);
+        return Objects.equals(transactionCategories, that.transactionCategories)
+                && Objects.equals(csvInputFolder, that.csvInputFolder)
+                && Objects.equals(transactionDisplayNames, that.transactionDisplayNames);
     }
 
     @Override

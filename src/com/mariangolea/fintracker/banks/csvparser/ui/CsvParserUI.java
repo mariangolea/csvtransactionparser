@@ -1,7 +1,7 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
@@ -48,10 +48,12 @@ public class CsvParserUI extends Application {
     protected TextFlow feedbackPane;
     private Label inResponseLabel;
     private Label outResponseLabel;
-    protected final ObservableList<BankTransactionAbstractGroup> inModel = FXCollections.observableArrayList();
-    protected final ObservableList<BankTransactionAbstractGroup> outModel = FXCollections.observableArrayList();
+    protected final ObservableList<BankTransactionCompanyGroup> inModel = FXCollections.observableArrayList();
+    protected final ObservableList<BankTransactionCompanyGroup> outModel = FXCollections.observableArrayList();
+    private ListView<BankTransactionCompanyGroup> listViewIN;
+    private ListView<BankTransactionCompanyGroup> listViewOUT;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
-    private final UserPreferencesHandler preferences = new UserPreferencesHandler();
+    private final UserPreferencesHandler preferences = UserPreferencesHandler.getInstance();
     private final UserPreferences userPrefs;
     protected final List<File> parsedCsvFiles = new ArrayList<>();
     private Stage primaryStage;
@@ -61,7 +63,7 @@ public class CsvParserUI extends Application {
     protected static final String FINISHED_PARSING_CSV_FILES = "Finished parsing the CSV files: ";
 
     public CsvParserUI() {
-        userPrefs = preferences.loadUserPreferences();
+        userPrefs = preferences.getPreferences();
     }
 
     @Override
@@ -167,7 +169,7 @@ public class CsvParserUI extends Application {
 
     protected void parseUserSelectedCSVFiles(List<File> csvFiles) {
         userPrefs.setCSVInputFolder(csvFiles.get(0).getParent());
-        preferences.storePreferences(userPrefs);
+        preferences.storePreferences();
         parsedCsvFiles.addAll(csvFiles);
         startParsingCsvFiles(csvFiles);
     }
@@ -203,11 +205,16 @@ public class CsvParserUI extends Application {
     }
 
     private ScrollPane createTransactionView(BankTransaction.Type type) {
-        ObservableList<BankTransactionAbstractGroup> model = BankTransaction.Type.IN == type ? inModel : outModel;
+        ObservableList<BankTransactionCompanyGroup> model = BankTransaction.Type.IN == type ? inModel : outModel;
         Label responseLabel = BankTransaction.Type.IN == type ? inResponseLabel : outResponseLabel;
-        ListView<BankTransactionAbstractGroup> listView = new ListView<>(model);
+        ListView<BankTransactionCompanyGroup> listView = new ListView<>(model);
+        if (BankTransaction.Type.IN == type){
+            listViewIN = listView;
+        } else{
+            listViewOUT = listView;
+        }
         model.addListener(new TransactionGroupListSelectionListener(listView, responseLabel));
-        listView.setCellFactory((ListView<BankTransactionAbstractGroup> param) -> {
+        listView.setCellFactory(param -> {
             return new TransactionGroupCellRenderer(param);
         });
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -227,19 +234,17 @@ public class CsvParserUI extends Application {
         return scrollPane;
     }
 
-    protected TextFlow constructFeedbackPane(){
+    protected TextFlow constructFeedbackPane() {
         return new TextFlow();
     }
-    
+
     protected void appendReportText(CsvFileParseResponse fileResponse) {
         appendHyperlinkToFile("\n", fileResponse.csvFile, ": ");
         if (fileResponse.allCsvContentProcessed && fileResponse.expectedTransactionsNumber == fileResponse.foundTransactionsNumber) {
             appendReportMessage("ALL OK!");
         } else if (!fileResponse.allCsvContentProcessed) {
             String message = "Find below CSV content lines unprocessed.\n";
-            for (String line : fileResponse.unprocessedStrings) {
-                message += "\t" + line;
-            }
+            message = fileResponse.unprocessedStrings.stream().map((line) -> "\t" + line).reduce(message, String::concat);
             appendReportMessage(message);
         } else {
             if (fileResponse.expectedTransactionsNumber == 0) {

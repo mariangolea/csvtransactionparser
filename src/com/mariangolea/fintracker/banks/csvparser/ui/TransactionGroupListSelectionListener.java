@@ -1,6 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import java.math.BigDecimal;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -18,10 +18,10 @@ public class TransactionGroupListSelectionListener implements ListChangeListener
     public static final String LABEL_NOTHING_SELECTED = "Total Amount: ";
     public static final String LABEL_SOMETHING_SELECTED = "Selected Amount: ";
 
-    private final ListView<BankTransactionAbstractGroup> list;
+    private final ListView<BankTransactionCompanyGroup> list;
     private final Label amountArea;
 
-    public TransactionGroupListSelectionListener(ListView<BankTransactionAbstractGroup> list, Label amountArea) {
+    public TransactionGroupListSelectionListener(ListView<BankTransactionCompanyGroup> list, Label amountArea) {
         this.list = list;
         this.amountArea = amountArea;
     }

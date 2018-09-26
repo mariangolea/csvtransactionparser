@@ -12,6 +12,7 @@ import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVParserFactory;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
@@ -178,11 +179,11 @@ public class CsvParserUICategorizerTest extends FXUITest {
             super.parseUserSelectedCSVFiles(csvFiles); //To change body of generated methods, choose Tools | Templates.
         }
 
-        public ObservableList<BankTransactionAbstractGroup> getInModel() {
+        public ObservableList<BankTransactionCompanyGroup> getInModel() {
             return inModel;
         }
 
-        public ObservableList<BankTransactionAbstractGroup> getOutModel() {
+        public ObservableList<BankTransactionCompanyGroup> getOutModel() {
             return outModel;
         }
 

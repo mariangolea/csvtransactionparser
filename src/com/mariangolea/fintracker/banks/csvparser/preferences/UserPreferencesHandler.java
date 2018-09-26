@@ -34,13 +34,31 @@ public class UserPreferencesHandler {
 
     private final Properties userPrefsFile = new Properties();
     private final Properties companyNamesFile = new Properties();
-
+    private UserPreferences userPreferences;
+    
+    private static class Holder{
+        private static UserPreferencesHandler HANDLER = new UserPreferencesHandler();
+    }
+    
+    private UserPreferencesHandler(){}
+    
+    public static UserPreferencesHandler getInstance(){
+        return Holder.HANDLER;
+    }
+    
+    public UserPreferences getPreferences(){
+        if (userPreferences == null){
+            userPreferences = loadUserPreferences();
+        }
+        return userPreferences;
+    }
+    
     /**
      * Get the user preferences.
      *
      * @return user preferences
      */
-    public UserPreferences loadUserPreferences() {
+    private UserPreferences loadUserPreferences() {
         UserPreferences loadedPrefs = new UserPreferences();
         loadUserPrefsFile(loadedPrefs);
         loadCompanyNamesFile(loadedPrefs);
@@ -52,10 +70,9 @@ public class UserPreferencesHandler {
      * Stores user preferences. Depending on user choice, this happens on a default
      * location or a user defined one.
      *
-     * @param userPreferences
      * @return true if successfull
      */
-    public boolean storePreferences(final UserPreferences userPreferences) {
+    public boolean storePreferences() {
         boolean success = storeUserPrefsFile(userPreferences);
         success &= storeCompanyNamesFile(userPreferences);
         return success;

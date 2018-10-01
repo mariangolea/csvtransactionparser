@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 
 /**
  *
- * @author Marian Golea <marian.golea@microchip.com>
+ * @author Marian Golea <mariangolea@gmail.com>
  */
 public class BankTransactionDefaultGroupTest {
 

@@ -17,7 +17,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Marian Golea <marian.golea@microchip.com>
+ * @author Marian Golea <mariangolea@gmail.com>
  */
 public class BankTransactionCompanyGroupTest {
 

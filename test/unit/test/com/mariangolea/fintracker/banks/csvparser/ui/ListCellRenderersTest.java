@@ -8,10 +8,8 @@ import java.util.Date;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
-import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupCellRenderer;
+import com.mariangolea.fintracker.banks.csvparser.ui.renderer.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
 import java.math.BigDecimal;
 import javafx.collections.FXCollections;
@@ -30,7 +28,7 @@ public class ListCellRenderersTest extends FXUITest {
 
         BankTransactionCompanyGroup one = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
         ListView<BankTransactionCompanyGroup> test = new ListView<>(FXCollections.observableArrayList(one));
-        LocalExtensionGroupRenderer renderer = new LocalExtensionGroupRenderer(test);
+        LocalExtensionGroupRenderer renderer = new LocalExtensionGroupRenderer();
         assertTrue(renderer.getText() == null);
         renderer.updateItem(one, true);
         assertTrue(renderer.getText() == null);
@@ -74,8 +72,8 @@ public class ListCellRenderersTest extends FXUITest {
 
     private class LocalExtensionGroupRenderer extends TransactionGroupCellRenderer {
 
-        public LocalExtensionGroupRenderer(ListView<BankTransactionCompanyGroup> param) {
-            super(param);
+        public LocalExtensionGroupRenderer() {
+            super();
         }
 
         @Override

@@ -37,7 +37,7 @@ public class UserPreferencesHandler {
     private UserPreferences userPreferences;
     
     private static class Holder{
-        private static UserPreferencesHandler HANDLER = new UserPreferencesHandler();
+        private static final UserPreferencesHandler HANDLER = new UserPreferencesHandler();
     }
     
     private UserPreferencesHandler(){}
@@ -48,7 +48,8 @@ public class UserPreferencesHandler {
     
     public UserPreferences getPreferences(){
         if (userPreferences == null){
-            userPreferences = loadUserPreferences();
+            userPreferences = new UserPreferences();
+            loadUserPreferences();
         }
         return userPreferences;
     }
@@ -58,12 +59,9 @@ public class UserPreferencesHandler {
      *
      * @return user preferences
      */
-    private UserPreferences loadUserPreferences() {
-        UserPreferences loadedPrefs = new UserPreferences();
-        loadUserPrefsFile(loadedPrefs);
-        loadCompanyNamesFile(loadedPrefs);
-
-        return loadedPrefs;
+    private void loadUserPreferences() {
+        loadUserPrefsFile();
+        loadCompanyNamesFile();
     }
 
     /**
@@ -73,8 +71,8 @@ public class UserPreferencesHandler {
      * @return true if successfull
      */
     public boolean storePreferences() {
-        boolean success = storeUserPrefsFile(userPreferences);
-        success &= storeCompanyNamesFile(userPreferences);
+        boolean success = storeUserPrefsFile();
+        success &= storeCompanyNamesFile();
         return success;
     }
 
@@ -86,47 +84,46 @@ public class UserPreferencesHandler {
         return true;
     }
 
-    private void loadUserPrefsFile(final UserPreferences userPreferences) {
+    private void loadUserPrefsFile() {
         File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
         try {
             if (propertiesFile.exists()) {
-                FileReader reader = new FileReader(propertiesFile);
-                userPrefsFile.load(reader);
-                reader.close();
+                try (FileReader reader = new FileReader(propertiesFile)) {
+                    userPrefsFile.load(reader);
+                }
                 userPreferences.setCSVInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
                 String categoryNamesString = userPrefsFile.getProperty(CATEGORY_NAMES);
-                Set<String> categoryNames = new HashSet<String>(
+                Set<String> categoryNames = new HashSet<>(
                         convertPersistedStringToList(categoryNamesString, SEPARATOR_USER_CATEGORIES));
-                for (String categoryName : categoryNames) {
-                    Set<String> bankGroups = new HashSet<String>(
+                categoryNames.forEach((categoryName) -> {
+                    Set<String> bankGroups = new HashSet<>(
                             convertPersistedStringToList(userPrefsFile.getProperty(categoryName), SEPARATOR_BANKS));
                     UserDefinedTransactionGroup userGroup = new UserDefinedTransactionGroup(categoryName);
-                    for (String bankGroup : bankGroups) {
-                        List<String> bankWithTransactions = convertPersistedStringToList(bankGroup,
-                                SEPARATOR_TRANSACTIONS);
-                        String swiftCode = bankWithTransactions.toArray()[0].toString();
-                        Set<String> transactions = new HashSet<String>(convertPersistedStringToList(
-                                bankWithTransactions.toArray()[1].toString(), SEPARATOR_USER_CATEGORIES));
-                        userGroup.addAssociations(swiftCode, transactions);
-                    }
+                    bankGroups.stream().map((bankGroup) -> convertPersistedStringToList(bankGroup,
+                            SEPARATOR_TRANSACTIONS)).forEachOrdered((bankWithTransactions) -> {
+                                String swiftCode = bankWithTransactions.toArray()[0].toString();
+                                Set<String> transactions = new HashSet<>(convertPersistedStringToList(
+                                        bankWithTransactions.toArray()[1].toString(), SEPARATOR_USER_CATEGORIES));
+                                userGroup.addAssociations(swiftCode, transactions);
+                            });
                     userPreferences.addDefinition(categoryName, userGroup);
-                }
+                });
             }
         } catch (IOException ex) {
             Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private void loadCompanyNamesFile(final UserPreferences userPreferences) {
+    private void loadCompanyNamesFile() {
         File propertiesFile = new File(COMPANY_NAMES_FILE_PATH_DEFAULT);
         try {
             if (propertiesFile.exists()) {
-                FileReader reader = new FileReader(propertiesFile);
-                companyNamesFile.load(reader);
-                reader.close();
-                for (Object categoryName : companyNamesFile.keySet()) {
-                    userPreferences.setTransactionDisplayName(categoryName.toString(), companyNamesFile.get(categoryName).toString());
+                try (FileReader reader = new FileReader(propertiesFile)) {
+                    companyNamesFile.load(reader);
                 }
+                companyNamesFile.keySet().forEach((categoryName) -> {
+                    userPreferences.setTransactionDisplayName(categoryName.toString(), companyNamesFile.get(categoryName).toString());
+                });
             }
         } catch (IOException ex) {
             Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -134,23 +131,23 @@ public class UserPreferencesHandler {
     }
 
 
-    private boolean storeUserPrefsFile(final UserPreferences userPreferences) {
+    private boolean storeUserPrefsFile() {
         userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getCSVInputFolder());
         final Set<String> categoryNames = userPreferences.getUserDefinedCategoryNames();
         String categoryNamesValue = convertStringsForStorage(categoryNames, SEPARATOR_USER_CATEGORIES);
         if (categoryNamesValue != null && !categoryNamesValue.isEmpty()) {
             userPrefsFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
-            for (String categoryName : categoryNames) {
+            categoryNames.forEach((categoryName) -> {
                 UserDefinedTransactionGroup userGroup = userPreferences.getDefinition(categoryName);
                 Set<String> swiftCodes = userGroup.getSwiftCodes();
                 Set<String> perBank = new HashSet<>();
-                for (String swiftCode : swiftCodes) {
+                swiftCodes.forEach((swiftCode) -> {
                     String forSwiftCode = convertStringsForStorage(userGroup.getTransactionsFor(swiftCode),
                             SEPARATOR_USER_CATEGORIES);
                     perBank.add(swiftCode + SEPARATOR_TRANSACTIONS + forSwiftCode);
-                }
+                });
                 userPrefsFile.setProperty(categoryName, convertStringsForStorage(perBank, SEPARATOR_BANKS));
-            }
+            });
         }
 
         File propertiesFile = new File(USER_PREFERENCES_FILE_PATH_DEFAULT);
@@ -161,9 +158,9 @@ public class UserPreferencesHandler {
                     return false;
                 }
             }
-            FileWriter writer = new FileWriter(propertiesFile);
-            userPrefsFile.store(writer, COMMENTS);
-            writer.close();
+            try (FileWriter writer = new FileWriter(propertiesFile)) {
+                userPrefsFile.store(writer, COMMENTS);
+            }
             success.set(true);
 
         } catch (IOException ex) {
@@ -173,10 +170,10 @@ public class UserPreferencesHandler {
         return success.get();
     }
 
-    private boolean storeCompanyNamesFile(final UserPreferences userPreferences) {
-        for (String transactionDescString : userPreferences.getUserDefinedCompanyNames()) {
+    private boolean storeCompanyNamesFile() {
+        userPreferences.getUserDefinedCompanyNames().forEach((transactionDescString) -> {
             companyNamesFile.setProperty(transactionDescString, userPreferences.getDisplayName(transactionDescString));
-        }
+        });
 
         File propertiesFile = new File(COMPANY_NAMES_FILE_PATH_DEFAULT);
         AtomicBoolean success = new AtomicBoolean(false);
@@ -186,9 +183,9 @@ public class UserPreferencesHandler {
                     return false;
                 }
             }
-            FileWriter writer = new FileWriter(propertiesFile);
-            companyNamesFile.store(writer, COMMENTS);
-            writer.close();
+            try (FileWriter writer = new FileWriter(propertiesFile)) {
+                companyNamesFile.store(writer, COMMENTS);
+            }
             success.set(true);
 
         } catch (IOException ex) {
@@ -204,9 +201,7 @@ public class UserPreferencesHandler {
         if (strings == null || strings.isEmpty()) {
             return soleString;
         }
-        for (String categoryName : strings) {
-            soleString += categoryName + separator;
-        }
+        soleString = strings.stream().map((categoryName) -> categoryName + separator).reduce(soleString, String::concat);
         soleString = soleString.substring(0, soleString.length() - 1);
 
         return soleString;

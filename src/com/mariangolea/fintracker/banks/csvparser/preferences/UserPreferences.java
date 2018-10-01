@@ -99,13 +99,13 @@ public class UserPreferences {
     public void setTransactionDisplayName(final String transactionDesc, final String displayName) {
         Objects.requireNonNull(transactionDesc);
         Objects.requireNonNull(displayName);
-        transactionDisplayNames.put(transactionDesc, displayName);
+        transactionDisplayNames.put(transactionDesc.toLowerCase(), displayName);
     }
 
     public String getCompanyDescriptionShortFor(final String companyDescriptionLong){
         Objects.requireNonNull(companyDescriptionLong);
         for (String shortDesc : transactionDisplayNames.keySet()){
-            if (companyDescriptionLong.contains(shortDesc)){
+            if (companyDescriptionLong.toLowerCase().contains(shortDesc)){
                 return shortDesc;
             }
         }

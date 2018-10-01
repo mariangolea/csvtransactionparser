@@ -1,5 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
+import com.mariangolea.fintracker.banks.csvparser.ui.renderer.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
@@ -13,6 +14,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -25,6 +27,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -92,8 +95,8 @@ public class CsvParserUI extends Application {
 
         ScrollPane centerScroll = createFeedbackView();
 
-        ScrollPane scrollPaneIN = createTransactionView(BankTransaction.Type.IN);
-        ScrollPane scrollPaneOUT = createTransactionView(BankTransaction.Type.OUT);
+        GridPane scrollPaneIN = createTransactionView(BankTransaction.Type.IN);
+        GridPane scrollPaneOUT = createTransactionView(BankTransaction.Type.OUT);
 
         grid.add(inResponseLabel, 0, 0);
         grid.add(scrollPaneIN, 0, 1);
@@ -169,7 +172,6 @@ public class CsvParserUI extends Application {
 
     protected void parseUserSelectedCSVFiles(List<File> csvFiles) {
         userPrefs.setCSVInputFolder(csvFiles.get(0).getParent());
-        preferences.storePreferences();
         parsedCsvFiles.addAll(csvFiles);
         startParsingCsvFiles(csvFiles);
     }
@@ -204,25 +206,40 @@ public class CsvParserUI extends Application {
         runThread.start();
     }
 
-    private ScrollPane createTransactionView(BankTransaction.Type type) {
-        ObservableList<BankTransactionCompanyGroup> model = BankTransaction.Type.IN == type ? inModel : outModel;
+    private GridPane createTransactionView(BankTransaction.Type type) {
+        FilteredList<BankTransactionCompanyGroup> model = new FilteredList<>(BankTransaction.Type.IN == type ? inModel : outModel, s -> true);
         Label responseLabel = BankTransaction.Type.IN == type ? inResponseLabel : outResponseLabel;
         ListView<BankTransactionCompanyGroup> listView = new ListView<>(model);
-        if (BankTransaction.Type.IN == type){
+        if (BankTransaction.Type.IN == type) {
             listViewIN = listView;
-        } else{
+        } else {
             listViewOUT = listView;
         }
         model.addListener(new TransactionGroupListSelectionListener(listView, responseLabel));
         listView.setCellFactory(param -> {
-            return new TransactionGroupCellRenderer(param);
+            return new TransactionGroupCellRenderer();
         });
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         ScrollPane scrollPane = new ScrollPane(listView);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
 
-        return scrollPane;
+        GridPane pane = new GridPane();
+        TextField search = new TextField();
+        search.setPromptText("Enter company name to filter on");
+        search.textProperty().addListener(text -> {
+            String filter = search.getText();
+            if (filter == null || filter.length() == 0) {
+                model.setPredicate(s -> true);
+            } else {
+                model.setPredicate(s -> s.getCompanyDesc() != null && s.getCompanyDesc().toLowerCase().contains(filter.toLowerCase()));
+            }
+        });
+
+        pane.add(search, 0, 0, 1, 1);
+        pane.add(scrollPane, 0, 1, 3, 12);
+
+        return pane;
     }
 
     protected ScrollPane createFeedbackView() {

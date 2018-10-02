@@ -1,12 +1,12 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
-import com.mariangolea.fintracker.banks.csvparser.ui.renderer.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import com.mariangolea.fintracker.banks.csvparser.ui.transactions.TransactionTypeView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,27 +14,21 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -49,12 +43,10 @@ import javafx.stage.Stage;
 public class CsvParserUI extends Application {
 
     protected TextFlow feedbackPane;
-    private Label inResponseLabel;
-    private Label outResponseLabel;
-    protected final ObservableList<BankTransactionCompanyGroup> inModel = FXCollections.observableArrayList();
-    protected final ObservableList<BankTransactionCompanyGroup> outModel = FXCollections.observableArrayList();
-    private ListView<BankTransactionCompanyGroup> listViewIN;
-    private ListView<BankTransactionCompanyGroup> listViewOUT;
+    protected final ObservableList<BankTransactionGroupInterface> inModel = FXCollections.observableArrayList();
+    protected final ObservableList<BankTransactionGroupInterface> outModel = FXCollections.observableArrayList();
+    private TransactionTypeView inView;
+    private TransactionTypeView outView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = UserPreferencesHandler.getInstance();
     private final UserPreferences userPrefs;
@@ -71,8 +63,6 @@ public class CsvParserUI extends Application {
 
     @Override
     public void init() throws Exception {
-        inResponseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
-        outResponseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
         MenuBar menuBar = createMenu();
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -80,29 +70,24 @@ public class CsvParserUI extends Application {
         grid.setPadding(new Insets(10, 10, 10, 10));
         ColumnConstraints col = new ColumnConstraints();
         col.setFillWidth(true);
+        col.setHgrow(Priority.ALWAYS);
+        col.setPercentWidth(40);
+        grid.getColumnConstraints().add(col);
         col.setHgrow(Priority.SOMETIMES);
+        col.setPercentWidth(20);
         grid.getColumnConstraints().add(col);
         col.setHgrow(Priority.ALWAYS);
-        col.setPercentWidth(80);
+        col.setPercentWidth(40);
         grid.getColumnConstraints().add(col);
-        col.setHgrow(Priority.SOMETIMES);
-        grid.getColumnConstraints().add(col);
-        RowConstraints row = new RowConstraints();
-        row.setFillHeight(true);
-        row.setVgrow(Priority.ALWAYS);
-        grid.getRowConstraints().add(row);
-        grid.getRowConstraints().add(row);
 
         ScrollPane centerScroll = createFeedbackView();
 
-        GridPane scrollPaneIN = createTransactionView(BankTransaction.Type.IN);
-        GridPane scrollPaneOUT = createTransactionView(BankTransaction.Type.OUT);
+        inView = new TransactionTypeView(BankTransaction.Type.IN, inModel);
+        outView = new TransactionTypeView(BankTransaction.Type.OUT, outModel);
 
-        grid.add(inResponseLabel, 0, 0);
-        grid.add(scrollPaneIN, 0, 1);
-        grid.add(centerScroll, 1, 0, 1, 2);
-        grid.add(outResponseLabel, 2, 0);
-        grid.add(scrollPaneOUT, 2, 1);
+        grid.add(inView, 0, 0);
+        grid.add(centerScroll, 1,0);
+        grid.add(outView, 2, 0);
         grid.setStyle("-fx-background-color: BEIGE;");
 
         root = new BorderPane();
@@ -132,6 +117,8 @@ public class CsvParserUI extends Application {
                     }
                 });
             });
+            inView.updateTreeModel();
+            outView.updateTreeModel();
         }
     }
 
@@ -204,42 +191,6 @@ public class CsvParserUI extends Application {
         });
         Thread runThread = new Thread(parseResponse);
         runThread.start();
-    }
-
-    private GridPane createTransactionView(BankTransaction.Type type) {
-        FilteredList<BankTransactionCompanyGroup> model = new FilteredList<>(BankTransaction.Type.IN == type ? inModel : outModel, s -> true);
-        Label responseLabel = BankTransaction.Type.IN == type ? inResponseLabel : outResponseLabel;
-        ListView<BankTransactionCompanyGroup> listView = new ListView<>(model);
-        if (BankTransaction.Type.IN == type) {
-            listViewIN = listView;
-        } else {
-            listViewOUT = listView;
-        }
-        model.addListener(new TransactionGroupListSelectionListener(listView, responseLabel));
-        listView.setCellFactory(param -> {
-            return new TransactionGroupCellRenderer();
-        });
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        ScrollPane scrollPane = new ScrollPane(listView);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-
-        GridPane pane = new GridPane();
-        TextField search = new TextField();
-        search.setPromptText("Enter company name to filter on");
-        search.textProperty().addListener(text -> {
-            String filter = search.getText();
-            if (filter == null || filter.length() == 0) {
-                model.setPredicate(s -> true);
-            } else {
-                model.setPredicate(s -> s.getCompanyDesc() != null && s.getCompanyDesc().toLowerCase().contains(filter.toLowerCase()));
-            }
-        });
-
-        pane.add(search, 0, 0, 1, 1);
-        pane.add(scrollPane, 0, 1, 3, 12);
-
-        return pane;
     }
 
     protected ScrollPane createFeedbackView() {

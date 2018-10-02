@@ -6,7 +6,7 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.ui.edit.BankTransactionGroupEditHandler;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
@@ -16,7 +16,7 @@ import javafx.scene.control.MenuItem;
  */
 public class BankTransactionGroupContextMenu extends ContextMenu {
 
-    BankTransactionCompanyGroup group;
+    BankTransactionGroupInterface group;
     private final BankTransactionGroupEditHandler editHandler;
 
     public BankTransactionGroupContextMenu(final BankTransactionGroupEditHandler editHandler) {
@@ -24,7 +24,7 @@ public class BankTransactionGroupContextMenu extends ContextMenu {
         getItems().add(constructEditMenu());
     }
 
-    public void setBankTransactionGroup(final BankTransactionCompanyGroup group) {
+    public void setBankTransactionGroup(final BankTransactionGroupInterface group) {
         this.group = group;
     }
 

@@ -103,7 +103,7 @@ public class UserPreferences {
     }
 
     public String getCompanyDescriptionShortFor(final String companyDescriptionLong){
-        Objects.requireNonNull(companyDescriptionLong);
+        if (companyDescriptionLong == null) return null;
         for (String shortDesc : transactionDisplayNames.keySet()){
             if (companyDescriptionLong.toLowerCase().contains(shortDesc)){
                 return shortDesc;

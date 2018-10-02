@@ -5,7 +5,7 @@
  */
 package com.mariangolea.fintracker.banks.csvparser.ui.edit;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 import java.util.Optional;
@@ -18,9 +18,12 @@ import javafx.util.Pair;
 public class BankTransactionGroupEditHandler {
 
     private final UserPreferences userPrefs = UserPreferencesHandler.getInstance().getPreferences();
-    private final BankTransactionEditDialog editPopup = new BankTransactionEditDialog();
+    private BankTransactionEditDialog editPopup;
 
-    public void editGroup(final BankTransactionCompanyGroup group) {
+    public void editGroup(final BankTransactionGroupInterface group) {
+        if (editPopup == null) {
+            editPopup = new BankTransactionEditDialog();
+        }
         editPopup.setBankTransactionGroup(group);
         Optional<Pair<String, String>> result = editPopup.showAndWait();
         result.ifPresent(userData -> {

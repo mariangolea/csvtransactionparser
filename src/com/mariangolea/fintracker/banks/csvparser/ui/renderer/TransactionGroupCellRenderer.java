@@ -1,65 +1,48 @@
 package com.mariangolea.fintracker.banks.csvparser.ui.renderer;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
-import com.mariangolea.fintracker.banks.csvparser.ui.BankTransactionGroupContextMenu;
-import com.mariangolea.fintracker.banks.csvparser.ui.edit.BankTransactionGroupEditHandler;
 import javafx.collections.MapChangeListener;
 
-import javafx.scene.control.ListCell;
-import javafx.scene.input.MouseButton;
+import javafx.scene.control.TreeCell;
 
 /**
  * @author mariangolea@gmail.com
  */
-public class TransactionGroupCellRenderer extends ListCell<BankTransactionCompanyGroup> {
-    private final BankTransactionGroupEditHandler editHandler = new BankTransactionGroupEditHandler();
-    private final BankTransactionGroupContextMenu contextMenu = new BankTransactionGroupContextMenu(editHandler);
-    private final UserPreferences userPrefs;
-
+public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupInterface> {
+    UserPreferencesHandler userPrefsHandler =  UserPreferencesHandler.getInstance();
     public TransactionGroupCellRenderer() {
-        setContextMenu(contextMenu);
-        setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                if (mouseEvent.getClickCount() == 2) {
-                    editHandler.editGroup(getItem());
-                }
-            }
-        });
-        this.userPrefs = UserPreferencesHandler.getInstance().getPreferences();
     }
 
     @Override
-    protected void updateItem(BankTransactionCompanyGroup value, boolean empty) {
+    protected void updateItem(BankTransactionGroupInterface value, boolean empty) {
         super.updateItem(value, empty);
-
-        if (empty) {
+        if (empty || value == null) {
+            setText(null);
             return;
         }
 
-        String existingKey = userPrefs.getCompanyDescriptionShortFor(value.getCompanyDesc());
         String text = "";
-        if (existingKey != null) {
-            text += userPrefs.getDisplayName(existingKey);
-        } else {
-            text += value.getCompanyDesc();
+        if (value.getUserDefinedCategory() != null) {
+            String existingKey = userPrefsHandler.getPreferences().getCompanyDescriptionShortFor(value.getUserDefinedCategory());
+            if (existingKey != null) {
+                text += userPrefsHandler.getPreferences().getDisplayName(existingKey);
+            } else {
+                text += value.getUserDefinedCategory();
+            }
         }
         text += "\n" + value.getGroupIdentifier() + "\n" + value.getTotalAmount();
         setText(text);
-        contextMenu.setX(getLayoutX());
-        contextMenu.setY(getLayoutY());
-        contextMenu.setBankTransactionGroup(value);
 
         setStyle("-fx-background-color: lavender; selected: skyblue");
-        userPrefs.addTransactionDisplayNamesMapListener(new UserPrefsChangeListener(value));
+        userPrefsHandler.getPreferences().addTransactionDisplayNamesMapListener(new UserPrefsChangeListener(value));
     }
 
     private class UserPrefsChangeListener implements MapChangeListener<String, String> {
 
-        BankTransactionCompanyGroup value;
+        BankTransactionGroupInterface value;
 
-        UserPrefsChangeListener(BankTransactionCompanyGroup value) {
+        UserPrefsChangeListener(BankTransactionGroupInterface value) {
             this.value = value;
         }
 

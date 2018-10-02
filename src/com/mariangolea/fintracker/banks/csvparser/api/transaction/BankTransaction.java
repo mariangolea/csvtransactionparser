@@ -12,7 +12,7 @@ import java.util.Objects;
  *
  * @author mariangolea@gmail.com
  */
-public final class BankTransaction implements Serializable {
+public final class BankTransaction implements Serializable, BankTransactionGroupInterface {
 
     /**
      * Whether a certain {@link BankTransaction} represents a incoming or
@@ -82,6 +82,31 @@ public final class BankTransaction implements Serializable {
         this.validatedDuringParse = validatedDuringParse;
     }
 
+    @Override
+    public int getTransactionsNumber() {
+        return 0;
+    }
+
+    @Override
+    public String getUserDefinedCategory() {
+        return null;
+    }
+
+    @Override
+    public List<BankTransactionGroupInterface> getContainedTransactions() {
+        return null;
+    }
+
+    @Override
+    public BigDecimal getTotalAmount() {
+        return amount;
+    }
+
+    @Override
+    public String getGroupIdentifier() {
+        return title;
+    }
+    
     /**
      * Whether transaction target (usually a company) was identified.
      * {@link  com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser#createCompanyIdDescriptionTransaction}
@@ -106,67 +131,82 @@ public final class BankTransaction implements Serializable {
 
     /**
      * Get the Date object for when this transaction was initiated.
-     * @return 
+     *
+     * @return
      */
     public final Date getStartDate() {
         return startDate;
     }
-    
+
     /**
      * Get the Date object for when this transaction was settled by the bank.
-     * @return 
+     *
+     * @return
      */
     public final Date getCompletedDate() {
         return completedDate;
     }
-    
+
     /**
      * Amount of currency spent on this transaction.
+     *
      * @return at least {@link BigDecimal#ZERO}
      */
     public final BigDecimal getAmount() {
         return amount;
     }
-    
+
     /**
      * Every transaction contains a certain description.
-     * <br> Each parser expects a hard coded list of transaction descriptions for which it can translate this content to something
-     * more meaningful to the user. 
-     * @return meaningful adaptation (company string), or all description string from CSV content when transaction identification fails or is obsolete.
+     * <br> Each parser expects a hard coded list of transaction descriptions
+     * for which it can translate this content to something more meaningful to
+     * the user.
+     *
+     * @return meaningful adaptation (company string), or all description string
+     * from CSV content when transaction identification fails or is obsolete.
      */
     public final String getDescription() {
         return description;
     }
-    
+
     /**
      * Whether this is a outgoing or incoming currency transaction.
-     * @return 
+     *
+     * @return
      */
     public final Type getType() {
         return type;
     }
-    
+
     /**
-     * Each parser is aware of a hard coded list of transaction "types" it knows (POS operations, credit payments, and so on).
-     * <br> Whenever that happens, title will contain a short string version which makes sense to the user.
-     * <br> Otherwise, it contains the full string found, allowing user to edit it.
-     * @return 
+     * Each parser is aware of a hard coded list of transaction "types" it knows
+     * (POS operations, credit payments, and so on).
+     * <br> Whenever that happens, title will contain a short string version
+     * which makes sense to the user.
+     * <br> Otherwise, it contains the full string found, allowing user to edit
+     * it.
+     *
+     * @return
      */
     public final String getTitle() {
         return title;
     }
-    
+
     /**
-     * Get the full list of String lines of CSV text that this transaction was parsed from.
-     * @return 
+     * Get the full list of String lines of CSV text that this transaction was
+     * parsed from.
+     *
+     * @return
      */
     public final List<String> getCsvContent() {
         return csvContent;
     }
-    
+
     /**
-     * Get the number of CSV lines of text which were parsed for this transaction.
-     * @return 
+     * Get the number of CSV lines of text which were parsed for this
+     * transaction.
+     *
+     * @return
      */
     public final int getOriginalCSVContentLinesNumber() {
         return csvContent.size();

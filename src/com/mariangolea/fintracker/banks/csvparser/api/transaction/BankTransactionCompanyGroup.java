@@ -6,11 +6,12 @@ import java.util.Objects;
 
 /**
  * Group of transactions which were made with the same "target" entity.
+ * <br>This class will represent a leaf in the general tree of user defined transaction categories {@link BankTransactionGroupInterface}
  * @author mariangolea@gmail.com
  */
-public final class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
+public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup implements BankTransactionGroupInterface{
 
-    private final List<BankTransaction> list = new ArrayList<>();
+    private final List<BankTransactionGroupInterface> list = new ArrayList<>();
     private final String companyDesc;
     
     /**
@@ -31,6 +32,21 @@ public final class BankTransactionCompanyGroup extends BankTransactionAbstractGr
         return list.size();
     }
 
+    @Override
+    public String getUserDefinedCategory() {
+        String companyNamePattern = USER_PREFERENCES_HANDLER.getPreferences().getCompanyDescriptionShortFor(companyDesc);
+        if (companyNamePattern != null){
+            String displayName = USER_PREFERENCES_HANDLER.getPreferences().getDisplayName(companyNamePattern);
+            return displayName;
+        }
+        return null;
+    }
+
+    @Override
+    public List<BankTransactionGroupInterface> getContainedTransactions() {
+        return getTransactions();
+    }
+    
     @Override
     public void addTransactionImpl(final BankTransaction transaction) {
         list.add(transaction);
@@ -53,7 +69,7 @@ public final class BankTransactionCompanyGroup extends BankTransactionAbstractGr
      * Get a copy of the transactions as a list.
      * @return 
      */
-    public List<BankTransaction> getTransactions() {
+    public List<BankTransactionGroupInterface> getTransactions() {
         return new ArrayList<>(list);
     }
 

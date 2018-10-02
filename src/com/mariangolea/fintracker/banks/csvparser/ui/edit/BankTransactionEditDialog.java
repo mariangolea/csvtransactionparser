@@ -1,6 +1,7 @@
 package com.mariangolea.fintracker.banks.csvparser.ui.edit;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 import javafx.application.Platform;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -18,7 +19,7 @@ import javafx.util.Pair;
  */
 public class BankTransactionEditDialog extends Dialog<Pair<String,String>> {
 
-    private BankTransactionCompanyGroup group;
+    private BankTransactionGroupInterface group;
     private TextField companyNameField;
     private TextField displayCompanyNameField;
     private TextField companyNameSubstringField;
@@ -70,15 +71,15 @@ public class BankTransactionEditDialog extends Dialog<Pair<String,String>> {
         });
     }
 
-    public void setBankTransactionGroup(final BankTransactionCompanyGroup group) {
+    public void setBankTransactionGroup(final BankTransactionGroupInterface group) {
         this.group = group;
-        companyNameField.setText(group.getCompanyDesc());
-        String shortCompanyDesc = handler.getPreferences().getCompanyDescriptionShortFor(group.getCompanyDesc());
+        companyNameField.setText(group.getUserDefinedCategory());
+        String shortCompanyDesc = handler.getPreferences().getCompanyDescriptionShortFor(group.getUserDefinedCategory());
         String display = shortCompanyDesc == null ? "" : handler.getPreferences().getDisplayName(shortCompanyDesc);
         displayCompanyNameField.setText(display);
 
         companyNameSubstringField.setPromptText("Company name substring to apply when looking for ismilar transactions");
-        companyNameSubstringField.setText(display.isEmpty() ? group.getCompanyDesc() : display);
+        companyNameSubstringField.setText(display.isEmpty() ? group.getUserDefinedCategory() : display);
         displayNameField.setPromptText("Short company name for all other similar company descriptions.");
     }
 }

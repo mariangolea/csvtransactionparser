@@ -9,6 +9,8 @@ import java.util.Objects;
 
 /**
  * Container of both parsed and raw csv data for any transaction.
+ * <br> Instances of this class will always contain data read directly from CSV
+ * files, making no further changes on them.
  *
  * @author mariangolea@gmail.com
  */
@@ -106,7 +108,7 @@ public final class BankTransaction implements Serializable, BankTransactionGroup
     public String getGroupIdentifier() {
         return title;
     }
-    
+
     /**
      * Whether transaction target (usually a company) was identified.
      * {@link  com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser#createCompanyIdDescriptionTransaction}

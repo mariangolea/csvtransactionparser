@@ -5,8 +5,6 @@ import java.util.Locale;
 
 /**
  * Enum of supported banks (Romania).
- *
- * @author mariangolea@gmail.com
  */
 public enum Bank {
     ING(AbstractBankParser.ROMANIAN_LOCALE,

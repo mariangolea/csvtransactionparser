@@ -5,8 +5,6 @@ import javafx.application.Application;
 
 /**
  * UI component for parsing bank csv transaction reports parser.
- *
- * @author mariangolea@gmail.com
  */
 public class BankCsvReportsParser {
 

@@ -13,7 +13,6 @@ import org.junit.BeforeClass;
 
 /**
  * Takes care of initialising the FX thread.
- * @author Marian Golea <mariangolea@gmail.com>
  */
 public class FXUITest {
 

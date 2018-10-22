@@ -36,10 +36,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class CsvParserUI extends Application {
 
     protected TextFlow feedbackPane;
@@ -48,7 +44,7 @@ public class CsvParserUI extends Application {
     private TransactionTypeView inView;
     private TransactionTypeView outView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
-    private final UserPreferencesHandler preferences = UserPreferencesHandler.getInstance();
+    private final UserPreferencesHandler preferences = UserPreferencesHandler.INSTANCE;
     private final UserPreferences userPrefs;
     protected final List<File> parsedCsvFiles = new ArrayList<>();
     private Stage primaryStage;

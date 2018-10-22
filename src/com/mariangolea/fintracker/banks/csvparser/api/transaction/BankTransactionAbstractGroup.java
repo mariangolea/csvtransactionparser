@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Base abstract class allowing grouping of transaction on criteria that
+ * Base abstract class allowing grouping of transactions on criteria that
  * inheritors need to support themselves.
  * <p>
  * The application allows multiple levels of grouping:
@@ -25,27 +25,21 @@ import java.util.Objects;
  * class, but it makes sense to mention it in here.
  * <br>4. User can also create larger groups out of the ones from point 3.
  * </p>
- *
- * @author mariangolea@gmail.com
  */
-public abstract class BankTransactionAbstractGroup {
+public abstract class BankTransactionAbstractGroup implements BankTransactionGroupInterface {
 
-    private final String transactionGroupIdentifier;
-    private final BankTransaction.Type type;
+    private final String categoryName;
     private BigDecimal amount = BigDecimal.ZERO;
 
-    /**
-     * Create a instance of this class.
-     *
-     * @param transactionGroupIdentifier identifier for this group.
-     * @param type whether it represents outgoing or incoming currency.
-     */
-    public BankTransactionAbstractGroup(final String transactionGroupIdentifier, BankTransaction.Type type) {
-        Objects.requireNonNull(transactionGroupIdentifier);
-        Objects.requireNonNull(type);
+    public BankTransactionAbstractGroup(final String categoryName) {
+        Objects.requireNonNull(categoryName);
 
-        this.transactionGroupIdentifier = transactionGroupIdentifier;
-        this.type = type;
+        this.categoryName = categoryName;
+    }
+
+    @Override
+    public String getCategoryName() {
+        return categoryName;
     }
 
     /**
@@ -53,74 +47,52 @@ public abstract class BankTransactionAbstractGroup {
      *
      * @return
      */
+    @Override
     public abstract int getTransactionsNumber();
-    
+
     /**
-     * Each inheritor has its own data structure according to its transaction grouping criteria.
+     * Each inheritor has its own data structure according to its transaction
+     * grouping criteria.
      * <br> This method is present to allow them do just that.
+     *
      * @param transaction transaction to add based on specific criteria.
      */
-    protected abstract void addTransactionImpl(final BankTransaction transaction);
+    protected void addTransactionImpl(final BankTransaction transaction) {
+    }
 
-    /**
-     * Check whether this transaction group accepts the possible match.
-     * <br> verifies for equality of group identifier and type. 
-     * <br> called automatically when an attempt to add a transaction to this group is made.
-     * @param transaction transaction to verify.
-     * @return 
-     */
     public boolean matchesTransaction(final BankTransaction transaction) {
-        return null != transaction && transactionGroupIdentifier.equals(transaction.getTitle())
-                && type == transaction.getType();
+        return null != transaction && transaction.description != null && transaction.description.contains(categoryName);
     }
 
-    /**
-     * Get the group identifier (common transactions title as they show up in
-     * csv).
-     *
-     * @return transactionGroupIdentifier
-     */
-    public final String getGroupIdentifier() {
-        return transactionGroupIdentifier;
-    }
-    
-    /**
-     * Get the total currency amount in contained transactions.
-     * @return 
-     */
+    @Override
     public BigDecimal getTotalAmount() {
         return amount;
     }
 
     /**
-     * Whether this group represents outgoing or incoming transactions.
-     * @return 
-     */
-    public BankTransaction.Type getType() {
-        return type;
-    }
-    
-    /**
-     * Try to add a transaction to this group, returns true if successful, basically if {@link #matchesTransaction} returns true.
+     * Try to add a transaction to this group, returns true if successful,
+     * basically if {@link #matchesTransaction} returns true.
+     *
      * @param parsedTransaction transaction to add
      * @return true if successful
      */
-    public final boolean addTransaction(final BankTransaction parsedTransaction) {
+    protected boolean addTransaction(final BankTransaction parsedTransaction) {
         if (matchesTransaction(parsedTransaction)) {
             addTransactionImpl(parsedTransaction);
-            amount = amount.add(parsedTransaction.getAmount());
+            amount = amount.add(parsedTransaction.creditAmount).subtract(parsedTransaction.debitAmount);
             return true;
         }
         return false;
 
     }
-    
+
     /**
      * Try to add a list of transactions to this group.
+     *
      * @param parsedTransactions transactions to add
      * @return list of transaction which do not match this group.
      */
-    public List<BankTransaction> addTransactions(final List<BankTransaction> parsedTransactions) {
+    protected List<BankTransaction> addTransactions(final List<BankTransaction> parsedTransactions) {
         List<BankTransaction> incompatibleTransactions = new ArrayList<>();
         parsedTransactions.forEach((transaction) -> {
             boolean added = addTransaction(transaction);
@@ -140,17 +112,19 @@ public abstract class BankTransactionAbstractGroup {
             return false;
         }
         BankTransactionAbstractGroup that = (BankTransactionAbstractGroup) o;
-        return type == that.type
-                && Objects.equals(transactionGroupIdentifier, that.transactionGroupIdentifier);
+        return Objects.equals(categoryName, that.categoryName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, transactionGroupIdentifier);
+        return Objects.hash(categoryName);
     }
 
     @Override
     public String toString() {
-        return transactionGroupIdentifier + "\n" + amount.floatValue(); 
+        return categoryName + "\n" 
+                + amount.floatValue() + "\n" 
+                + getTransactionsNumber() + " transactions" + "\n" 
+                + getGroupsNumber() + " groups";
     }
 }

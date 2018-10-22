@@ -6,7 +6,6 @@ import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 
 /**
    Factory for supported parsers.
- * @author mariangolea@gmail.com
  */
 public class BankCSVParserFactory {
     

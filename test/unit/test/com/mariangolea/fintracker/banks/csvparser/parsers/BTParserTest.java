@@ -21,8 +21,6 @@ import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
 /**
  * Tests individual methods in INGParser class.
- *
- * @author mariangolea@gmail.com
  */
 public class BTParserTest extends BTParser {
 
@@ -80,12 +78,11 @@ public class BTParserTest extends BTParser {
 
         // we expect a unrecognized string.
         assertTrue(!response.allCsvContentProcessed);
-        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
+        assertTrue(response.foundTransactionsNumber == 3);
     }
 
     @Test
     public void testMethodsBasic() {
-        assertTrue(getListOfSupportedTransactionIDs() != null);
         assertTrue(findNextTransactionLineIndex(null) == 1);
     }
 }

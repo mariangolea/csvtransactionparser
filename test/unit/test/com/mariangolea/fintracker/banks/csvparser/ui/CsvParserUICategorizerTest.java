@@ -34,10 +34,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 @RunWith(MockitoJUnitRunner.class)
 public class CsvParserUICategorizerTest extends FXUITest {
 

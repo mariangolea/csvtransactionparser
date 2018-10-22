@@ -7,8 +7,6 @@ import java.util.List;
 
 /**
  * Command line support for parsing supported arguments.
- *
- * @author mariangolea@gmail.com
  */
 public class CmdArgParser {
 

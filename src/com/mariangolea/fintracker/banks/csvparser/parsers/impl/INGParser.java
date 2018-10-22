@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -22,62 +21,11 @@ import org.apache.commons.csv.CSVRecord;
 
 /**
  * CSV parser for ING bank.
- *
- * @author mariangolea@gmail.com
  */
 public class INGParser extends AbstractBankParser {
 
-    /**
-    Enum of all known transaction identifier strings.
-    */
-    public enum OperationID {
-        CASH_WITHDRAWAL("Retragere numerar"),
-        RATE_CREDIT("Rata Credit"),
-        ASIGURARI_GENERALE("Prima asigurari generale"),
-        INCASARE("Incasare"),
-        COMISION("Comision plata anticipata"),
-        RECALCULARI_CREDITE("Recalculari aferente creditului"),
-        TRANSFER_HOMEBANK("Transfer Home'Bank"),
-        PRIMA_ASIGURARE_ING("Prima asigurare ING Credit Protect"),
-        PRIMA_ASIGURARE_VIATA("Prima asigurare de viata (credite)"),
-        CUMPARARE_POS("Cumparare POS"),
-        RAMBURSARE_RATE_CREDIT("Rambursare rata card credit"),
-        REALIMENTARE("Realimentare (debitare directa)"),
-        CUMPARARE_POS_CORECTIE("Cumparare POS corectie"),
-        ALIMENTARE_CREDIT("Alimentare Credit"),
-        TAXA_EMITERE_CARD("Taxa emitere card");
-
-        public final String desc;
-
-        private OperationID(String desc) {
-            this.desc = desc;
-        }
-
-        private static OperationID getOperationID(final String operationLine) {
-            for (OperationID id : OperationID.values()) {
-                if (operationLine.contains(id.desc)) {
-                    return id;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    private final List<String> operationDescriptionsList = new ArrayList<>();
-
     public INGParser() {
         super(Bank.ING, new SimpleDateFormat("dd-MM-yyyy"), NumberFormat.getInstance(ROMANIAN_LOCALE));
-    }
-
-    @Override
-    public List<String> getListOfSupportedTransactionIDs() {
-        if (operationDescriptionsList.isEmpty()) {
-            for (OperationID operation : OperationID.values()) {
-                operationDescriptionsList.add(operation.desc);
-            }
-        }
-        return new ArrayList<>(operationDescriptionsList);
     }
 
     @Override
@@ -138,23 +86,25 @@ public class INGParser extends AbstractBankParser {
         }
         Date startedDate = completedDate;
         String desc = record.get(3);
-        OperationID operation = OperationID.getOperationID(desc);
-        if (operation == null){
+        if (desc == null || desc.isEmpty()){
             return null;
         }
         
-        BankTransaction.Type type = BankTransaction.Type.OUT;
-        int amountIndex = 5;
-        if (record.get(amountIndex) == null || record.get(amountIndex).trim().isEmpty()){
-            amountIndex = 6;
-            type = BankTransaction.Type.IN;
+        temp = record.get(5);
+        BigDecimal debitAmount =  BigDecimal.ZERO;
+        if (temp != null && !temp.trim().isEmpty()){
+            debitAmount = parseAmount(temp);
         }
-        BigDecimal amount =  parseAmount(record.get(amountIndex));
-        if (amount == BigDecimal.ZERO) {
+        
+        temp = record.get(6);
+        BigDecimal creditAmount =  BigDecimal.ZERO;
+        if (temp != null && !temp.trim().isEmpty()){
+            creditAmount = parseAmount(temp);
+        }
+        if (creditAmount == BigDecimal.ZERO && debitAmount == BigDecimal.ZERO) {
             return null;
         }
 
-        String title = operation.desc;
         int detailsLinesNumber = toConsume.size() - 1;
         String details = "";
         if (detailsLinesNumber > 0) {
@@ -168,7 +118,7 @@ public class INGParser extends AbstractBankParser {
                 }
             }
         }
-        return createGeneralTransaction(title, startedDate, completedDate, amount.abs(), details, type, toConsume);
+        return createTransaction(startedDate, completedDate, creditAmount.abs(), debitAmount.abs(), desc + details, toConsume);
     }
 
 }

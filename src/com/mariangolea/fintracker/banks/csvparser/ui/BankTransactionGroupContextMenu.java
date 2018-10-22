@@ -10,10 +10,6 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
-/**
- *
- * @author Marian
- */
 public class BankTransactionGroupContextMenu extends ContextMenu {
 
     BankTransactionGroupInterface group;

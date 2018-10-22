@@ -11,8 +11,6 @@ import java.util.List;
 /**
  * CMD Utility to call the bank report CSV parser functionality using command line.
  * <br> Useful in basic validations of expected behavior.
- *
- * @author mariangolea@gmail.com
  */
 public class BankCSVReportsCmdParser {
 
@@ -44,7 +42,6 @@ public class BankCSVReportsCmdParser {
         for (CsvFileParseResponse response : responses) {
             System.out.println("\t" + response.csvFile.getAbsolutePath() + ":");
             System.out.println("\t\t - unparsedContent: " + (response.allCsvContentProcessed ? "NONE" : response.unprocessedStrings.size() + "Lines of text."));
-            System.out.println("\t\t - transaction groups: " + response.parsedTransactionGroups.size());
             System.out.println("\t\t - parser used: " + response.parserUsed.getBank().name());
             System.out.println("\t\t - parser supports finding label for expected transactions: " + !response.parserUsed.getBank().transactionsNumberLabel.isEmpty());
             System.out.println("\t\t - expected transactions number: " + response.expectedTransactionsNumber);

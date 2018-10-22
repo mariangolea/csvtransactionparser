@@ -17,10 +17,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- *
- * @author Marian
- */
 public class BankCsvReportsCmdParserTest {
 
     private final TestUtilities utils = new TestUtilities();

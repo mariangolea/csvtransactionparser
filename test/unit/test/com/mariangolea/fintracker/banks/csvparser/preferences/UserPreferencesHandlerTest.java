@@ -16,10 +16,6 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserDefinedTransac
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class UserPreferencesHandlerTest {
 
     private final UserPreferencesHandler handler = UserPreferencesHandler.getInstance();

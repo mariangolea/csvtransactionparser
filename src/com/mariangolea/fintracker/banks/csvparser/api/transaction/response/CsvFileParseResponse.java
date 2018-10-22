@@ -1,8 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction.response;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionUtils;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
 
 import java.io.File;
@@ -13,8 +11,6 @@ import java.util.Objects;
 /**
  * Response after a whole CSV file is parsed.
  * <br> Contains all data needed by upper layer of the application.
- *
- * @author mariangolea@gmail.com
  */
 public class CsvFileParseResponse {
 
@@ -39,9 +35,9 @@ public class CsvFileParseResponse {
     /**
     List of groups of similar transactions found within the csv file.
      */
-    public final List<BankTransactionCompanyGroup> parsedTransactionGroups = new ArrayList<>();
+    public final List<BankTransaction> parsedTransactions = new ArrayList<>();
     /**
-    Not recognised strings, if any.
+    Not recognized strings, if any.
      */
     public final List<String> unprocessedStrings = new ArrayList<>();
     /**
@@ -49,32 +45,30 @@ public class CsvFileParseResponse {
      */
     public final AbstractBankParser parserUsed;
 
-    private final BankTransactionUtils utils = new BankTransactionUtils();
-
     /**
     Construct a instance of this class,
     @param parserUsed used parser
     @param expectedTransactionsNumber if stated in csv file, 0 otherwise.
     @param foundTransactionsNumber number of identified transactions.
     @param csvFile csv file reference
-    @param groups parsed transaction groups.
-    @param unprocessedStrings list of not recognised strings.
+    @param transactions parsed transactions.
+    @param unprocessedStrings list of not recognized strings.
      */
     public CsvFileParseResponse(
             AbstractBankParser parserUsed,
             int expectedTransactionsNumber,
             int foundTransactionsNumber,
             final File csvFile,
-            final List<BankTransactionDefaultGroup> groups,
+            final List<BankTransaction> transactions,
             final List<String> unprocessedStrings) {
         Objects.requireNonNull(csvFile);
-        Objects.requireNonNull(groups);
+        Objects.requireNonNull(transactions);
         Objects.requireNonNull(unprocessedStrings);
         Objects.requireNonNull(parserUsed);
         this.parserUsed = parserUsed;
         this.csvFile = csvFile;
         this.unprocessedStrings.addAll(unprocessedStrings);
-        parsedTransactionGroups.addAll(utils.processTransactions(groups));
+        parsedTransactions.addAll(transactions);
         this.expectedTransactionsNumber = expectedTransactionsNumber;
         this.foundTransactionsNumber = foundTransactionsNumber;
 

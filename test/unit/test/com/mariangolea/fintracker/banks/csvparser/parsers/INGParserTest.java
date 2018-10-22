@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser.parsers;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
@@ -23,10 +18,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- *
- * @author Marian
- */
 public class INGParserTest extends INGParser{
 
     private final TestUtilities utils = new TestUtilities();

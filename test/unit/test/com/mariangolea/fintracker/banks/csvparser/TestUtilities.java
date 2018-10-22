@@ -20,10 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import org.apache.commons.csv.CSVFormat;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class TestUtilities {
 
     public TemporaryFolder folder = new TemporaryFolder();

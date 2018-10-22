@@ -7,20 +7,17 @@ import com.mariangolea.fintracker.banks.csvparser.ui.BankTransactionGroupContext
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
 import com.mariangolea.fintracker.banks.csvparser.ui.edit.BankTransactionGroupEditHandler;
 import com.mariangolea.fintracker.banks.csvparser.ui.renderer.TransactionGroupCellRenderer;
-import com.mariangolea.fintracker.banks.csvparser.ui.transactions.FilterableTreeView.FilterableTreeItem;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
+import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class TransactionTypeView extends GridPane {
 
     private Label responseLabel;
@@ -29,6 +26,7 @@ public class TransactionTypeView extends GridPane {
     FilterableTreeView treeView;
     private final BankTransactionGroupEditHandler editHandler = new BankTransactionGroupEditHandler();
     private final BankTransactionGroupContextMenu contextMenu = new BankTransactionGroupContextMenu(editHandler);
+    private TextField searchField;
 
     public TransactionTypeView(BankTransaction.Type type, ObservableList<BankTransactionGroupInterface> model) {
         this.type = type;
@@ -39,23 +37,12 @@ public class TransactionTypeView extends GridPane {
     protected final void constructView() {
         responseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
 
-        TextField search = new TextField();
-        search.setPromptText("Enter company name to filter on");
-        search.textProperty().addListener(text -> {
-            String filter = search.getText();
-            if (filter == null || filter.length() == 0) {
-                treeView.getFilterableRoot().predicateProperty().setValue(s -> true);
-            } else {
-                treeView.getFilterableRoot().predicateProperty().setValue(s -> s.getUserDefinedCategory() != null && s.getUserDefinedCategory().toLowerCase().contains(filter.toLowerCase()));
-            }
-            treeView.getFilterableRoot().getChildren().clear();
-            treeView.getFilterableRoot().getChildren().addAll(treeView.getFilterableRoot().getFilteredChildren());
-        });
-
+        searchField = new TextField();
+        searchField.setPromptText("Enter company name to filter on");
         treeView = constructTreeView();
 
         this.add(responseLabel, 0, 0, 3, 1);
-        this.add(search, 0, 1, 1, 1);
+        this.add(searchField, 0, 1, 1, 1);
         this.add(treeView, 0, 2, 3, 20);
     }
 
@@ -84,15 +71,21 @@ public class TransactionTypeView extends GridPane {
             return new TransactionGroupCellRenderer();
         });
         treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        treeView.getFilterableRoot().predicateProperty().bind(Bindings.createObjectBinding(() -> {
+            if (searchField.getText() == null || searchField.getText().isEmpty()) {
+                return null;
+            }
+            return TreeItemPredicate.create(group -> group.toString().toLowerCase().contains(searchField.getText().toLowerCase()));
+        }, searchField.textProperty()));
 
         return treeView;
     }
 
     public void updateTreeModel() {
         FilterableTreeItem root = treeView.getFilterableRoot();
-        root.getChildren().clear();
+        root.getInternalChildren().clear();
         model.forEach((group) -> {
-            root.getChildren().add(new FilterableTreeItem(group));
+            root.getInternalChildren().add(new FilterableTreeItem(group));
         });
         treeView.refresh();
     }

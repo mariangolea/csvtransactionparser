@@ -11,13 +11,9 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHan
 import java.util.Optional;
 import javafx.util.Pair;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class BankTransactionGroupEditHandler {
 
-    private final UserPreferences userPrefs = UserPreferencesHandler.getInstance().getPreferences();
+    private final UserPreferences userPrefs = UserPreferencesHandler.INSTANCE.getPreferences();
     private BankTransactionEditDialog editPopup;
 
     public void editGroup(final BankTransactionGroupInterface group) {
@@ -28,7 +24,7 @@ public class BankTransactionGroupEditHandler {
         Optional<Pair<String, String>> result = editPopup.showAndWait();
         result.ifPresent(userData -> {
             if (userData.getKey() != null && !userData.getKey().isEmpty() && userData.getValue() != null && !userData.getValue().isEmpty()) {
-                userPrefs.setTransactionDisplayName(userData.getKey(), userData.getValue());
+                userPrefs.setCompanyName(userData.getKey(), userData.getValue());
             }
         });
 

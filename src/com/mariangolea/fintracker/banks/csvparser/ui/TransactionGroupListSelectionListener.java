@@ -2,18 +2,16 @@ package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.ui.transactions.FilterableTreeView;
-import com.mariangolea.fintracker.banks.csvparser.ui.transactions.TransactionTypeView;
 import java.math.BigDecimal;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
+import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 
 /**
  * Updates amount based on existing selections. If none are made, all
  * transactions are summed up.
- *
- * @author mariangolea@gmail.com
  */
 public class TransactionGroupListSelectionListener implements ChangeListener {
 
@@ -33,17 +31,33 @@ public class TransactionGroupListSelectionListener implements ChangeListener {
         ObservableList<Integer> selectedIndices = treeView.getSelectionModel().getSelectedIndices();
         BigDecimal amount = BigDecimal.ZERO;
         if (selectedIndices == null || selectedIndices.size() < 1) {
-            int size = treeView.getFilterableRoot().getFilteredChildren().size();
+            int size = treeView.getFilterableRoot().getInternalChildren().size();
             for (int i = 0; i < size; i++) {
-                amount = amount.add(treeView.getFilterableRoot().getFilteredChildren().get(i).getTotalAmount());
+                amount = amount.add(getTotalAmount(treeView.getTreeItem(i)));
             }
             amountArea.setText(LABEL_NOTHING_SELECTED + amount);
         } else {
-            for (int index : selectedIndices) {
-                amount = amount.add(treeView.getFilterableRoot().getFilteredChildren().get(index).getTotalAmount());
+            for (int i : selectedIndices) {
+                amount = amount.add(getTotalAmount(treeView.getTreeItem(i)));
             }
             amountArea.setText(LABEL_SOMETHING_SELECTED + amount);
         }
-        
+
+    }
+
+    private BigDecimal getTotalAmount(FilterableTreeItem<BankTransactionGroupInterface> item) {
+        if (item.getInternalChildren() == null || item.getInternalChildren().isEmpty()) {
+            return item.getValue() == null ? BigDecimal.ZERO : item.getValue().getTotalAmount();
+        } else {
+            BigDecimal amount = BigDecimal.ZERO;
+            item.getInternalChildren().forEach((child) -> {
+                BankTransactionGroupInterface value = child.getValue();
+                if (value != null) {
+                    amount.add(child.getValue().getTotalAmount());
+                }
+            });
+
+            return amount;
+        }
     }
 }

@@ -15,8 +15,6 @@ import java.io.FileReader;
 /**
  * Uses apache's CSVBox to read the text from a csv file containing transactions
  * report from any supported banks.
- *
- * @author mariangolea@gmail.com
  */
 public final class BankCSVTransactionParser {
 

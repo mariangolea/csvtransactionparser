@@ -14,12 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.csv.CSVRecord;
 
-/**
- * CSV parser for Banca Transilvania bank.
- */
 public class BTParser extends AbstractBankParser {
-
-    private BigDecimal amountValidationCounter = BigDecimal.ZERO;
 
     public BTParser() {
         super(Bank.BT, new SimpleDateFormat("dd-MM-yyyy"), new SimpleDateFormat("dd-MM-yyyy"),
@@ -33,7 +28,6 @@ public class BTParser extends AbstractBankParser {
 
     @Override
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
-        amountValidationCounter = BigDecimal.ZERO;
         return super.parseCsvResponse(split, file); 
     }
 

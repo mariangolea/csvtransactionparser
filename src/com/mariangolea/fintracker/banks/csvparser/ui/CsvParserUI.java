@@ -1,19 +1,18 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
-import com.mariangolea.fintracker.banks.csvparser.ui.transactions.TransactionTypeView;
+import com.mariangolea.fintracker.banks.csvparser.ui.transactions.TransactionTableView;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -39,10 +38,9 @@ import javafx.stage.Stage;
 public class CsvParserUI extends Application {
 
     protected TextFlow feedbackPane;
-    protected final ObservableList<BankTransactionGroupInterface> inModel = FXCollections.observableArrayList();
-    protected final ObservableList<BankTransactionGroupInterface> outModel = FXCollections.observableArrayList();
-    private TransactionTypeView inView;
-    private TransactionTypeView outView;
+    protected final Collection<BankTransaction> model = FXCollections.observableArrayList();
+    
+    private TransactionTableView tableView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = UserPreferencesHandler.INSTANCE;
     private final UserPreferences userPrefs;
@@ -78,12 +76,10 @@ public class CsvParserUI extends Application {
 
         ScrollPane centerScroll = createFeedbackView();
 
-        inView = new TransactionTypeView(BankTransaction.Type.IN, inModel);
-        outView = new TransactionTypeView(BankTransaction.Type.OUT, outModel);
+        tableView = new TransactionTableView(model);
 
-        grid.add(inView, 0, 0);
-        grid.add(centerScroll, 1,0);
-        grid.add(outView, 2, 0);
+        grid.add(tableView, 0, 0);
+        grid.add(centerScroll, 1, 0);
         grid.setStyle("-fx-background-color: BEIGE;");
 
         root = new BorderPane();
@@ -102,19 +98,11 @@ public class CsvParserUI extends Application {
     protected void loadData(final List<CsvFileParseResponse> parsedTransactions) {
         if (parsedTransactions != null) {
             parsedTransactions.forEach(csvFileResponse -> {
-                csvFileResponse.parsedTransactionGroups.forEach(transactionGroup -> {
-                    switch (transactionGroup.getType()) {
-                        case IN:
-                            inModel.add(transactionGroup);
-                            break;
-                        case OUT:
-                            outModel.add(transactionGroup);
-                            break;
-                    }
+                csvFileResponse.parsedTransactions.forEach(transaction -> {
+                    model.add(transaction);
                 });
             });
-            inView.updateTreeModel();
-            outView.updateTreeModel();
+            tableView.resetView();
         }
     }
 

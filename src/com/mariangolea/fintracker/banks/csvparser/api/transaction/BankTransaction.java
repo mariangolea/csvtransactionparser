@@ -12,7 +12,7 @@ import java.util.Objects;
  * <br> Instances of this class will always contain data read directly from CSV
  * files, making no further changes on them.
  */
-public final class BankTransaction implements Serializable {
+public final class BankTransaction implements Serializable, Comparable<BankTransaction> {
 
     public final Date startDate;
     public final Date completedDate;
@@ -76,4 +76,10 @@ public final class BankTransaction implements Serializable {
                 debitAmount,
                 description);
     }
+
+    @Override
+    public int compareTo(final BankTransaction o) {
+        return completedDate.compareTo(o.completedDate);
+    }
+    
 }

@@ -68,13 +68,11 @@ public class BankTransactionEditDialog extends Dialog<Pair<String,String>> {
 
     public void setBankTransactionGroup(final BankTransactionGroupInterface group) {
         this.group = group;
-        companyNameField.setText(group.getUserDefinedCategory());
-        String shortCompanyDesc = handler.getPreferences().getCompanyNameShortFor(group.getUserDefinedCategory());
-        String display = shortCompanyDesc == null ? "" : handler.getPreferences().getDisplayName(shortCompanyDesc);
-        displayCompanyNameField.setText(display);
-
+        String categoryName = group.getCategoryName();
+        companyNameField.setText(categoryName);
+        displayCompanyNameField.setText(categoryName);
         companyNameSubstringField.setPromptText("Company name substring to apply when looking for ismilar transactions");
-        companyNameSubstringField.setText(display.isEmpty() ? group.getUserDefinedCategory() : display);
+        companyNameSubstringField.setText(handler.getPreferences().getCompanyIdentifierString(categoryName));
         displayNameField.setPromptText("Short company name for all other similar company descriptions.");
     }
 }

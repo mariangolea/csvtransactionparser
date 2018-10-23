@@ -5,22 +5,38 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 
-/**
- * Container of user preferences:
- * <br>User preferred input folder.
- * <br>User defined transaction categories, as a map. Category name as key,
- * {@link UserDefinedTransactionGroup} as value.
- * <br>User defined company names, as a map. Company name as a key, display name
- * as a value. Keys are used to match transaction description fields.
- */
 public class UserPreferences {
 
     private final ObservableMap<String, Collection<String>> categories = FXCollections.observableMap(new HashMap<>());
     private final Collection<String> topMostCategories = new ArrayList<>();
     private String csvInputFolder;
+    private Timeframe transactionsTimeframe = Timeframe.MONTH;
     //identifier string, display name.
     private final ObservableMap<String, String> companyNames = FXCollections.observableMap(new HashMap<>());
+    //switched keys and values from previous map.
+    private final ObservableMap<String, String> companyNamesReversed = FXCollections.observableMap(new HashMap<>());
 
+    public enum Timeframe{
+        MONTH(Calendar.MONTH),
+        YEAR(Calendar.YEAR);
+        
+        public final int timeframe;
+        
+        private Timeframe(int timeframe){
+            this.timeframe = timeframe;
+        }
+        
+        public static Timeframe getTimeframe(int timeframe){
+            switch (timeframe){
+                case 1:
+                default:
+                    return Timeframe.MONTH;
+                case 2:
+                    return Timeframe.YEAR;
+            }
+        }
+    }
+    
     public boolean addTransactionCategoriesMapListener(MapChangeListener<String, Collection<String>> listener) {
         if (listener == null) {
             return false;
@@ -78,11 +94,16 @@ public class UserPreferences {
         Objects.requireNonNull(company);
         Objects.requireNonNull(displayName);
         companyNames.put(company.toLowerCase(), displayName);
+        companyNamesReversed.put(displayName, company.toLowerCase());
     }
 
     public String getCompanyDisplayName(final String company) {
         Objects.requireNonNull(company);
         return companyNames.get(company.toLowerCase());
+    }
+    
+    public String getCompanyIdentifierString(final String companyDisplayName){
+        return companyNamesReversed.get(companyDisplayName);
     }
 
     public boolean addDefinition(final String categoryName, Collection<String> subCategories) {
@@ -111,7 +132,7 @@ public class UserPreferences {
         return true;
     }
 
-    public boolean updateDefinition(final String categoryName, final Set<String> subCategories) {
+    public boolean updateDefinition(final String categoryName, final Collection<String> subCategories) {
         Objects.requireNonNull(categoryName);
         Objects.requireNonNull(subCategories);
         if (!categories.containsKey(categoryName)) {
@@ -130,6 +151,14 @@ public class UserPreferences {
         this.csvInputFolder = csvInputFolder;
     }
 
+    public Timeframe getTransactionGroupingTimeframe(){
+        return transactionsTimeframe;
+    }
+    
+    public void setTransactionGroupingTimeframe(Timeframe timeframe){
+        this.transactionsTimeframe = timeframe;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -141,11 +170,12 @@ public class UserPreferences {
         UserPreferences that = (UserPreferences) o;
         return Objects.equals(categories, that.categories)
                 && Objects.equals(csvInputFolder, that.csvInputFolder)
+                 && transactionsTimeframe == that.transactionsTimeframe
                 && Objects.equals(companyNames, that.companyNames);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(categories, csvInputFolder, companyNames);
+        return Objects.hash(categories, csvInputFolder, transactionsTimeframe, companyNames);
     }
 }

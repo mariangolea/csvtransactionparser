@@ -1,6 +1,5 @@
 package com.mariangolea.fintracker.banks.csvparser.ui.transactions;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.ui.BankTransactionGroupContextMenu;
@@ -18,18 +17,16 @@ import javafx.scene.layout.GridPane;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 import org.eclipse.fx.ui.controls.tree.TreeItemPredicate;
 
-public class TransactionTypeView extends GridPane {
+public class TransactionTreeView extends GridPane {
 
     private Label responseLabel;
-    private final BankTransaction.Type type;
     protected final ObservableList<BankTransactionGroupInterface> model;
     FilterableTreeView treeView;
     private final BankTransactionGroupEditHandler editHandler = new BankTransactionGroupEditHandler();
     private final BankTransactionGroupContextMenu contextMenu = new BankTransactionGroupContextMenu(editHandler);
     private TextField searchField;
 
-    public TransactionTypeView(BankTransaction.Type type, ObservableList<BankTransactionGroupInterface> model) {
-        this.type = type;
+    public TransactionTreeView(ObservableList<BankTransactionGroupInterface> model) {
         this.model = model;
         constructView();
     }
@@ -47,7 +44,7 @@ public class TransactionTypeView extends GridPane {
     }
 
     protected final FilterableTreeView constructTreeView() {
-        FilterableTreeItem root = new FilterableTreeItem(new BankTransactionCompanyGroup("fake", "fake", BankTransaction.Type.IN));
+        FilterableTreeItem root = new FilterableTreeItem(new BankTransactionCompanyGroup("fake"));
         treeView = new FilterableTreeView(root);
         treeView.getSelectionModel().selectedItemProperty().addListener(new TransactionGroupListSelectionListener(treeView, responseLabel));
         treeView.setEditable(true);

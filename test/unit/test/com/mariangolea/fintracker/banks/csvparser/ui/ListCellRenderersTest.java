@@ -8,14 +8,18 @@ import java.util.Date;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.ui.renderer.TransactionGroupCellRenderer;
 import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
+import com.mariangolea.fintracker.banks.csvparser.ui.transactions.FilterableTreeView;
 import java.math.BigDecimal;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 
 public class ListCellRenderersTest extends FXUITest {
 
@@ -26,8 +30,8 @@ public class ListCellRenderersTest extends FXUITest {
             return;
         }
 
-        BankTransactionCompanyGroup one = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
-        ListView<BankTransactionCompanyGroup> test = new ListView<>(FXCollections.observableArrayList(one));
+        Extension one = new Extension("one");
+        ListView<Extension> test = new ListView<>(FXCollections.observableArrayList(one));
         LocalExtensionGroupRenderer renderer = new LocalExtensionGroupRenderer();
         assertTrue(renderer.getText() == null);
         renderer.updateItem(one, true);
@@ -41,30 +45,27 @@ public class ListCellRenderersTest extends FXUITest {
         if (!fxInitialized) {
             assertTrue("Useless in headless mode", true);
             return;
-        } 
-        
-        BankTransactionCompanyGroup one = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
-        one.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(100), "two",
-                BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        BankTransactionCompanyGroup two = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
-        two.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(300), "two",
-                BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        BankTransactionCompanyGroup three = new BankTransactionCompanyGroup("one", "one", BankTransaction.Type.IN);
-        three.addTransaction(new BankTransaction(true, true, "one", new Date(), new Date(), new BigDecimal(500), "two",
-                BankTransaction.Type.IN, Arrays.asList("one", "two")));
-        ListView<BankTransactionCompanyGroup> test = new ListView<>(FXCollections.observableArrayList(one, two, three));
+        }
+
+        Extension one = createExtension(new BigDecimal(100));
+        Extension two = createExtension(new BigDecimal(300));
+        Extension three = createExtension(new BigDecimal(500));
+        three.addGroup(one);
+        three.addGroup(two);
+        FilterableTreeItem<BankTransactionGroupInterface> root = new FilterableTreeItem(three);
+        FilterableTreeView test = new FilterableTreeView(root);
         test.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         Label pane = new Label();
         TransactionGroupListSelectionListener renderer = new TransactionGroupListSelectionListener(test, pane);
-        renderer.onChanged(null);
+        renderer.changed(null, null, null);
 
         // calling with no indices selected should compute total amount.
         String text = pane.getText();
         assertTrue(text != null && text.contains("900"));
 
         test.getSelectionModel().selectIndices(0, 1);
-        renderer.onChanged(null);
+        renderer.changed(null, null, null);
         // calling with first 2 selected should compute only for those.
         text = pane.getText();
         assertTrue(text != null && text.contains("400"));
@@ -77,9 +78,37 @@ public class ListCellRenderersTest extends FXUITest {
         }
 
         @Override
-        protected void updateItem(BankTransactionCompanyGroup value, boolean empty) {
+        protected void updateItem(BankTransactionGroupInterface value, boolean empty) {
             super.updateItem(value, empty); //To change body of generated methods, choose Tools | Templates.
         }
+        
+    }
 
+    private Extension createExtension(final BigDecimal amount) {
+        Extension one = new Extension("one");
+        one.addTransaction(new BankTransaction(new Date(), new Date(), amount, BigDecimal.ZERO, "two", Arrays.asList("one", "two")));
+        return one;
+    }
+
+    protected static class Extension extends BankTransactionDefaultGroup {
+
+        public Extension(String companyDesc) {
+            super(companyDesc);
+        }
+
+        @Override
+        protected List<BankTransaction> addTransactions(List<BankTransaction> parsedTransactions) {
+            return super.addTransactions(parsedTransactions); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        protected boolean addTransaction(BankTransaction parsedTransaction) {
+            return super.addTransaction(parsedTransaction); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        protected void addGroup(BankTransactionGroupInterface group) {
+            super.addGroup(group); //To change body of generated methods, choose Tools | Templates.
+        }
     }
 }

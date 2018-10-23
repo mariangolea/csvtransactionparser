@@ -1,44 +1,34 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 import org.junit.Test;
 
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserDefinedTransactionGroup;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 
 public class UserPreferencesHandlerTest {
 
-    private final UserPreferencesHandler handler = UserPreferencesHandler.getInstance();
+    private final UserPreferencesHandler handler = UserPreferencesHandler.INSTANCE;
 
     @Test
     public void testFirstLoadPreferences() {
         // delete preferences file to verify initial app behavior.
-        handler.deletePreferencesFile();
+        handler.deletePreferences();
         UserPreferences prefs = handler.getPreferences();
-        assertTrue(prefs.getUserDefinitions() != null && prefs.getUserDefinitions().isEmpty());
+        assertTrue(prefs.getUserDefinedCategoryNames() != null && prefs.getUserDefinedCategoryNames().isEmpty());
         assertTrue(prefs.getCSVInputFolder() == null);
     }
 
     @Test
     public void testBehaviorStorePreferences() {
-        handler.deletePreferencesFile();
+        handler.deletePreferences();
         UserPreferences prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
-        UserDefinedTransactionGroup group = new UserDefinedTransactionGroup("category1");
-        group.addAssociations("first", new HashSet<>(Arrays.asList("1", "2")));
-        group.addAssociations("swift", new HashSet<>(Arrays.asList("1", "2")));
-        prefs.addDefinition("category1", group);
-        prefs.setTransactionDisplayName("incasare", "incasareDisplayName");
+        prefs.addDefinition("category1", Arrays.asList("1", "2"));
+        prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.
         boolean stored = handler.storePreferences();
@@ -46,7 +36,7 @@ public class UserPreferencesHandlerTest {
         UserPreferences loaded = handler.getPreferences();
         assertTrue(prefs.equals(loaded));
 
-        boolean deleted = handler.deletePreferencesFile();
+        boolean deleted = handler.deletePreferences();
         assertTrue(deleted);
     }
 }

@@ -4,16 +4,15 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserDefinedTransactionGroup;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
+import java.util.Arrays;
 
 public class UserPreferencesTest {
 
     @Test
     public void testMethods() {
         UserPreferences prefs = new UserPreferences();
-        prefs.addDefinition("one", new UserDefinedTransactionGroup("one"));
-        boolean success = prefs.addDefinition("one", new UserDefinedTransactionGroup("one"));
+        boolean success = prefs.addDefinition("one", Arrays.asList("one"));
         assertTrue(!success);
 
         success = prefs.removeDefinition("fake");
@@ -22,15 +21,14 @@ public class UserPreferencesTest {
         success = prefs.removeDefinition("one");
         assertTrue(success);
 
-        success = prefs.updateDefinition("one", new UserDefinedTransactionGroup("one"));
+        success = prefs.updateDefinition("one", Arrays.asList("one"));
         assertTrue(!success);
 
-        prefs.addDefinition("one", new UserDefinedTransactionGroup("one"));
-        success = prefs.updateDefinition("one", new UserDefinedTransactionGroup("one"));
+        success = prefs.updateDefinition("one", Arrays.asList("one"));
         assertTrue(success);
 
         UserPreferences other = new UserPreferences();
-        other.addDefinition("one", new UserDefinedTransactionGroup("one"));
+        other.addDefinition("one", Arrays.asList("one"));
         assertTrue(prefs.equals(other));
     }
 }

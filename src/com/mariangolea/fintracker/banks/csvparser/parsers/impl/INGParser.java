@@ -19,9 +19,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-/**
- * CSV parser for ING bank.
- */
 public class INGParser extends AbstractBankParser {
 
     public INGParser() {

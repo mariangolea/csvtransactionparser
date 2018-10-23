@@ -2,16 +2,13 @@ package test.com.mariangolea.fintracker.banks.csvparser.api;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
-import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-public class BankTransactionCompanyGroupTest{
+public class BankTransactionCompanyGroupTest extends BankTransactionTest{
 
     @Test
     public void testLegalAdd() {
@@ -62,28 +59,6 @@ public class BankTransactionCompanyGroupTest{
         assertTrue(firstGroup.hashCode() == secondGroup.hashCode());
     }
 
-    protected BankTransaction[] createLegalTestTransactions() {
-        BTParser bt = new BTParser();
-        Date date = bt.parseCompletedDate("19-08-2018");
-        BankTransaction first = new BankTransaction(date, date, BigDecimal.ONE, BigDecimal.ZERO, "description",
-                Arrays.asList("one", "two"));
-        BankTransaction second = new BankTransaction(date, date, BigDecimal.ONE, BigDecimal.ZERO, "description",
-                Arrays.asList("one", "two"));
-
-        return new BankTransaction[]{first, second};
-    }
-
-    protected BankTransaction[] createIllegalTestTransactions() {
-        BTParser bt = new BTParser();
-        Date date = bt.parseCompletedDate("19-08-2018");
-        BankTransaction first = new BankTransaction(date, date, BigDecimal.ONE, BigDecimal.ZERO, "uugh",
-                Arrays.asList("one", "two"));
-        BankTransaction second = new BankTransaction(date, date, BigDecimal.ONE, BigDecimal.ZERO, "",
-                Arrays.asList("one", "two"));
-
-        return new BankTransaction[]{first, second};
-    }
-    
     protected static class Extension extends BankTransactionCompanyGroup{
 
         public Extension(String companyDesc) {

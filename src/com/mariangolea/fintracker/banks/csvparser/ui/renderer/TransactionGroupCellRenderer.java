@@ -7,7 +7,9 @@ import javafx.collections.MapChangeListener;
 import javafx.scene.control.TreeCell;
 
 public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupInterface> {
-    UserPreferencesHandler userPrefsHandler =  UserPreferencesHandler.INSTANCE;
+
+    UserPreferencesHandler userPrefsHandler = UserPreferencesHandler.INSTANCE;
+
     public TransactionGroupCellRenderer() {
     }
 
@@ -19,18 +21,7 @@ public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupI
             return;
         }
 
-        String text = "";
-        if (value.getUserDefinedCategory() != null) {
-            String existingKey = userPrefsHandler.getPreferences().getCompanyNameShortFor(value.getUserDefinedCategory());
-            if (existingKey != null) {
-                text += userPrefsHandler.getPreferences().getDisplayName(existingKey);
-            } else {
-                text += value.getUserDefinedCategory();
-            }
-        }
-        text += "\n" + value.getGroupIdentifier() + "\n" + value.getTotalAmount();
-        setText(text);
-
+        setText(value.toString());
         setStyle("-fx-background-color: lavender; selected: skyblue");
         userPrefsHandler.getPreferences().addCompanyNamesMapListener(new UserPrefsChangeListener(value));
     }

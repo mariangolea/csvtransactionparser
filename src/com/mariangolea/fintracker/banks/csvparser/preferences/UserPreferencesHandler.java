@@ -1,5 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.preferences;
 
+import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences.Timeframe;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -9,13 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Stores user preferences in the following format: <br>
- * categories=name1,name2,name3 <br>
- * name1=swiftcode1:transactionid1,transactionid2;swiftcode2:transactionid2,id3,id4
- * <br>
- * name2=swiftcode1:transactionid3;swiftcode2:transactionid4
- */
 public enum UserPreferencesHandler {
 
     INSTANCE;
@@ -30,6 +24,7 @@ public enum UserPreferencesHandler {
 
     private static final String CATEGORY_NAMES = "categories";
     private static final String INPUT_FOLDER = "inputFolder";
+    private static final String TRANSACTION_GROUPING_TIMEFRAME = "timeFrame";
     private static final String SEPARATOR = ";";
 
     private final Properties userPrefsFile = new Properties();
@@ -48,23 +43,12 @@ public enum UserPreferencesHandler {
         return userPreferences;
     }
 
-    /**
-     * Get the user preferences.
-     *
-     * @return user preferences
-     */
     private void loadPreferences() {
         loadUserPrefsFile();
         loadCompanyNamesFile();
         loadCategoryNamesFile();
     }
 
-    /**
-     * Stores user preferences. Depending on user choice, this happens on a
-     * default location or a user defined one.
-     *
-     * @return true if successfull
-     */
     public boolean storePreferences() {
         boolean success = storeUserPrefsFile();
         success &= storeCompanyNamesFile();
@@ -90,6 +74,8 @@ public enum UserPreferencesHandler {
     protected void loadUserPrefsFile() {
         userPrefsFile.putAll(loadProperties(USER_PREFERENCES_FILE_PATH_DEFAULT));
         userPreferences.setCSVInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
+        Timeframe timeFrame = Timeframe.valueOf(userPrefsFile.getProperty(TRANSACTION_GROUPING_TIMEFRAME));
+        userPreferences.setTransactionGroupingTimeframe(timeFrame);
     }
 
     protected void loadCompanyNamesFile() {
@@ -113,6 +99,7 @@ public enum UserPreferencesHandler {
 
     protected boolean storeUserPrefsFile() {
         userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getCSVInputFolder());
+        userPrefsFile.setProperty(TRANSACTION_GROUPING_TIMEFRAME, userPreferences.getTransactionGroupingTimeframe().name());
         return storeProperties(USER_PREFERENCES_FILE_PATH_DEFAULT, userPrefsFile, COMMENTS);
     }
 
@@ -137,16 +124,16 @@ public enum UserPreferencesHandler {
         return storeProperties(CATEGORIES_FILE_PATH_DEFAULT, userPrefsFile, COMMENTS);
     }
 
-    private void storeTopMostCategoryName(final String topMostCategory){
+    private void storeTopMostCategoryName(final String topMostCategory) {
         Collection<String> subCategories = userPreferences.getCategory(topMostCategory);
-        if (subCategories != null){
+        if (subCategories != null) {
             userPrefsFile.setProperty(topMostCategory, convertStringsForStorage(subCategories, SEPARATOR));
-            for(String category : subCategories){
+            for (String category : subCategories) {
                 storeTopMostCategoryName(category);
             }
         }
     }
-    
+
     protected boolean storeProperties(final String filePath, final Properties properties, final String comments) {
         File propertiesFile = new File(filePath);
         AtomicBoolean success = new AtomicBoolean(false);

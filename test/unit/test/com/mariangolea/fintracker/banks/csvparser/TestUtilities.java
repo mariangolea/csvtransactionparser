@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser;
 
 import java.io.File;
@@ -24,13 +19,6 @@ public class TestUtilities {
 
     public TemporaryFolder folder = new TemporaryFolder();
 
-    /**
-     * Constructs csv text content as expected by the parser. <br>
-     * Adds bank swift code, relevant text delimiter, and line separator.
-     *
-     * @param bank bank
-     * @return whole csv page text content
-     */
     public String[] constructMockCSVContentForBank(Bank bank) {
         List<String> texts = new ArrayList<>();
         texts.add("Gibberish");
@@ -46,14 +34,6 @@ public class TestUtilities {
         return texts.toArray(new String[texts.size()]);
     }
 
-    /**
-     * Writes a single page csv file with received text.
-     *
-     * @param bank bank
-     * @param csv file
-     * @param records records
-     * @return csv file on disk, may be null
-     */
     public File writeCSVFile(Bank bank, File csv, final String... records) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(csv))) {
             for (String record : records) {
@@ -70,15 +50,6 @@ public class TestUtilities {
         return csv;
     }
 
-    /**
-     * Creates a standard set of lines corresponding to 1 of each types of
-     * transactions for a specific bank. <br>
-     * These lines can be written to a text file, then attempted to read from a
-     * CSV file.
-     *
-     * @param bank bank
-     * @return list of string lines
-     */
     public List<String> constructSimplestPositiveLinesInput(final Bank bank) {
         switch (bank) {
             case BT:

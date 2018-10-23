@@ -3,9 +3,6 @@ package com.mariangolea.fintracker.banks.csvparser.api;
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
 import java.util.Locale;
 
-/**
- * Enum of supported banks (Romania).
- */
 public enum Bank {
     ING(AbstractBankParser.ROMANIAN_LOCALE,
             "Data,,,Detalii tranzactie,,Debit,Credit",
@@ -14,10 +11,6 @@ public enum Bank {
             "Data tranzactie,Data valuta,Descriere,Referinta tranzactiei,Debit,Credit,Sold contabil",
             "Gasit/e:");
 
-    /**
-     * Default locale for this bank.
-     * <br> Used to parse certain date strings.
-     */
     public final Locale locale;
     /**
      * Each CSV file has a header that the parser needs to skip when looking for

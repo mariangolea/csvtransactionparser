@@ -11,18 +11,17 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVParserFactory;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
@@ -56,8 +55,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         // tests in other files ensure response integrity, no need to do that in here.
         LocalUI local = new LocalUI();
         local.loadData(Arrays.asList(response));
-        assertTrue(local.getInModel() != null);
-        assertTrue(local.getOutModel() != null);
+        assertTrue(local.getModel() != null);
 
         MenuBar menu = local.createMenu();
         assertTrue(menu != null);
@@ -81,8 +79,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         }
 
         //test parsed the same file content twice, so double expected values.
-        assertTrue(local.getInModel() != null && local.getInModel().size() == 3);
-        assertTrue(local.getOutModel() != null && local.getOutModel().size() == 3);
+        assertTrue(local.getModel() != null && local.getModel().size() == 3);
 
         assertTrue(local.getParsedCsvFiles().size() == initialParsedCSVFiles + 1);
     }
@@ -175,12 +172,8 @@ public class CsvParserUICategorizerTest extends FXUITest {
             super.parseUserSelectedCSVFiles(csvFiles); //To change body of generated methods, choose Tools | Templates.
         }
 
-        public ObservableList<BankTransactionCompanyGroup> getInModel() {
-            return inModel;
-        }
-
-        public ObservableList<BankTransactionCompanyGroup> getOutModel() {
-            return outModel;
+        public Collection<BankTransaction> getModel() {
+            return model;
         }
 
         public List<File> getParsedCsvFiles() {

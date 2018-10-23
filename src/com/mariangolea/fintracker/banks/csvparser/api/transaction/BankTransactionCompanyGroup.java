@@ -5,18 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Group of transactions which were made with the same "target" entity.
- */
 public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
     private final List<BankTransaction> list = new ArrayList<>();
 
-    /**
-     * Create a instance of this class.
-     *
-     * @param companyDesc company descriptor string
-     */
     public BankTransactionCompanyGroup(String companyDesc) {
         super(companyDesc);
         Objects.requireNonNull(companyDesc);

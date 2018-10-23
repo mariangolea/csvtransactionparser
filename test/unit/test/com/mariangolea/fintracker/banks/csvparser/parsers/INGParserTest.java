@@ -74,12 +74,11 @@ public class INGParserTest extends INGParser{
 
         // ING CSV files are dumber than BT ones. They end with a signature text which is irrelevant, but no way of taking it out programtically...
         assertTrue(response.unprocessedStrings.isEmpty());
-        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
+        assertTrue(response.parsedTransactions != null && response.parsedTransactions.size() == 3);
     }
 
     @Test
     public void testMethodsBasic() {
-        assertTrue(getListOfSupportedTransactionIDs() != null);
         assertTrue(findNextTransactionLineIndex(null) == -1);
         
         List<String> impropper = new ArrayList<>();

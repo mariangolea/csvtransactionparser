@@ -5,12 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Each transaction parser uses a set of hard coded strings in order to identify
- * transactions. <br>
- * This class contains a map of all found transactions during the parse of a set
- * of CSV files. Key is represented by the parsed company descriptor.
- */
 public class BankTransactionDefaultGroup extends BankTransactionCompanyGroup {
 
     private final List<BankTransactionGroupInterface> groups = new ArrayList<>();

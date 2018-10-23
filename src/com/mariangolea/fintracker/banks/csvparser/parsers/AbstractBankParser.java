@@ -20,22 +20,11 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-/**
- * Parent of all bank CSV report parsers.
- */
 public abstract class AbstractBankParser {
 
-    /**
-     * Romanian is not a Locale offered by default. This is how it can be
-     * obtained.
-     */
     public static final Locale ROMANIAN_LOCALE = new Locale.Builder().setLanguage("ro").setRegion("RO")
             .setLanguageTag("ro-RO").build();
 
-    /**
-     * Identifier string for unrecognised transactions. Used as a key in
-     * constructed transaction groups.
-     */
     public static final String UNRECOGNIZED_TRANSACTION = "Unrecognized Transaction";
 
     private final NumberFormat numberFormat;
@@ -47,27 +36,10 @@ public abstract class AbstractBankParser {
     private final Map<String, Date> parsedStartedDates = new HashMap<>();
     private final Map<String, BigDecimal> parsedAmounts = new HashMap<>();
 
-    /**
-     * Construct a instance of this class.
-     *
-     * @param bank bank data used to identify transactions.
-     * @param startDateFormat start dates vary in their string representation,
-     * especially for romanian locale.
-     * @param numberFormat number format, also weird for Romanian.
-     */
     public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final NumberFormat numberFormat) {
         this(bank, startDateFormat, DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE), numberFormat);
     }
 
-    /**
-     * Construct a instance of this class.
-     *
-     * @param bank bank data used to identify transactions.
-     * @param startDateFormat start dates vary in their string representation,
-     * especially for romanian locale.
-     * @param completedDateFormat completed date format
-     * @param numberFormat number format, also weird for Romanian.
-     */
     public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final DateFormat completedDateFormat,
             final NumberFormat numberFormat) {
         Objects.requireNonNull(startDateFormat);
@@ -80,42 +52,14 @@ public abstract class AbstractBankParser {
         this.completedDateFormat = completedDateFormat;
     }
 
-    /**
-     * Parse a {@link BankTransaction} instance out of the received list of CSV
-     * record strings.
-     *
-     * @param toConsume string list representation of this transaction in CSV
-     * file.
-     * @return
-     */
     public abstract BankTransaction parseTransaction(List<String> toConsume);
 
-    /**
-     * Look ahead in the remaining list of CSV strings and identify the starting
-     * index of next transaction.
-     *
-     * @param toConsume rest of CSV data for this file.
-     * @return
-     */
     public abstract int findNextTransactionLineIndex(List<String> toConsume);
 
-    /**
-     * Get the Bank data that this parser works with.
-     *
-     * @return
-     */
     public Bank getBank() {
         return bank;
     }
 
-    /**
-     * Read the whole list of strings which represent the File object next to
-     * it, and create a response containing all parsed transactions.
-     *
-     * @param split
-     * @param file
-     * @return
-     */
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
         List<BankTransaction> result = new ArrayList<>();
 
@@ -191,13 +135,6 @@ public abstract class AbstractBankParser {
         return -1;
     }
 
-    /**
-     * Parse the completed date for a transaction.
-     * <br> Method uses a cache to prevent parsing when not needed.
-     *
-     * @param dateString
-     * @return
-     */
     public Date parseCompletedDate(final String dateString) {
         Date completedDate = dateString == null ? null : parsedCompletedDates.get(dateString);
         if (completedDate != null) {
@@ -215,13 +152,6 @@ public abstract class AbstractBankParser {
         return completedDate;
     }
 
-    /**
-     * Parse the started date for a transaction.
-     * <br> Method uses a cache to prevent parsing when not needed.
-     *
-     * @param dateString
-     * @return
-     */
     public Date parseStartDate(final String dateString) {
         Date startedDate = dateString == null ? null : parsedStartedDates.get(dateString);
         if (startedDate != null) {
@@ -239,13 +169,6 @@ public abstract class AbstractBankParser {
         return startedDate;
     }
 
-    /**
-     * Parse the amount for a transaction.
-     * <br> Method uses a cache to prevent parsing when not needed.
-     *
-     * @param amountString
-     * @return never null
-     */
     public BigDecimal parseAmount(final String amountString) {
         BigDecimal amount = amountString == null ? null : parsedAmounts.get(amountString);
         if (amount != null) {
@@ -268,13 +191,6 @@ public abstract class AbstractBankParser {
         return amount;
     }
 
-    /**
-     * Transform a whole String text line into a {@link CSVRecord} from apache
-     * library.
-     *
-     * @param singleLine
-     * @return
-     */
     public final CSVRecord parseSingleLine(String singleLine) {
         Reader in = new StringReader(singleLine);
         CSVRecord record = null;

@@ -9,10 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 
-/**
- * Updates amount based on existing selections. If none are made, all
- * transactions are summed up.
- */
 public class TransactionGroupListSelectionListener implements ChangeListener {
 
     public static final String LABEL_NOTHING_SELECTED = "Total Amount: ";

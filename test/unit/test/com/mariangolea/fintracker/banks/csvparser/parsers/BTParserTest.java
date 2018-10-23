@@ -19,9 +19,6 @@ import java.math.BigDecimal;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- * Tests individual methods in INGParser class.
- */
 public class BTParserTest extends BTParser {
 
     private final TestUtilities utils = new TestUtilities();

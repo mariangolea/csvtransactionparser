@@ -8,19 +8,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * CMD Utility to call the bank report CSV parser functionality using command line.
- * <br> Useful in basic validations of expected behavior.
- */
 public class BankCSVReportsCmdParser {
 
     private final CmdArgParser cmdParser = new CmdArgParser();
 
-    /**
-     * 
-     * @param args
-     * @return 
-     */
     public List<CsvFileParseResponse> parseInput(final String[] args) {
         List<File> inputFiles = cmdParser.getCSVFiles(args);
         BankCSVTransactionParser fac = new BankCSVTransactionParser();

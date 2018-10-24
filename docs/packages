@@ -1,9 +1,0 @@
-com.mariangolea.fintracker.banks.csvparser.api
-com.mariangolea.fintracker.banks.csvparser.api.transaction
-com.mariangolea.fintracker.banks.csvparser.api.transaction.response
-com.mariangolea.fintracker.banks.csvparser
-com.mariangolea.fintracker.banks.csvparser.cmdsupport
-com.mariangolea.fintracker.banks.csvparser.parsers
-com.mariangolea.fintracker.banks.csvparser.parsers.impl
-com.mariangolea.fintracker.banks.csvparser.preferences
-com.mariangolea.fintracker.banks.csvparser.ui

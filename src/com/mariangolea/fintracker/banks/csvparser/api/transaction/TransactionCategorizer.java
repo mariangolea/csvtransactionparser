@@ -38,7 +38,7 @@ public class TransactionCategorizer {
     private final List<BankTransaction> transactions = new ArrayList<>();
 
     //for every relevant time slot (monthly or yearly), keep a collection of company groups (each group has a list of transactions).
-    private final Map<YearSlot, Collection<BankTransactionCompanyGroup>> slottedCompanyGroups = new ConcurrentHashMap<>();
+    private final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedCompanyGroups = new ConcurrentHashMap<>();
     //for every relevant time slot (monthly or yearly), keep a collection fully categorized transactions. each group represents a top most category name.
     private final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedCategorised = new ConcurrentHashMap<>();
 
@@ -53,32 +53,25 @@ public class TransactionCategorizer {
      * categories and their transactions.
      */
     public Map<YearSlot, Collection<BankTransactionGroupInterface>> categorize() {
-        if (!slottedCategorised.isEmpty()) {
+        if (slottedCategorised.isEmpty()) {
             categorizeByCompanyNames();
             Collection<String> topMostCategories = userPrefs.getTopMostCategories();
 
-            Collection<Runnable> tasks = new ArrayList<>(topMostCategories.size());
             topMostCategories.forEach((topMostCategory) -> {
-                tasks.add((Runnable) () -> {
-                    Map<YearSlot, BankTransactionGroupInterface> perSlot = createSlottedGroups(topMostCategory);
-                    perSlot.keySet().forEach(timeSlot -> {
-                        slottedCategorised.get(timeSlot).add(perSlot.get(timeSlot));
-                    });
+                Map<YearSlot, BankTransactionGroupInterface> perSlot = createSlottedGroups(topMostCategory);
+                perSlot.keySet().forEach(timeSlot -> {
+                    Collection<BankTransactionGroupInterface> collection = slottedCategorised.get(timeSlot);
+                    if (collection == null){
+                        collection = new ArrayList<>();
+                        slottedCategorised.put(timeSlot, collection);
+                    }
+
+                    BankTransactionGroupInterface add = perSlot.get(timeSlot);
+                    if (add != null) {
+                        collection.add(perSlot.get(timeSlot));
+                    }
                 });
             });
-
-            final ExecutorService service = Executors.newFixedThreadPool(topMostCategories.size());
-            tasks.forEach(runnable -> {
-                service.submit(runnable);
-            });
-            try {
-                service.awaitTermination(10, TimeUnit.SECONDS);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TransactionCategorizer.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                service.shutdown();
-            }
-
         }
         return slottedCategorised;
     }
@@ -88,7 +81,9 @@ public class TransactionCategorizer {
         Map<YearSlot, BankTransactionGroupInterface> slotted = new ConcurrentHashMap<>();
         timeSlots.forEach(slot -> {
             BankTransactionGroupInterface group = createSlottedGroup(slot, category);
-            slotted.put(slot, group);
+            if (group != null) {
+                slotted.put(slot, group);
+            }
         });
 
         return slotted;
@@ -99,23 +94,25 @@ public class TransactionCategorizer {
         if (subCategories != null) {
             final BankTransactionDefaultGroup group = new BankTransactionDefaultGroup(category);
             subCategories.stream().map((subCategory) -> createSlottedGroup(timeSlot, subCategory)).forEachOrdered((subGroup) -> {
-                group.addGroup(subGroup);
+                if (subGroup != null) {
+                    group.addGroup(subGroup);
+                }
             });
             return group;
         } else {
-            BankTransactionCompanyGroup companyGroup = findCompanyGroup(timeSlot, category);
+            BankTransactionGroupInterface companyGroup = findCompanyGroup(timeSlot, category);
             return companyGroup;
         }
     }
 
-    protected BankTransactionCompanyGroup findCompanyGroup(final YearSlot timeSlot, final String category) {
-        Collection<BankTransactionCompanyGroup> slotedCompanyGroups = slottedCompanyGroups.get(timeSlot);
+    protected BankTransactionGroupInterface findCompanyGroup(final YearSlot timeSlot, final String companyName) {
+        Collection<BankTransactionGroupInterface> slotedCompanyGroups = slottedCompanyGroups.get(timeSlot);
         if (slotedCompanyGroups == null) {
             return null;
         }
 
-        for (BankTransactionCompanyGroup companyGroup : slotedCompanyGroups) {
-            if (companyGroup.getCategoryName().equalsIgnoreCase(category)) {
+        for (BankTransactionGroupInterface companyGroup : slotedCompanyGroups) {
+            if (companyGroup.getCategoryName().equalsIgnoreCase(companyName)) {
                 return companyGroup;
             }
         }
@@ -123,43 +120,42 @@ public class TransactionCategorizer {
         return null;
     }
 
-    protected void categorizeByCompanyNames() {
-        if (!slottedCompanyGroups.isEmpty()) {
-            return;
-        }
-
+    protected Map<YearSlot, Collection<BankTransactionGroupInterface>> categorizeByCompanyNames() {
         if (transactions.isEmpty()) {
-            return;
+            return slottedCompanyGroups;
         }
 
-        Collections.sort(transactions);
+        if (slottedCompanyGroups.isEmpty()) {
+            Collections.sort(transactions);
 
-        final Map<YearSlot, Map<String, BankTransactionCompanyGroup>> slottedCategoriesMap = new HashMap<>();
-        transactions.forEach((transaction) -> {
-            YearSlot timeSlot = createSlot(transaction.completedDate);
-            Map<String, BankTransactionCompanyGroup> categoriesMap = slottedCategoriesMap.get(timeSlot);
-            if (categoriesMap == null) {
-                categoriesMap = new HashMap<>();
-                slottedCategoriesMap.put(timeSlot, categoriesMap);
-            }
+            final Map<YearSlot, Map<String, BankTransactionGroupInterface>> slottedCategoriesMap = new HashMap<>();
+            transactions.forEach((transaction) -> {
+                YearSlot timeSlot = createSlot(transaction.completedDate);
+                Map<String, BankTransactionGroupInterface> categoriesMap = slottedCategoriesMap.get(timeSlot);
+                if (categoriesMap == null) {
+                    categoriesMap = new HashMap<>();
+                    slottedCategoriesMap.put(timeSlot, categoriesMap);
+                }
 
-            String category = getMatchingCategory(transaction.description);
-            BankTransactionCompanyGroup group = categoriesMap.get(category);
-            if (group == null) {
-                group = new BankTransactionCompanyGroup(category);
-                categoriesMap.put(category, group);
-            }
+                String category = getMatchingCategory(transaction.description);
+                BankTransactionGroupInterface group = categoriesMap.get(category);
+                if (group == null) {
+                    group = new BankTransactionCompanyGroup(category);
+                    categoriesMap.put(category, group);
+                }
 
-            List<BankTransaction> foundTransactions = group.getContainedTransactions();
-            if (foundTransactions == null) {
-                foundTransactions = new ArrayList<>();
-            }
-            foundTransactions.add(transaction);
-        });
+                List<BankTransaction> foundTransactions = group.getContainedTransactions();
+                if (foundTransactions == null) {
+                    foundTransactions = new ArrayList<>();
+                }
+                foundTransactions.add(transaction);
+            });
 
-        slottedCategoriesMap.entrySet().forEach(entry -> {
-            slottedCompanyGroups.put(entry.getKey(), entry.getValue().values());
-        });
+            slottedCategoriesMap.entrySet().forEach(entry -> {
+                slottedCompanyGroups.put(entry.getKey(), entry.getValue().values());
+            });
+        }
+        return slottedCompanyGroups;
     }
 
     protected String getMatchingCategory(String transactionDescription) {
@@ -180,9 +176,7 @@ public class TransactionCategorizer {
     }
 
     protected Collection<YearSlot> computeTimeSlots() {
-        Date first = transactions.get(0).completedDate;
-        Date last = transactions.get(transactions.size() - 1).completedDate;
-        TimeSlots timeSlotsCalc = new TimeSlots(first, last);
+        TimeSlots timeSlotsCalc = new TimeSlots(transactions);
         UserPreferences.Timeframe timeframe = userPrefs.getTransactionGroupingTimeframe();
         return UserPreferences.Timeframe.YEAR == timeframe ? timeSlotsCalc.getYearSlots() : timeSlotsCalc.getMonthSlots();
     }

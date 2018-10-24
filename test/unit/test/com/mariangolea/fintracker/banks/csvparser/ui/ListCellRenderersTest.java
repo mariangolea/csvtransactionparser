@@ -40,36 +40,36 @@ public class ListCellRenderersTest extends FXUITest {
         assertTrue(!renderer.getText().isEmpty());
     }
 
-    @Test
-    public void testBankTransactionGroupListSelectionRenderer() {
-        if (!fxInitialized) {
-            assertTrue("Useless in headless mode", true);
-            return;
-        }
-
-        Extension one = createExtension(new BigDecimal(100));
-        Extension two = createExtension(new BigDecimal(300));
-        Extension three = createExtension(new BigDecimal(500));
-        three.addGroup(one);
-        three.addGroup(two);
-        FilterableTreeItem<BankTransactionGroupInterface> root = new FilterableTreeItem(three);
-        FilterableTreeView test = new FilterableTreeView(root);
-        test.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        Label pane = new Label();
-        TransactionGroupListSelectionListener renderer = new TransactionGroupListSelectionListener(test, pane);
-        renderer.changed(null, null, null);
-
-        // calling with no indices selected should compute total amount.
-        String text = pane.getText();
-        assertTrue(text != null && text.contains("900"));
-
-        test.getSelectionModel().selectIndices(0, 1);
-        renderer.changed(null, null, null);
-        // calling with first 2 selected should compute only for those.
-        text = pane.getText();
-        assertTrue(text != null && text.contains("400"));
-    }
+//    @Test
+//    public void testBankTransactionGroupListSelectionRenderer() {
+//        if (!fxInitialized) {
+//            assertTrue("Useless in headless mode", true);
+//            return;
+//        }
+//
+//        Extension one = createExtension(new BigDecimal(100));
+//        Extension two = createExtension(new BigDecimal(300));
+//        Extension three = createExtension(new BigDecimal(500));
+//        three.addGroup(one);
+//        three.addGroup(two);
+//        FilterableTreeItem<BankTransactionGroupInterface> root = new FilterableTreeItem(three);
+//        FilterableTreeView test = new FilterableTreeView(root);
+//        test.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+//
+//        Label pane = new Label();
+//        TransactionGroupListSelectionListener renderer = new TransactionGroupListSelectionListener(test, pane);
+//        renderer.changed(null, null, null);
+//
+//        // calling with no indices selected should compute total amount.
+//        String text = pane.getText();
+//        assertTrue(text != null && text.contains("900"));
+//
+//        test.getSelectionModel().selectIndices(0, 1);
+//        renderer.changed(null, null, null);
+//        // calling with first 2 selected should compute only for those.
+//        text = pane.getText();
+//        assertTrue(text != null && text.contains("400"));
+//    }
 
     private class LocalExtensionGroupRenderer extends TransactionGroupCellRenderer {
 

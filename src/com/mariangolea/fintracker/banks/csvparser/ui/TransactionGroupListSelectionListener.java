@@ -7,6 +7,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;
+import javafx.scene.control.TreeItem;
 import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 
 public class TransactionGroupListSelectionListener implements ChangeListener {
@@ -46,12 +47,12 @@ public class TransactionGroupListSelectionListener implements ChangeListener {
             return item.getValue() == null ? BigDecimal.ZERO : item.getValue().getTotalAmount();
         } else {
             BigDecimal amount = BigDecimal.ZERO;
-            item.getInternalChildren().forEach((child) -> {
+            for (TreeItem<BankTransactionGroupInterface> child : item.getInternalChildren()){
                 BankTransactionGroupInterface value = child.getValue();
                 if (value != null) {
-                    amount.add(child.getValue().getTotalAmount());
+                    amount = amount.add(child.getValue().getTotalAmount());
                 }
-            });
+            }
 
             return amount;
         }

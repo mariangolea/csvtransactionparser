@@ -81,4 +81,9 @@ public abstract class BankTransactionAbstractGroup implements BankTransactionGro
                 + getTransactionsNumber() + " transactions" + "\n" 
                 + getGroupsNumber() + " groups";
     }
+
+    @Override
+    public int compareTo(BankTransactionGroupInterface o) {
+        return categoryName.compareTo(o.getCategoryName());
+    }
 }

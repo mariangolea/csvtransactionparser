@@ -1,7 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +14,7 @@ public class BankTransactionDefaultGroup extends BankTransactionCompanyGroup {
 
     @Override
     public List<BankTransactionGroupInterface> getContainedGroups() {
-        return Collections.unmodifiableList(groups);
+        return groups;
     }
 
     protected void addGroup(final BankTransactionGroupInterface group){

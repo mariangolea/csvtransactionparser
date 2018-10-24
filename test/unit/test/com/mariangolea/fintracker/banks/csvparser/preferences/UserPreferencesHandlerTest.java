@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import static org.junit.Assert.assertNotNull;
 
 public class UserPreferencesHandlerTest {
 
@@ -18,7 +19,8 @@ public class UserPreferencesHandlerTest {
         // delete preferences file to verify initial app behavior.
         handler.deletePreferences();
         UserPreferences prefs = handler.getPreferences();
-        assertTrue(prefs.getUserDefinedCategoryNames() != null && prefs.getUserDefinedCategoryNames().isEmpty());
+        assertNotNull(prefs.getUserDefinedCategoryNames());
+        assertTrue(prefs.getUserDefinedCategoryNames().isEmpty());
         assertTrue(prefs.getCSVInputFolder() == null);
     }
 
@@ -27,7 +29,7 @@ public class UserPreferencesHandlerTest {
         handler.deletePreferences();
         UserPreferences prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
-        prefs.addDefinition("category1", Arrays.asList("1", "2"));
+        prefs.setDefinition("category1", Arrays.asList("1", "2"));
         prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.

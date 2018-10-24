@@ -54,6 +54,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(mockCSV);
         // tests in other files ensure response integrity, no need to do that in here.
         LocalUI local = new LocalUI();
+        local.createTableView();
         local.loadData(Arrays.asList(response));
         assertTrue(local.getModel() != null);
 
@@ -79,7 +80,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         }
 
         //test parsed the same file content twice, so double expected values.
-        assertTrue(local.getModel() != null && local.getModel().size() == 3);
+        assertTrue(local.getModel() != null && local.getModel().size() == 6);
 
         assertTrue(local.getParsedCsvFiles().size() == initialParsedCSVFiles + 1);
     }
@@ -163,6 +164,13 @@ public class CsvParserUICategorizerTest extends FXUITest {
             return super.createFeedbackView(); //To change body of generated methods, choose Tools | Templates.
         }
 
+        @Override
+        protected void createTableView() {
+            super.createTableView(); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        
+        
         public TextFlow getFeedbackPane() {
             return feedbackPane;
         }

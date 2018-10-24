@@ -3,6 +3,7 @@ package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -44,7 +45,7 @@ public final class BankTransaction implements Serializable, Comparable<BankTrans
     }
 
     public final List<String> getCsvContent() {
-        return csvContent;
+        return Collections.unmodifiableList(csvContent);
     }
 
     public final int getCSVContentLines() {
@@ -79,7 +80,11 @@ public final class BankTransaction implements Serializable, Comparable<BankTrans
 
     @Override
     public int compareTo(final BankTransaction o) {
-        return completedDate.compareTo(o.completedDate);
+        int result = completedDate.compareTo(o.completedDate);
+        if (result == 0){
+            result = description.compareTo(o.description);
+        }
+        return result;
     }
     
 }

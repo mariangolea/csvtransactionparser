@@ -25,16 +25,6 @@ public class UserPreferences {
         private Timeframe(int timeframe){
             this.timeframe = timeframe;
         }
-        
-        public static Timeframe getTimeframe(int timeframe){
-            switch (timeframe){
-                case 1:
-                default:
-                    return Timeframe.MONTH;
-                case 2:
-                    return Timeframe.YEAR;
-            }
-        }
     }
     
     public boolean addTransactionCategoriesMapListener(MapChangeListener<String, Collection<String>> listener) {
@@ -106,7 +96,7 @@ public class UserPreferences {
         return companyNamesReversed.get(companyDisplayName);
     }
 
-    public boolean addDefinition(final String categoryName, Collection<String> subCategories) {
+    public boolean setDefinition(final String categoryName, Collection<String> subCategories) {
         Objects.requireNonNull(categoryName);
         Objects.requireNonNull(subCategories);
         if (categories.containsKey(categoryName)) {
@@ -129,17 +119,6 @@ public class UserPreferences {
         Collection<String> subCategories = categories.remove(categoryName);
         topMostCategories.remove(categoryName);
         topMostCategories.addAll(subCategories);
-        return true;
-    }
-
-    public boolean updateDefinition(final String categoryName, final Collection<String> subCategories) {
-        Objects.requireNonNull(categoryName);
-        Objects.requireNonNull(subCategories);
-        if (!categories.containsKey(categoryName)) {
-            return false;
-        }
-        categories.get(categoryName).addAll(subCategories);
-        topMostCategories.removeAll(subCategories);
         return true;
     }
 

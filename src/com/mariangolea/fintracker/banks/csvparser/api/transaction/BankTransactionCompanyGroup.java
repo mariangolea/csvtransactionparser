@@ -1,7 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +35,7 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
     @Override
     public List<BankTransaction> getContainedTransactions() {
-        return Collections.unmodifiableList(list);
+        return list;
     }
 
     @Override
@@ -56,5 +55,4 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
     public int hashCode() {
         return Objects.hash(super.hashCode(), list);
     }
-
 }

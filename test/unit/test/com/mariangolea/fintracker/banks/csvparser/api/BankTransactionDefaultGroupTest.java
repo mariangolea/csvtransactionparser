@@ -6,6 +6,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import java.util.Arrays;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BankTransactionDefaultGroupTest extends BankTransactionCompanyGroupTest {
@@ -22,7 +23,28 @@ public class BankTransactionDefaultGroupTest extends BankTransactionCompanyGroup
         assertTrue(firstGroup.getTransactionsNumber() == 2);
         assertTrue(firstGroup.getGroupsNumber() == 1);
     }
+    
+    @Test
+    public void testEqualsHashCode(){
+        BankTransactionCompanyGroupTest.Extension first = createGroup();
+        assertTrue(first.equals(first));
 
+        BankTransactionCompanyGroupTest.Extension second = createGroup();
+        assertTrue(first.equals(second));
+        assertTrue(first.hashCode() == second.hashCode());
+        
+        BankTransactionCompanyGroupTest.Extension third = null;
+        assertFalse(first.equals(third));
+    }
+
+    
+    private BankTransactionCompanyGroupTest.Extension createGroup(){
+        BankTransaction[] legal = createLegalTestTransactions();
+        BankTransactionCompanyGroupTest.Extension defaultGroup = new BankTransactionCompanyGroupTest.Extension("description");
+        defaultGroup.addTransactions(Arrays.asList(legal));
+        return defaultGroup;
+    }
+    
     private class Extension extends BankTransactionDefaultGroup {
 
         public Extension(String companyDesc) {

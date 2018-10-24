@@ -1,72 +1,44 @@
 package com.mariangolea.fintracker.banks.csvparser.api.filters;
 
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public final class TimeSlots {
+    private final Collection<BankTransaction> transactions;
+    private final Set<YearSlot> monthSlots = new HashSet<>();
+    private final Collection<YearSlot> yearSlots = new HashSet<>();
 
-    private final Date start;
-    private final Date end;
-
-    public TimeSlots(final Date start, final Date end) {
-        Objects.requireNonNull(start);
-        Objects.requireNonNull(end);
-        if (start.compareTo(end) > 0) {
-            throw new IllegalArgumentException("Start date needs to be smaller or equals to end date!");
-        }
-
-        this.start = start;
-        this.end = end;
+    public TimeSlots(final Collection<BankTransaction> transactions) {
+        Objects.requireNonNull(transactions);
+        this.transactions = transactions;
     }
 
     public Collection<YearSlot> getMonthSlots() {
-        Collection<YearSlot> intervals = Collections.EMPTY_LIST;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(start);
-        int startYear = calendar.get(Calendar.YEAR);
-        int startMonth = calendar.get(Calendar.MONTH);
-        calendar.setTime(end);
-        int endYear = calendar.get(Calendar.YEAR);
-        int endMonth = calendar.get(Calendar.MONTH);
-        if (startYear == endYear) {
-            intervals.addAll(getMonthIntervals(startYear, startMonth, endMonth));
-        } else {
-            intervals.addAll(getMonthIntervals(startYear, startMonth, 11));
-            for (int currentYear = startYear + 1; currentYear < endYear; currentYear++) {
-                intervals.addAll(getMonthIntervals(currentYear, 0, 11));
-            }
-            intervals.addAll(getMonthIntervals(endYear, 0, endMonth));
+        if (monthSlots.isEmpty()){
+            computeSlots();
         }
-
-        return intervals;
+        return monthSlots;
     }
 
     public Collection<YearSlot> getYearSlots() {
-        Collection<YearSlot> intervals = Collections.EMPTY_LIST;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(start);
-        int startYear = calendar.get(Calendar.YEAR);
-        calendar.setTime(end);
-        int endYear = calendar.get(Calendar.YEAR);
-        
-        if (startYear == endYear){
-            intervals.add(new YearSlot(endYear));
+        if (yearSlots.isEmpty()){
+            computeSlots();
         }
-        for (int currentYear = startYear+1; currentYear <= endYear; currentYear++){
-            intervals.add(new YearSlot(currentYear));
-        }
-        return intervals;
+        return yearSlots;
     }
 
-    protected Collection<MonthSlot> getMonthIntervals(int year, int startMonth, int endMonth) {
-        Collection<MonthSlot> intervals = Collections.EMPTY_LIST;
-        for (int currentMonth = startMonth; currentMonth <= endMonth; currentMonth++) {
-            intervals.add(new MonthSlot(currentMonth, year));
-        }
-
-        return intervals;
+    private void computeSlots(){
+        Calendar cal = Calendar.getInstance();
+        transactions.forEach(transaction ->{
+            cal.setTime(transaction.completedDate);
+            int month = cal.get(Calendar.MONTH);
+            int year = cal.get(Calendar.YEAR);
+            monthSlots.add(new MonthSlot(month, year));
+            yearSlots.add(new YearSlot(year));
+        });
     }
 }

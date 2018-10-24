@@ -76,7 +76,7 @@ public class CsvParserUI extends Application {
 
         ScrollPane centerScroll = createFeedbackView();
 
-        tableView = new TransactionTableView(model);
+        createTableView();
 
         grid.add(tableView, 0, 0);
         grid.add(centerScroll, 1, 0);
@@ -186,6 +186,10 @@ public class CsvParserUI extends Application {
         return scrollPane;
     }
 
+    protected void createTableView(){
+        tableView = new TransactionTableView(model);
+    }
+    
     protected TextFlow constructFeedbackPane() {
         return new TextFlow();
     }

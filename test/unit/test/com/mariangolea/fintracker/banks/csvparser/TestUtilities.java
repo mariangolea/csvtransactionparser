@@ -10,9 +10,16 @@ import java.util.logging.Logger;
 import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
+import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import org.apache.commons.csv.CSVFormat;
 
 public class TestUtilities {
@@ -34,6 +41,43 @@ public class TestUtilities {
         return texts.toArray(new String[texts.size()]);
     }
 
+    public static Collection<BankTransaction> constructMockDefaultTransactionsForCategorizer(final UserPreferences userPrefs) {
+        Collection<BankTransaction> transactions = new ArrayList<>();
+        populateUserPrefsWithCompanyAndGroupData(userPrefs);
+        
+        transactions.add(createTransaction(createDate(6, 2016), BigDecimal.ZERO, BigDecimal.ONE, "  Carrefour SRL  Romania"));
+        transactions.add(createTransaction(createDate(1, 2017), BigDecimal.ZERO, BigDecimal.ONE, "Auchan Romania SRL"));
+        transactions.add(createTransaction(createDate(5, 2018), BigDecimal.ZERO, BigDecimal.ONE, "Limited Petrom SA"));
+        transactions.add(createTransaction(createDate(5, 2018), BigDecimal.TEN, BigDecimal.ZERO, "Employer Company SRL"));
+        transactions.add(createTransaction(createDate(5, 2018), BigDecimal.TEN, BigDecimal.ZERO, "Auchan Romania"));
+        transactions.add(createTransaction(createDate(2, 2019), BigDecimal.TEN, BigDecimal.ZERO, "Employer Company SRL"));
+
+        return transactions;
+    }
+
+    public static void populateUserPrefsWithCompanyAndGroupData(final UserPreferences userPrefs) {
+        userPrefs.setCompanyDisplayName("  Carrefour SRL ", "Carrefour");
+        userPrefs.setCompanyDisplayName("Petrom SA", "Petrom");
+        userPrefs.setCompanyDisplayName("Auchan Romania", "Auchan");
+        userPrefs.setCompanyDisplayName("Employer Company SRL", "Employer");
+
+        userPrefs.setDefinition("Food", createList("Auchan","Carrefour"));
+        userPrefs.setDefinition("Fuel", createList("Petrom"));
+        userPrefs.setDefinition("Existential", createList("Food", "Fuel"));
+        userPrefs.setDefinition("Revenues", createList("Employer"));
+    }
+    
+    public static Date createDate(int month, int year){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.YEAR, year);
+        return cal.getTime();
+    }
+    
+    public static BankTransaction createTransaction(final Date completed, final BigDecimal credit, final BigDecimal debit, final String description){
+        return new BankTransaction(completed, completed, credit, debit, description, Arrays.asList("one", "two"));
+    }
+    
     public File writeCSVFile(Bank bank, File csv, final String... records) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(csv))) {
             for (String record : records) {
@@ -98,5 +142,14 @@ public class TestUtilities {
         lines.add(third);
         lines.add("Pointless");
         return lines;
+    }
+
+    public static Collection<String> createList(final String... args) {
+        Collection<String> list = new ArrayList<>();
+        for (String arg : args) {
+            list.add(arg);
+        }
+
+        return list;
     }
 }

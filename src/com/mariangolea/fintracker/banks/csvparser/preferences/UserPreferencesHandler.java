@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
@@ -60,27 +61,31 @@ public enum UserPreferencesHandler {
         boolean success = deletePreferencesFile(USER_PREFERENCES_FILE_PATH_DEFAULT);
         success |= deletePreferencesFile(COMPANY_NAMES_FILE_PATH_DEFAULT);
         success |= deletePreferencesFile(CATEGORIES_FILE_PATH_DEFAULT);
+        userPreferences = null;
         return success;
     }
 
     protected boolean deletePreferencesFile(final String filePath) {
         File propertiesFile = new File(filePath);
-        if (propertiesFile.exists()) {
-            return propertiesFile.delete();
+        try {
+            Files.deleteIfExists(propertiesFile.toPath());
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        return true;
     }
 
     protected void loadUserPrefsFile() {
         userPrefsFile.putAll(loadProperties(USER_PREFERENCES_FILE_PATH_DEFAULT));
         userPreferences.setCSVInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
-        Timeframe timeFrame = Timeframe.valueOf(userPrefsFile.getProperty(TRANSACTION_GROUPING_TIMEFRAME));
+        Timeframe timeFrame = Timeframe.valueOf(userPrefsFile.getProperty(TRANSACTION_GROUPING_TIMEFRAME, Timeframe.MONTH.name()));
         userPreferences.setTransactionGroupingTimeframe(timeFrame);
     }
 
     protected void loadCompanyNamesFile() {
         companyNamesFile.putAll(loadProperties(COMPANY_NAMES_FILE_PATH_DEFAULT));
-        companyNamesFile.keySet().forEach((categoryName) -> {
+        companyNamesFile.keySet().forEach(categoryName -> {
             userPreferences.setCompanyDisplayName(categoryName.toString(), companyNamesFile.get(categoryName).toString());
         });
     }
@@ -93,7 +98,7 @@ public enum UserPreferencesHandler {
         categoryNames.forEach((categoryName) -> {
             Set<String> categories = new HashSet<>(
                     convertPersistedStringToList(userPrefsFile.getProperty(categoryName), SEPARATOR));
-            userPreferences.addDefinition(categoryName, categories);
+            userPreferences.setDefinition(categoryName, categories);
         });
     }
 
@@ -138,10 +143,8 @@ public enum UserPreferencesHandler {
         File propertiesFile = new File(filePath);
         AtomicBoolean success = new AtomicBoolean(false);
         try {
-            if (!propertiesFile.exists()) {
-                if (!propertiesFile.createNewFile()) {
-                    return false;
-                }
+            if (!propertiesFile.exists() && !propertiesFile.createNewFile()) {
+                return false;
             }
             try (FileWriter writer = new FileWriter(propertiesFile)) {
                 properties.store(writer, comments);

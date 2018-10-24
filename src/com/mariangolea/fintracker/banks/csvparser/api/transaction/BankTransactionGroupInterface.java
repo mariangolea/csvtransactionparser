@@ -3,7 +3,7 @@ package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface BankTransactionGroupInterface {
+public interface BankTransactionGroupInterface extends Comparable<BankTransactionGroupInterface>{
 
     public static final String UNCATEGORIZED = "Uncategorized";
 

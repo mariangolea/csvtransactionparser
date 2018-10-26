@@ -1,7 +1,6 @@
-package com.mariangolea.fintracker.banks.csvparser.ui;
+package com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
-import com.mariangolea.fintracker.banks.csvparser.ui.transactions.FilterableTreeView;
 import java.math.BigDecimal;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

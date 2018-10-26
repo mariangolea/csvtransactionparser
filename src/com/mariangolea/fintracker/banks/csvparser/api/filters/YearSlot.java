@@ -32,6 +32,9 @@ public class YearSlot implements Comparable<YearSlot> {
 
     @Override
     public int compareTo(YearSlot o) {
+        if (o == null){
+            return 1;
+        }
         return year - o.year;
     }
 }

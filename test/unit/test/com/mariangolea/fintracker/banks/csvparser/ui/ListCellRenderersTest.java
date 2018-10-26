@@ -8,18 +8,13 @@ import java.util.Date;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
-import com.mariangolea.fintracker.banks.csvparser.ui.renderer.TransactionGroupCellRenderer;
-import com.mariangolea.fintracker.banks.csvparser.ui.TransactionGroupListSelectionListener;
-import com.mariangolea.fintracker.banks.csvparser.ui.transactions.FilterableTreeView;
+import com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree.TransactionGroupCellRenderer;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Collection;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import org.eclipse.fx.ui.controls.tree.FilterableTreeItem;
 
 public class ListCellRenderersTest extends FXUITest {
 
@@ -90,25 +85,20 @@ public class ListCellRenderersTest extends FXUITest {
         return one;
     }
 
-    protected static class Extension extends BankTransactionDefaultGroup {
+    protected static class Extension extends BankTransactionCompanyGroup {
 
         public Extension(String companyDesc) {
             super(companyDesc);
         }
 
         @Override
-        protected List<BankTransaction> addTransactions(List<BankTransaction> parsedTransactions) {
-            return super.addTransactions(parsedTransactions); //To change body of generated methods, choose Tools | Templates.
+        protected void addTransactions(Collection<BankTransaction> parsedTransactions) {
+            super.addTransactions(parsedTransactions); 
         }
 
         @Override
-        protected boolean addTransaction(BankTransaction parsedTransaction) {
-            return super.addTransaction(parsedTransaction); //To change body of generated methods, choose Tools | Templates.
-        }
-
-        @Override
-        protected void addGroup(BankTransactionGroupInterface group) {
-            super.addGroup(group); //To change body of generated methods, choose Tools | Templates.
+        protected void addTransaction(BankTransaction parsedTransaction) {
+            super.addTransaction(parsedTransaction); //To change body of generated methods, choose Tools | Templates.
         }
     }
 }

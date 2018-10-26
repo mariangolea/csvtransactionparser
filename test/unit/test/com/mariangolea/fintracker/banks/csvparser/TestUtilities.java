@@ -51,6 +51,7 @@ public class TestUtilities {
         transactions.add(createTransaction(createDate(5, 2018), BigDecimal.TEN, BigDecimal.ZERO, "Employer Company SRL"));
         transactions.add(createTransaction(createDate(5, 2018), BigDecimal.TEN, BigDecimal.ZERO, "Auchan Romania"));
         transactions.add(createTransaction(createDate(2, 2019), BigDecimal.TEN, BigDecimal.ZERO, "Employer Company SRL"));
+        transactions.add(createTransaction(createDate(2, 2016), BigDecimal.ZERO, BigDecimal.ONE, "  No Category..."));
 
         return transactions;
     }

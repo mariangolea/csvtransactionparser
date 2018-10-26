@@ -3,16 +3,16 @@ package test.com.mariangolea.fintracker.banks.csvparser.api;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-public class BankTransactionCompanyGroupTest extends BankTransactionTest{
+public class BankTransactionCompanyGroupTest extends BankTransactionTest {
 
     @Test
-    public void testLegalAdd() {
-        BankTransaction[] legal = createLegalTestTransactions();
+    public void testAdd() {
+        BankTransaction[] legal = createTestTransactions();
         Extension firstGroup = new Extension("description");
         firstGroup.addTransaction(legal[0]);
         firstGroup.addTransactions(Arrays.asList(legal[1]));
@@ -31,27 +31,12 @@ public class BankTransactionCompanyGroupTest extends BankTransactionTest{
     }
 
     @Test
-    public void testIllegalAdd() {
-        BankTransaction[] illegal = createIllegalTestTransactions();
-        Extension firstGroup = new Extension("description");
-        boolean success = firstGroup.addTransaction(illegal[0]);
-        assertTrue(!success);
-
-        List<BankTransaction> notAdded = firstGroup.addTransactions(Arrays.asList(illegal[1]));
-        assertTrue(notAdded != null && notAdded.size() == 1 && notAdded.get(0) == illegal[1]);
-        
-        assertTrue(firstGroup.getTransactionsNumber() == 0);
-        assertTrue(firstGroup.getGroupsNumber() == 0);
-        assertNull(firstGroup.getContainedGroups());
-    }
-
-    @Test
     public void testHashEquals() {
-        BankTransaction[] legal = createLegalTestTransactions();
+        BankTransaction[] legal = createTestTransactions();
         Extension firstGroup = new Extension("description");
         firstGroup.addTransactions(Arrays.asList(legal));
 
-        BankTransaction[] legalCloned = createLegalTestTransactions();
+        BankTransaction[] legalCloned = createTestTransactions();
         Extension secondGroup = new Extension("description");
         secondGroup.addTransactions(Arrays.asList(legalCloned));
 
@@ -59,20 +44,20 @@ public class BankTransactionCompanyGroupTest extends BankTransactionTest{
         assertTrue(firstGroup.hashCode() == secondGroup.hashCode());
     }
 
-    protected static class Extension extends BankTransactionCompanyGroup{
+    protected static class Extension extends BankTransactionCompanyGroup {
 
         public Extension(String companyDesc) {
             super(companyDesc);
         }
 
         @Override
-        protected List<BankTransaction> addTransactions(List<BankTransaction> parsedTransactions) {
-            return super.addTransactions(parsedTransactions); //To change body of generated methods, choose Tools | Templates.
+        protected void addTransactions(Collection<BankTransaction> parsedTransactions) {
+            super.addTransactions(parsedTransactions);
         }
 
         @Override
-        protected boolean addTransaction(BankTransaction parsedTransaction) {
-            return super.addTransaction(parsedTransaction); //To change body of generated methods, choose Tools | Templates.
+        protected void addTransaction(BankTransaction parsedTransaction) {
+            super.addTransaction(parsedTransaction);
         }
     }
 }

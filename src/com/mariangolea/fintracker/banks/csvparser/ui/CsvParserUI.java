@@ -5,7 +5,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFi
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
-import com.mariangolea.fintracker.banks.csvparser.ui.transactions.TransactionTableView;
+import com.mariangolea.fintracker.banks.csvparser.ui.categorized.table.TransactionTableView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,21 +65,13 @@ public class CsvParserUI extends Application {
         ColumnConstraints col = new ColumnConstraints();
         col.setFillWidth(true);
         col.setHgrow(Priority.ALWAYS);
-        col.setPercentWidth(40);
         grid.getColumnConstraints().add(col);
-        col.setHgrow(Priority.SOMETIMES);
-        col.setPercentWidth(20);
-        grid.getColumnConstraints().add(col);
-        col.setHgrow(Priority.ALWAYS);
-        col.setPercentWidth(40);
-        grid.getColumnConstraints().add(col);
-
-        ScrollPane centerScroll = createFeedbackView();
-
+        
+        ScrollPane feedback = createFeedbackView();
         createTableView();
 
-        grid.add(tableView, 0, 0);
-        grid.add(centerScroll, 1, 0);
+        grid.add(tableView, 0, 0, GridPane.REMAINING, GridPane.REMAINING);
+        grid.add(feedback, 0, 11, GridPane.REMAINING, 1);
         grid.setStyle("-fx-background-color: BEIGE;");
 
         root = new BorderPane();
@@ -92,6 +84,9 @@ public class CsvParserUI extends Application {
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Bank Transactions Merger");
         primaryStage.setScene(new Scene(root, 1000, 600, Color.BISQUE));
+        primaryStage.setOnCloseRequest(eh -> {
+            UserPreferencesHandler.INSTANCE.storePreferences();
+        });
         primaryStage.show();
     }
 

@@ -1,4 +1,4 @@
-package com.mariangolea.fintracker.banks.csvparser.ui.transactions;
+package com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import javafx.scene.control.TreeView;

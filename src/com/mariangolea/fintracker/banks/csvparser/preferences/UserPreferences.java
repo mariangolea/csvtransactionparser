@@ -7,6 +7,8 @@ import javafx.collections.ObservableMap;
 
 public class UserPreferences {
 
+    public static final String UNCATEGORIZED = "Uncategorized";
+
     private final ObservableMap<String, Collection<String>> categories = FXCollections.observableMap(new HashMap<>());
     private final Collection<String> topMostCategories = new ArrayList<>();
     private String csvInputFolder;
@@ -16,17 +18,17 @@ public class UserPreferences {
     //switched keys and values from previous map.
     private final ObservableMap<String, String> companyNamesReversed = FXCollections.observableMap(new HashMap<>());
 
-    public enum Timeframe{
+    public enum Timeframe {
         MONTH(Calendar.MONTH),
         YEAR(Calendar.YEAR);
-        
+
         public final int timeframe;
-        
-        private Timeframe(int timeframe){
+
+        private Timeframe(int timeframe) {
             this.timeframe = timeframe;
         }
     }
-    
+
     public boolean addTransactionCategoriesMapListener(MapChangeListener<String, Collection<String>> listener) {
         if (listener == null) {
             return false;
@@ -75,7 +77,7 @@ public class UserPreferences {
         return companyNames.keySet();
     }
 
-    public Collection<String> getCategory(final String categoryName) {
+    public Collection<String> getSubCategories(final String categoryName) {
         Objects.requireNonNull(categoryName);
         return categories.get(categoryName);
     }
@@ -91,8 +93,18 @@ public class UserPreferences {
         Objects.requireNonNull(company);
         return companyNames.get(company.toLowerCase());
     }
-    
-    public String getCompanyIdentifierString(final String companyDisplayName){
+
+    public String getMatchingCategory(String companyDescriptionString) {
+        for (String companyIdentifier : getCompanyIdentifierStrings()) {
+            if (companyDescriptionString.toLowerCase().contains(companyIdentifier.toLowerCase())) {
+                return getCompanyDisplayName(companyIdentifier);
+            }
+        }
+
+        return UNCATEGORIZED;
+    }
+
+    public String getCompanyIdentifierString(final String companyDisplayName) {
         return companyNamesReversed.get(companyDisplayName);
     }
 
@@ -130,14 +142,14 @@ public class UserPreferences {
         this.csvInputFolder = csvInputFolder;
     }
 
-    public Timeframe getTransactionGroupingTimeframe(){
+    public Timeframe getTransactionGroupingTimeframe() {
         return transactionsTimeframe;
     }
-    
-    public void setTransactionGroupingTimeframe(Timeframe timeframe){
+
+    public void setTransactionGroupingTimeframe(Timeframe timeframe) {
         this.transactionsTimeframe = timeframe;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -149,7 +161,7 @@ public class UserPreferences {
         UserPreferences that = (UserPreferences) o;
         return Objects.equals(categories, that.categories)
                 && Objects.equals(csvInputFolder, that.csvInputFolder)
-                 && transactionsTimeframe == that.transactionsTimeframe
+                && transactionsTimeframe == that.transactionsTimeframe
                 && Objects.equals(companyNames, that.companyNames);
     }
 

@@ -1,11 +1,9 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Collection;
 
 public interface BankTransactionGroupInterface extends Comparable<BankTransactionGroupInterface>{
-
-    public static final String UNCATEGORIZED = "Uncategorized";
 
     public int getTransactionsNumber();
 
@@ -13,9 +11,9 @@ public interface BankTransactionGroupInterface extends Comparable<BankTransactio
 
     public String getCategoryName();
 
-    public List<BankTransactionGroupInterface> getContainedGroups();
+    public Collection<BankTransactionGroupInterface> getContainedGroups();
 
-    public List<BankTransaction> getContainedTransactions();
+    public Collection<BankTransaction> getContainedTransactions();
 
     public BigDecimal getTotalAmount();
 }

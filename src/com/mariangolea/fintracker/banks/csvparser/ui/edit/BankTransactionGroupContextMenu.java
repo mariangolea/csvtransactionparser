@@ -1,6 +1,5 @@
-package com.mariangolea.fintracker.banks.csvparser.ui;
+package com.mariangolea.fintracker.banks.csvparser.ui.edit;
 
-import com.mariangolea.fintracker.banks.csvparser.ui.edit.BankTransactionGroupEditHandler;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;

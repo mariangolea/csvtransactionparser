@@ -1,5 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,23 +18,43 @@ public class BankTransactionDefaultGroup extends BankTransactionCompanyGroup {
         return groups;
     }
 
-    protected void addGroup(final BankTransactionGroupInterface group){
+    protected void addGroup(final BankTransactionGroupInterface group) {
         groups.add(group);
-        addTransactions(group.getContainedTransactions());
     }
-    
+
     @Override
     public int getTransactionsNumber() {
-        int number = 0;
-        number = groups.stream().map((group) -> group.getTransactionsNumber()).reduce(number, Integer::sum);
-        return number;
+        if (getGroupsNumber() == 0) {
+            return super.getTransactionsNumber();
+        } else {
+            int number = 0;
+            for (BankTransactionGroupInterface temp : groups) {
+                number += temp.getTransactionsNumber();
+            }
+            return number;
+        }
     }
+
+    @Override
+    public BigDecimal getTotalAmount() {
+        if (getGroupsNumber() == 0) {
+            return super.getTotalAmount();
+        } else {
+            BigDecimal number = BigDecimal.ZERO;
+            for (BankTransactionGroupInterface temp : groups) {
+                number = number.add(temp.getTotalAmount());
+            }
+            return number;
+        }
+    }
+    
+    
 
     @Override
     public int getGroupsNumber() {
         return groups.size();
     }
-    
+
     @Override
     public String toString() {
         return super.toString();

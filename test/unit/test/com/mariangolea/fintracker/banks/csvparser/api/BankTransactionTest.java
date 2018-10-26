@@ -48,12 +48,8 @@ public class BankTransactionTest {
         assertTrue(first.compareTo(second) < 0);
     }
 
-    protected BankTransaction[] createLegalTestTransactions() {
+    protected BankTransaction[] createTestTransactions() {
         return new BankTransaction[]{createTransaction("description", BigDecimal.ONE), createTransaction("description", BigDecimal.ONE)};
-    }
-
-    protected BankTransaction[] createIllegalTestTransactions() {
-        return new BankTransaction[]{createTransaction("uugh", BigDecimal.ONE), createTransaction("", BigDecimal.ONE)};
     }
 
     protected BankTransaction createTransaction(final String category, final BigDecimal amount) {

@@ -3,6 +3,7 @@ package test.com.mariangolea.fintracker.banks.csvparser.api.filters;
 import com.mariangolea.fintracker.banks.csvparser.api.filters.MonthSlot;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class MonthSlotTest {
@@ -20,5 +21,9 @@ public class MonthSlotTest {
          
          assertEquals(slot.hashCode(), slot2.hashCode());
          assertNotEquals(slot.hashCode(), three.hashCode());
+         
+         assertTrue(slot.compareTo(three) < 0);
+         assertTrue(slot.compareTo(fourth) > 0);     
+         assertTrue(slot.compareTo(slot2)==0);
      }
 }

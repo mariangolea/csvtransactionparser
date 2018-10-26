@@ -1,12 +1,16 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
-    private final List<BankTransaction> list = new ArrayList<>();
+    private final ObservableList<BankTransaction> list = FXCollections.observableArrayList();
+    private BigDecimal amount = BigDecimal.ZERO;
 
     public BankTransactionCompanyGroup(String companyDesc) {
         super(companyDesc);
@@ -14,13 +18,8 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
     }
 
     @Override
-    protected void addTransactionImpl(BankTransaction transaction) {
-        list.add(transaction);
-    }
-
-    @Override
-    public int getTransactionsNumber() {
-        return list.size();
+    public BigDecimal getTotalAmount() {
+        return amount;
     }
 
     @Override
@@ -35,7 +34,7 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
     @Override
     public List<BankTransaction> getContainedTransactions() {
-        return list;
+        return FXCollections.unmodifiableObservableList(list);
     }
 
     @Override
@@ -55,4 +54,16 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
     public int hashCode() {
         return Objects.hash(super.hashCode(), list);
     }
+
+    protected void addTransaction(final BankTransaction parsedTransaction) {
+        list.add(parsedTransaction);
+        amount = amount.add(parsedTransaction.creditAmount).subtract(parsedTransaction.debitAmount);
+    }
+
+    protected void addTransactions(final Collection<BankTransaction> parsedTransactions) {
+        parsedTransactions.forEach((transaction) -> {
+            addTransaction(transaction);
+        });
+    }
+
 }

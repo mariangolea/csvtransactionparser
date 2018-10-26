@@ -16,12 +16,10 @@ public enum UserPreferencesHandler {
     INSTANCE;
 
     private static final String COMMENTS = "Automatically generated. DO NOT EDIT YOURSELF!!!";
+    private static final String SUB_FOLDER = "preferences/";
     private static final String USER_PREFERENCES_FILE_DEFAULT_NAME = "userprefs.properties";
-    private static final String USER_PREFERENCES_FILE_PATH_DEFAULT = "./" + USER_PREFERENCES_FILE_DEFAULT_NAME;
     private static final String COMPANY_NAMES_FILE_DEFAULT_NAME = "companynames.properties";
-    private static final String COMPANY_NAMES_FILE_PATH_DEFAULT = "./" + COMPANY_NAMES_FILE_DEFAULT_NAME;
-    private static final String CATEGORIES_FILE_DEFAULT_NAME = "companynames.properties";
-    private static final String CATEGORIES_FILE_PATH_DEFAULT = "./" + CATEGORIES_FILE_DEFAULT_NAME;
+    private static final String CATEGORIES_FILE_DEFAULT_NAME = "categories.properties";
 
     private static final String CATEGORY_NAMES = "categories";
     private static final String INPUT_FOLDER = "inputFolder";
@@ -58,54 +56,45 @@ public enum UserPreferencesHandler {
     }
 
     public boolean deletePreferences() {
-        boolean success = deletePreferencesFile(USER_PREFERENCES_FILE_PATH_DEFAULT);
-        success |= deletePreferencesFile(COMPANY_NAMES_FILE_PATH_DEFAULT);
-        success |= deletePreferencesFile(CATEGORIES_FILE_PATH_DEFAULT);
+        boolean success = deletePreferencesFile(USER_PREFERENCES_FILE_DEFAULT_NAME);
+        success |= deletePreferencesFile(COMPANY_NAMES_FILE_DEFAULT_NAME);
+        success |= deletePreferencesFile(CATEGORIES_FILE_DEFAULT_NAME);
         userPreferences = null;
         return success;
     }
 
-    protected boolean deletePreferencesFile(final String filePath) {
-        File propertiesFile = new File(filePath);
-        try {
-            Files.deleteIfExists(propertiesFile.toPath());
-            return true;
-        } catch (IOException ex) {
-            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-    }
-
     protected void loadUserPrefsFile() {
-        userPrefsFile.putAll(loadProperties(USER_PREFERENCES_FILE_PATH_DEFAULT));
+        userPrefsFile.putAll(loadProperties(USER_PREFERENCES_FILE_DEFAULT_NAME));
         userPreferences.setCSVInputFolder(userPrefsFile.getProperty(INPUT_FOLDER));
         Timeframe timeFrame = Timeframe.valueOf(userPrefsFile.getProperty(TRANSACTION_GROUPING_TIMEFRAME, Timeframe.MONTH.name()));
         userPreferences.setTransactionGroupingTimeframe(timeFrame);
     }
 
     protected void loadCompanyNamesFile() {
-        companyNamesFile.putAll(loadProperties(COMPANY_NAMES_FILE_PATH_DEFAULT));
+        companyNamesFile.putAll(loadProperties(COMPANY_NAMES_FILE_DEFAULT_NAME));
         companyNamesFile.keySet().forEach(categoryName -> {
             userPreferences.setCompanyDisplayName(categoryName.toString(), companyNamesFile.get(categoryName).toString());
         });
     }
 
     protected void loadCategoryNamesFile() {
-        categoriesFile.putAll(loadProperties(CATEGORIES_FILE_PATH_DEFAULT));
-        String categoryNamesString = userPrefsFile.getProperty(CATEGORY_NAMES);
+        categoriesFile.putAll(loadProperties(CATEGORIES_FILE_DEFAULT_NAME));
+        String categoryNamesString = categoriesFile.getProperty(CATEGORY_NAMES);
         Set<String> categoryNames = new HashSet<>(
                 convertPersistedStringToList(categoryNamesString, SEPARATOR));
         categoryNames.forEach((categoryName) -> {
             Set<String> categories = new HashSet<>(
-                    convertPersistedStringToList(userPrefsFile.getProperty(categoryName), SEPARATOR));
+                    convertPersistedStringToList(categoriesFile.getProperty(categoryName), SEPARATOR));
             userPreferences.setDefinition(categoryName, categories);
         });
     }
 
     protected boolean storeUserPrefsFile() {
-        userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getCSVInputFolder());
+        if (userPreferences.getCSVInputFolder() != null) {
+            userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getCSVInputFolder());
+        }
         userPrefsFile.setProperty(TRANSACTION_GROUPING_TIMEFRAME, userPreferences.getTransactionGroupingTimeframe().name());
-        return storeProperties(USER_PREFERENCES_FILE_PATH_DEFAULT, userPrefsFile, COMMENTS);
+        return storeProperties(USER_PREFERENCES_FILE_DEFAULT_NAME, userPrefsFile, COMMENTS);
     }
 
     protected boolean storeCompanyNamesFile() {
@@ -113,65 +102,30 @@ public enum UserPreferencesHandler {
             companyNamesFile.setProperty(companyKey, userPreferences.getCompanyDisplayName(companyKey));
         });
 
-        return storeProperties(COMPANY_NAMES_FILE_PATH_DEFAULT, companyNamesFile, COMMENTS);
+        return storeProperties(COMPANY_NAMES_FILE_DEFAULT_NAME, companyNamesFile, COMMENTS);
     }
 
     protected boolean storeCategoriesFile() {
         final Collection<String> categoryNames = userPreferences.getTopMostCategories();
         String categoryNamesValue = convertStringsForStorage(categoryNames, SEPARATOR);
         if (categoryNamesValue != null && !categoryNamesValue.isEmpty()) {
-            userPrefsFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
+            categoriesFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
             categoryNames.forEach((categoryName) -> {
                 storeTopMostCategoryName(categoryName);
             });
         }
 
-        return storeProperties(CATEGORIES_FILE_PATH_DEFAULT, userPrefsFile, COMMENTS);
+        return storeProperties(CATEGORIES_FILE_DEFAULT_NAME, categoriesFile, COMMENTS);
     }
 
     private void storeTopMostCategoryName(final String topMostCategory) {
-        Collection<String> subCategories = userPreferences.getCategory(topMostCategory);
+        Collection<String> subCategories = userPreferences.getSubCategories(topMostCategory);
         if (subCategories != null) {
             userPrefsFile.setProperty(topMostCategory, convertStringsForStorage(subCategories, SEPARATOR));
             for (String category : subCategories) {
                 storeTopMostCategoryName(category);
             }
         }
-    }
-
-    protected boolean storeProperties(final String filePath, final Properties properties, final String comments) {
-        File propertiesFile = new File(filePath);
-        AtomicBoolean success = new AtomicBoolean(false);
-        try {
-            if (!propertiesFile.exists() && !propertiesFile.createNewFile()) {
-                return false;
-            }
-            try (FileWriter writer = new FileWriter(propertiesFile)) {
-                properties.store(writer, comments);
-            }
-            success.set(true);
-
-        } catch (IOException ex) {
-            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return success.get();
-    }
-
-    protected Properties loadProperties(final String filePath) {
-        File propertiesFile = new File(filePath);
-        Properties properties = new Properties();
-        try {
-            if (propertiesFile.exists()) {
-                try (FileReader reader = new FileReader(propertiesFile)) {
-                    properties.load(reader);
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return properties;
     }
 
     protected String convertStringsForStorage(final Collection<String> strings, final String separator) {
@@ -193,5 +147,60 @@ public enum UserPreferencesHandler {
         String[] split = string.split(separator);
         strings.addAll(Arrays.asList(split));
         return strings;
+    }
+    
+    private boolean storeProperties(final String filePath, final Properties properties, final String comments) {
+        File propertiesFile = new File(getPreferencesFolder(), filePath);
+        try {
+            if (!propertiesFile.exists() && !propertiesFile.createNewFile()) {
+                return false;
+            }
+            try (FileWriter writer = new FileWriter(propertiesFile)) {
+                properties.store(writer, comments);
+            }
+            return true;
+
+        } catch (IOException ex) {
+            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return false;
+    }
+
+    
+    private Properties loadProperties(final String filePath) {
+        File propertiesFile = new File(getPreferencesFolder(), filePath);
+        Properties properties = new Properties();
+        try {
+            if (!propertiesFile.exists()) {
+                propertiesFile.createNewFile();
+            }
+            try (FileReader reader = new FileReader(propertiesFile)) {
+                properties.load(reader);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return properties;
+    }
+
+    private boolean deletePreferencesFile(final String filePath) {
+        File propertiesFile = new File(getPreferencesFolder(), filePath);
+        try {
+            Files.deleteIfExists(propertiesFile.toPath());
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(UserPreferencesHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    private File getPreferencesFolder() {
+        File folder = new File(SUB_FOLDER);
+        if (!folder.isDirectory()) {
+            folder.mkdir();
+        }
+        return folder;
     }
 }

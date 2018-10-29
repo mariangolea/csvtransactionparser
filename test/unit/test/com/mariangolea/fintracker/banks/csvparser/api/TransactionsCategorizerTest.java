@@ -41,7 +41,7 @@ public class TransactionsCategorizerTest {
     @Test
     public void testUncategorized() {
         Extension calc = new Extension(transactions, userPrefs);
-        Collection<BankTransactionGroupInterface> uncategorized = calc.getUnmodifiableUnCategorized();
+        Collection<BankTransaction> uncategorized = calc.getUnmodifiableUnCategorized();
         assertNotNull(uncategorized);
         assertEquals(uncategorized.size(), 1);
     }
@@ -169,7 +169,7 @@ public class TransactionsCategorizerTest {
         }
 
         @Override
-        public Collection<BankTransactionGroupInterface> getUnmodifiableUnCategorized() {
+        public Collection<BankTransaction> getUnmodifiableUnCategorized() {
             return super.getUnmodifiableUnCategorized();
         }
 

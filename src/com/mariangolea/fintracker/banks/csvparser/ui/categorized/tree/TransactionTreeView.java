@@ -2,8 +2,8 @@ package com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
-import com.mariangolea.fintracker.banks.csvparser.ui.edit.BankTransactionGroupContextMenu;
-import com.mariangolea.fintracker.banks.csvparser.ui.edit.BankTransactionGroupEditHandler;
+import com.mariangolea.fintracker.banks.csvparser.ui.categorized.edit.BankTransactionGroupContextMenu;
+import com.mariangolea.fintracker.banks.csvparser.ui.categorized.edit.BankTransactionGroupEditHandler;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Label;

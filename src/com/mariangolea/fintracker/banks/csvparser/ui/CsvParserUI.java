@@ -1,11 +1,13 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 import com.mariangolea.fintracker.banks.csvparser.ui.categorized.table.TransactionTableView;
+import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.UncategorizedView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,8 +41,9 @@ public class CsvParserUI extends Application {
 
     protected TextFlow feedbackPane;
     protected final Collection<BankTransaction> model = FXCollections.observableArrayList();
-    
+
     private TransactionTableView tableView;
+    private UncategorizedView uncategorizedView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
     private final UserPreferencesHandler preferences = UserPreferencesHandler.INSTANCE;
     private final UserPreferences userPrefs;
@@ -53,6 +56,12 @@ public class CsvParserUI extends Application {
 
     public CsvParserUI() {
         userPrefs = preferences.getPreferences();
+        userPrefs.addCompanyNamesMapListener(listener -> {
+            updateView();
+        });
+        userPrefs.addTransactionCategoriesMapListener(listener -> {
+            updateView();
+        });
     }
 
     @Override
@@ -66,12 +75,18 @@ public class CsvParserUI extends Application {
         col.setFillWidth(true);
         col.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().add(col);
-        
-        ScrollPane feedback = createFeedbackView();
-        createTableView();
 
-        grid.add(tableView, 0, 0, GridPane.REMAINING, GridPane.REMAINING);
-        grid.add(feedback, 0, 11, GridPane.REMAINING, 1);
+        ScrollPane feedback = createFeedbackView();
+
+        GridPane display = new GridPane();
+        display.getColumnConstraints().add(col);
+        createTableView();
+        createUncategorizedView();
+        display.add(tableView, 0, 0, 12, 1);
+        display.add(uncategorizedView, 12, 0, 3, 1);
+
+        grid.add(display, 0, 0, 15, 12);
+        grid.add(feedback, 0, 12, 15, 1);
         grid.setStyle("-fx-background-color: BEIGE;");
 
         root = new BorderPane();
@@ -97,7 +112,7 @@ public class CsvParserUI extends Application {
                     model.add(transaction);
                 });
             });
-            tableView.resetView();
+            updateView();
         }
     }
 
@@ -119,6 +134,12 @@ public class CsvParserUI extends Application {
 
     public MenuBar constructSimpleMenuBar() {
         return new MenuBar();
+    }
+
+    public void createUncategorizedView() {
+        if (uncategorizedView == null) {
+            uncategorizedView = new UncategorizedView();
+        }
     }
 
     protected void popCSVFileChooser() {
@@ -181,10 +202,12 @@ public class CsvParserUI extends Application {
         return scrollPane;
     }
 
-    protected void createTableView(){
-        tableView = new TransactionTableView(model);
+    protected void createTableView() {
+        if (tableView == null) {
+            tableView = new TransactionTableView(model);
+        }
     }
-    
+
     protected TextFlow constructFeedbackPane() {
         return new TextFlow();
     }
@@ -235,5 +258,11 @@ public class CsvParserUI extends Application {
         }
         feedbackPane.getChildren().add(new Text(message));
         return true;
+    }
+
+    private void updateView() {
+        TransactionsCategorizedSlotter calc = new TransactionsCategorizedSlotter(model, userPrefs);
+        uncategorizedView.updateModel(calc.getUnmodifiableUnCategorized());
+        tableView.resetView(calc.getUnmodifiableSlottedCategorized());
     }
 }

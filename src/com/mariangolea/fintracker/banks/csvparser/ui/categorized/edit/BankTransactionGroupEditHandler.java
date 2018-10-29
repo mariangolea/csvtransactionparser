@@ -1,4 +1,4 @@
-package com.mariangolea.fintracker.banks.csvparser.ui.edit;
+package com.mariangolea.fintracker.banks.csvparser.ui.categorized.edit;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;

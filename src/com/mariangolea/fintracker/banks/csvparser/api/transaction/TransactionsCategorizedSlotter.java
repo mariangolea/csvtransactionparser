@@ -23,7 +23,7 @@ public class TransactionsCategorizedSlotter {
     private final List<BankTransaction> categorizableTransactions = new ArrayList<>();
 
     private final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedCategorised;
-    private final BankTransactionGroupInterface unCategorised;
+    private final Collection<BankTransaction> unCategorised;
     private final ObservableMap<Pair<YearSlot, String>, BankTransactionCompanyGroup> slottedCompanyGroups;
     private final TransactionsSlotter slotter;
 
@@ -33,12 +33,11 @@ public class TransactionsCategorizedSlotter {
         this.userPrefs = userPrefs;
 
         //get the collection of transactions which are not associated to any categories.
-        Collection<BankTransaction> uncategorizedTransactions = findUncategorized(transactions);
-        unCategorised = createUncategorizedGroup(uncategorizedTransactions);
+        unCategorised = findUncategorized(transactions);
 
         //keep only those currently associated to a category.
         this.categorizableTransactions.addAll(transactions);
-        this.categorizableTransactions.removeAll(uncategorizedTransactions);
+        this.categorizableTransactions.removeAll(unCategorised);
         Collections.sort(categorizableTransactions);
 
         //create a slotted map of company grouped transactions.
@@ -51,7 +50,7 @@ public class TransactionsCategorizedSlotter {
         return FXCollections.observableMap(slottedCategorised);
     }
 
-    public Collection<BankTransactionGroupInterface> getUnmodifiableUnCategorized() {
+    public Collection<BankTransaction> getUnmodifiableUnCategorized() {
         return FXCollections.observableArrayList(unCategorised);
     }
 
@@ -146,11 +145,5 @@ public class TransactionsCategorizedSlotter {
         Collections.sort(uncategorized);
 
         return uncategorized;
-    }
-
-    private BankTransactionGroupInterface createUncategorizedGroup(final Collection<BankTransaction> transactions) {
-        BankTransactionCompanyGroup group = new BankTransactionCompanyGroup(UserPreferences.UNCATEGORIZED);
-        group.addTransactions(transactions);
-        return group;
     }
 }

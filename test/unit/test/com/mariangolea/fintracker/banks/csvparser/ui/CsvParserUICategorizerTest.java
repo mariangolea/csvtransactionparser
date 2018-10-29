@@ -16,6 +16,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFi
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVParserFactory;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import com.mariangolea.fintracker.banks.csvparser.ui.categorized.table.TransactionTableView;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +56,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         // tests in other files ensure response integrity, no need to do that in here.
         LocalUI local = new LocalUI();
         local.createTableView();
+        local.createUncategorizedView();
         local.loadData(Arrays.asList(response));
         assertTrue(local.getModel() != null);
 
@@ -151,22 +153,22 @@ public class CsvParserUICategorizerTest extends FXUITest {
 
         @Override
         protected void loadData(List<CsvFileParseResponse> parsedTransactions) {
-            super.loadData(parsedTransactions); //To change body of generated methods, choose Tools | Templates.
+            super.loadData(parsedTransactions);
         }
 
         @Override
         public MenuBar createMenu() {
-            return super.createMenu(); //To change body of generated methods, choose Tools | Templates.
+            return super.createMenu(); 
         }
 
         @Override
         protected ScrollPane createFeedbackView() {
-            return super.createFeedbackView(); //To change body of generated methods, choose Tools | Templates.
+            return super.createFeedbackView(); 
         }
 
         @Override
         protected void createTableView() {
-            super.createTableView(); //To change body of generated methods, choose Tools | Templates.
+            super.createTableView(); 
         }
 
         

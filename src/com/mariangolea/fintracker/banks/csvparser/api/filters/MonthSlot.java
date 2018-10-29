@@ -1,5 +1,8 @@
 package com.mariangolea.fintracker.banks.csvparser.api.filters;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+
 public class MonthSlot extends YearSlot {
 
     public final int month;
@@ -7,6 +10,13 @@ public class MonthSlot extends YearSlot {
     public MonthSlot(int month, int year) {
         super(year);
         this.month = month;
+    }
+
+    @Override
+    public String toString(final Calendar cal, final DateFormat dateFormat) {
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.YEAR, year);
+        return dateFormat.format(cal.getTime());
     }
 
     @Override
@@ -41,4 +51,8 @@ public class MonthSlot extends YearSlot {
         return month - other.month;
     }
 
+    @Override
+    public String toString() {
+        return month + "\n" + super.toString();
+    }
 }

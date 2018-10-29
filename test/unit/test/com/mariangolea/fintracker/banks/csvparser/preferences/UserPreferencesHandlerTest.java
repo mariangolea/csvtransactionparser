@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class UserPreferencesHandlerTest {
 
@@ -21,7 +22,7 @@ public class UserPreferencesHandlerTest {
         UserPreferences prefs = handler.getPreferences();
         assertNotNull(prefs.getUserDefinedCategoryNames());
         assertTrue(prefs.getUserDefinedCategoryNames().isEmpty());
-        assertTrue(prefs.getCSVInputFolder() == null);
+        assertNull(prefs.getCSVInputFolder());
     }
 
     @Test

@@ -56,12 +56,6 @@ public class CsvParserUI extends Application {
 
     public CsvParserUI() {
         userPrefs = preferences.getPreferences();
-        userPrefs.addCompanyNamesMapListener(listener -> {
-            updateView();
-        });
-        userPrefs.addTransactionCategoriesMapListener(listener -> {
-            updateView();
-        });
     }
 
     @Override

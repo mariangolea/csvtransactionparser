@@ -6,9 +6,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.TransactionsSlotter;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -21,7 +19,6 @@ import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 public class TransactionsSlotterTest {
 
     private Collection<BankTransaction> transactions;
-    private Calendar calendar;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -29,30 +26,29 @@ public class TransactionsSlotterTest {
     @Before
     public void init() {
         transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(UserPreferencesHandler.INSTANCE.getPreferences());
-        calendar = Calendar.getInstance();
     }
 
     @Test
     public void testGetSlotYear() {
         TransactionsSlotter slotter = getSlotter(UserPreferences.Timeframe.YEAR);
-        YearSlot slot = slotter.getSlot(createDate(calendar, 2018));
+        YearSlot slot = slotter.getSlot(TestUtilities.createDate(2018));
         assertNotNull(slot);
         assertEquals(slot, new YearSlot(2018));
 
         //second time around result is cached!
-        YearSlot slot2 = slotter.getSlot(createDate(calendar, 2018));
+        YearSlot slot2 = slotter.getSlot(TestUtilities.createDate(2018));
         assertTrue(slot == slot2);
     }
 
     @Test
     public void testGetSlotMonth() {
         TransactionsSlotter slotter = getSlotter(UserPreferences.Timeframe.MONTH);
-        YearSlot slot = slotter.getSlot(createDate(calendar, 1, 2018));
+        YearSlot slot = slotter.getSlot(TestUtilities.createDate(1, 2018));
         assertNotNull(slot);
-        assertEquals(slot, new MonthSlot(1, 2018));
+        assertEquals(new MonthSlot(1, 2018), slot);
 
         //second time around result is cached!
-        YearSlot slot2 = slotter.getSlot(createDate(calendar, 1, 2018));
+        YearSlot slot2 = slotter.getSlot(TestUtilities.createDate(1, 2018));
         assertTrue(slot == slot2);
     }
 
@@ -88,17 +84,5 @@ public class TransactionsSlotterTest {
 
     private TransactionsSlotter getSlotter(UserPreferences.Timeframe timeframe) {
         return new TransactionsSlotter(timeframe, transactions);
-    }
-
-    private Date createDate(Calendar calendar, int month, int year) {
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        return calendar.getTime();
-
-    }
-
-    private Date createDate(Calendar calendar, int year) {
-        calendar.set(Calendar.YEAR, year);
-        return calendar.getTime();
     }
 }

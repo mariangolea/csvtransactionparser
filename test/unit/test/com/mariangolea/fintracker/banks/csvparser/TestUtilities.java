@@ -44,7 +44,7 @@ public class TestUtilities {
     public static Collection<BankTransaction> constructMockDefaultTransactionsForCategorizer(final UserPreferences userPrefs) {
         Collection<BankTransaction> transactions = new ArrayList<>();
         populateUserPrefsWithCompanyAndGroupData(userPrefs);
-        
+
         transactions.add(createTransaction(createDate(6, 2016), BigDecimal.ZERO, BigDecimal.ONE, "  Carrefour SRL  Romania"));
         transactions.add(createTransaction(createDate(1, 2017), BigDecimal.ZERO, BigDecimal.ONE, "Auchan Romania SRL"));
         transactions.add(createTransaction(createDate(5, 2018), BigDecimal.ZERO, BigDecimal.ONE, "Limited Petrom SA"));
@@ -62,23 +62,35 @@ public class TestUtilities {
         userPrefs.setCompanyDisplayName("Auchan Romania", "Auchan");
         userPrefs.setCompanyDisplayName("Employer Company SRL", "Employer");
 
-        userPrefs.setDefinition("Food", createList("Auchan","Carrefour"));
-        userPrefs.setDefinition("Fuel", createList("Petrom"));
-        userPrefs.setDefinition("Existential", createList("Food", "Fuel"));
-        userPrefs.setDefinition("Revenues", createList("Employer"));
+        userPrefs.appendDefinition("Food", createList("Auchan", "Carrefour"));
+        userPrefs.appendDefinition("Fuel", createList("Petrom"));
+        userPrefs.appendDefinition("Existential", createList("Food", "Fuel"));
+        userPrefs.appendDefinition("Revenues", createList("Employer"));
     }
-    
-    public static Date createDate(int month, int year){
+
+    public static Date createDate(int month, int year) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.MONTH, month);
         cal.set(Calendar.YEAR, year);
+        //depending on when these tests are ran, day int might be larger than supported by set month.
+        //so set a day that is supported by all months!
+        cal.set(Calendar.DAY_OF_MONTH, 2);
         return cal.getTime();
     }
-    
-    public static BankTransaction createTransaction(final Date completed, final BigDecimal credit, final BigDecimal debit, final String description){
+
+    public static Date createDate(int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        //depending on when these tests are ran, day int might be larger than supported by set month.
+        //so set a day that is supported by all months!
+        cal.set(Calendar.DAY_OF_MONTH, 2);
+        return cal.getTime();
+    }
+
+    public static BankTransaction createTransaction(final Date completed, final BigDecimal credit, final BigDecimal debit, final String description) {
         return new BankTransaction(completed, completed, credit, debit, description, Arrays.asList("one", "two"));
     }
-    
+
     public File writeCSVFile(Bank bank, File csv, final String... records) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(csv))) {
             for (String record : records) {

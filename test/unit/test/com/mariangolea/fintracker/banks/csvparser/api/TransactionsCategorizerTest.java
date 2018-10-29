@@ -43,20 +43,20 @@ public class TransactionsCategorizerTest {
         Extension calc = new Extension(transactions, userPrefs);
         Collection<BankTransaction> uncategorized = calc.getUnmodifiableUnCategorized();
         assertNotNull(uncategorized);
-        assertEquals(uncategorized.size(), 1);
+        assertEquals(1, uncategorized.size());
     }
 
     @Test
     public void testSlottedCategorized() throws IOException {
         TransactionsCategorizedSlotter calc = new TransactionsCategorizedSlotter(transactions, userPrefs);
         Map<YearSlot, Collection<BankTransactionGroupInterface>> result = calc.getUnmodifiableSlottedCategorized();
-        assertTrue(result.keySet().size() == 4);
+        assertEquals(4, result.keySet().size());
 
         Collection<String> topMostCategories = userPrefs.getTopMostCategories();
         final int topMostCategoriesSize = topMostCategories.size();
 
         result.keySet().forEach(slot -> {
-            assertEquals(result.get(slot).size(), topMostCategoriesSize);
+            assertEquals(topMostCategoriesSize, result.get(slot).size());
         });
     }
 
@@ -66,7 +66,7 @@ public class TransactionsCategorizerTest {
         Extension calc = new Extension(transactions, userPrefs);
         Map<Pair<YearSlot, String>, BankTransactionCompanyGroup> result = calc.getUnmodifiableSlottedCompanyGroups();
         assertNotNull(result);
-        assertEquals(result.keySet().size(), 6);
+        assertEquals(6, result.keySet().size());
 
         BankTransactionAbstractGroup test = result.get(new Pair(new YearSlot(2016), "Carrefour"));
         assertNotNull(test);
@@ -88,7 +88,7 @@ public class TransactionsCategorizerTest {
         Extension calc = new Extension(transactions, userPrefs);
         Map<Pair<YearSlot, String>, BankTransactionCompanyGroup> result = calc.getUnmodifiableSlottedCompanyGroups();
         assertNotNull(result);
-        assertEquals(result.keySet().size(), 6);
+        assertEquals(6, result.keySet().size());
 
         BankTransactionAbstractGroup test = result.get(new Pair(new MonthSlot(6, 2016), "Carrefour"));
         assertNotNull(test);
@@ -111,12 +111,12 @@ public class TransactionsCategorizerTest {
         BankTransactionGroupInterface group = calc.createSlottedGroupLocal(new YearSlot(2018), "Revenues");
         assertNotNull(group);
         assertEquals("Revenues", group.getCategoryName());
-        assertEquals(group.getGroupsNumber(), 1);
+        assertEquals(1, group.getGroupsNumber());
         ArrayList<BankTransactionGroupInterface> subGroups = new ArrayList<>(group.getContainedGroups());
         BankTransactionGroupInterface subGroup = subGroups.get(0);
         assertNotNull(subGroup);
         assertEquals("Employer", subGroup.getCategoryName());
-        assertEquals(subGroup.getGroupsNumber(), 0);
+        assertEquals(0, subGroup.getGroupsNumber());
     }
 
     @Test
@@ -126,12 +126,12 @@ public class TransactionsCategorizerTest {
         BankTransactionGroupInterface group = calc.createSlottedGroupLocal(new MonthSlot(5, 2018), "Revenues");
         assertNotNull(group);
         assertEquals("Revenues", group.getCategoryName());
-        assertEquals(group.getGroupsNumber(), 1);
+        assertEquals(1, group.getGroupsNumber());
         ArrayList<BankTransactionGroupInterface> subGroups = new ArrayList<>(group.getContainedGroups());
         BankTransactionGroupInterface subGroup = subGroups.get(0);
         assertNotNull(subGroup);
         assertEquals("Employer", subGroup.getCategoryName());
-        assertEquals(subGroup.getGroupsNumber(), 0);
+        assertEquals(0, subGroup.getGroupsNumber());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class TransactionsCategorizerTest {
         Extension calc = new Extension(transactions, userPrefs);
         Map<YearSlot, BankTransactionGroupInterface> groups = calc.createSlottedGroupsLocal("Employer");
         assertNotNull(groups);
-        assertEquals(groups.keySet().size(), 2);
+        assertEquals(2, groups.keySet().size());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class TransactionsCategorizerTest {
         Extension calc = new Extension(transactions, userPrefs);
         Map<YearSlot, BankTransactionGroupInterface> groups = calc.createSlottedGroupsLocal("Employer");
         assertNotNull(groups);
-        assertEquals(groups.keySet().size(), 2);
+        assertEquals(2, groups.keySet().size());
     }
 
     private class Extension extends TransactionsCategorizedSlotter {

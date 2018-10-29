@@ -2,15 +2,13 @@ package com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import java.util.*;
 import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 
 public class UserPreferences {
 
     public static final String UNCATEGORIZED = "Uncategorized";
 
-    private final ObservableMap<String, Collection<String>> categories = FXCollections.observableMap(new HashMap<>());
-    private final Collection<String> topMostCategories = new ArrayList<>();
+    private final CategoriesTree categories = new CategoriesTree();
     private String csvInputFolder;
     private Timeframe transactionsTimeframe = Timeframe.MONTH;
     //identifier string, display name.
@@ -29,48 +27,12 @@ public class UserPreferences {
         }
     }
 
-    public boolean addTransactionCategoriesMapListener(MapChangeListener<String, Collection<String>> listener) {
-        if (listener == null) {
-            return false;
-        }
-
-        categories.addListener(listener);
-        return true;
-    }
-
-    public boolean removeTransactionCategoriesMapListener(MapChangeListener<String, Collection<String>> listener) {
-        if (listener == null) {
-            return false;
-        }
-
-        categories.removeListener(listener);
-        return true;
-    }
-
-    public boolean addCompanyNamesMapListener(MapChangeListener<String, String> listener) {
-        if (listener == null) {
-            return false;
-        }
-
-        companyNames.addListener(listener);
-        return true;
-    }
-
-    public boolean removeCompanyNamesMapListener(MapChangeListener<String, String> listener) {
-        if (listener == null) {
-            return false;
-        }
-
-        companyNames.removeListener(listener);
-        return true;
-    }
-
     public Collection<String> getUserDefinedCategoryNames() {
-        return categories.keySet();
+        return categories.getAllSubCategoryNames();
     }
 
     public Collection<String> getTopMostCategories() {
-        return Collections.unmodifiableCollection(topMostCategories);
+        return categories.getNodeSubCategoryNames();
     }
 
     public Collection<String> getCompanyIdentifierStrings() {
@@ -79,7 +41,11 @@ public class UserPreferences {
 
     public Collection<String> getSubCategories(final String categoryName) {
         Objects.requireNonNull(categoryName);
-        return categories.get(categoryName);
+        CategoriesTree tree = categories.getCategory(categoryName);
+        if (tree == null){
+            return FXCollections.emptyObservableList();
+        }
+        return tree.getNodeSubCategoryNames();
     }
 
     public void setCompanyDisplayName(final String company, final String displayName) {
@@ -108,30 +74,32 @@ public class UserPreferences {
         return companyNamesReversed.get(companyDisplayName);
     }
 
-    public boolean setDefinition(final String categoryName, Collection<String> subCategories) {
+    public void appendDefinition(final String categoryName, final Collection<String> subCategories) {
         Objects.requireNonNull(categoryName);
         Objects.requireNonNull(subCategories);
-        if (categories.containsKey(categoryName)) {
-            return false;
+        
+        CategoriesTree tree = categories.getCategory(categoryName);
+        if (tree == null){
+            categories.addSubCategories(Arrays.asList(categoryName));
+            tree = categories.getCategory(categoryName);
         }
-
-        categories.put(categoryName, subCategories);
-        if (!topMostCategories.contains(categoryName)) {
-            topMostCategories.add(categoryName);
-        }
-        topMostCategories.removeAll(subCategories);
-        return true;
+        final Collection<String> newCategories = FXCollections.observableArrayList();
+        final Collection<CategoriesTree> existingCategories = FXCollections.observableArrayList();
+        subCategories.forEach(subcategory ->{
+            CategoriesTree existing = categories.getCategory(subcategory);
+            if (existing == null){
+                newCategories.add(subcategory);
+            } else{
+                existingCategories.add(existing);
+            }
+        });
+        tree.reparent(existingCategories);
+        tree.addSubCategories(newCategories);
     }
 
-    public boolean removeDefinition(final String categoryName) {
-        Objects.requireNonNull(categoryName);
-        if (!categories.containsKey(categoryName)) {
-            return false;
-        }
-        Collection<String> subCategories = categories.remove(categoryName);
-        topMostCategories.remove(categoryName);
-        topMostCategories.addAll(subCategories);
-        return true;
+    public String getParent(final String categoryName) {
+        CategoriesTree tree = categories.getCategory(categoryName);
+        return tree == null ? null : tree.getParentCategory().categoryName;
     }
 
     public String getCSVInputFolder() {
@@ -148,25 +116,5 @@ public class UserPreferences {
 
     public void setTransactionGroupingTimeframe(Timeframe timeframe) {
         this.transactionsTimeframe = timeframe;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        UserPreferences that = (UserPreferences) o;
-        return Objects.equals(categories, that.categories)
-                && Objects.equals(csvInputFolder, that.csvInputFolder)
-                && transactionsTimeframe == that.transactionsTimeframe
-                && Objects.equals(companyNames, that.companyNames);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(categories, csvInputFolder, transactionsTimeframe, companyNames);
     }
 }

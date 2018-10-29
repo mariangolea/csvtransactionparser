@@ -51,8 +51,7 @@ public class BankTransactionEditDialog extends Dialog<EditResult> {
         newAssociation.add(displayNameLabel, 0, 1);
         newAssociation.add(displayNameField, 1, 1);
         existingCategories = new ComboBox<>();
-        newCategory = new TextField("Type a category name if no existing one is of interest.");
-        newCategory.setPromptText("Insert a category name this transaction should belong to");
+        newCategory = new TextField();
         newAssociation.add(existingCategories, 0, 2);
         newAssociation.add(newCategory, 0, 3);
 
@@ -78,11 +77,14 @@ public class BankTransactionEditDialog extends Dialog<EditResult> {
     public void setBankTransaction(final BankTransaction transaction) {
         String categoryName = transaction.description;
         companyNameField.setText(categoryName);
+        companyNameField.setPrefColumnCount(categoryName.length());
         companyNameSubstringField.setPromptText("Company name substring to apply when looking for ismilar transactions");
-        companyNameSubstringField.setText(handler.getPreferences().getCompanyIdentifierString(categoryName));
+        final String substring = handler.getPreferences().getCompanyIdentifierString(categoryName);
+        companyNameSubstringField.setText(substring);
         displayNameField.setPromptText("Short company name for all other similar company descriptions.");
         ObservableList<String> categories = FXCollections.observableArrayList(UserPreferencesHandler.INSTANCE.getPreferences().getUserDefinedCategoryNames());
         existingCategories.setItems(categories);
+        newCategory.setPromptText("Type a category name if no existing one is of interest.");
     }
 
     private String getCategoryName() {

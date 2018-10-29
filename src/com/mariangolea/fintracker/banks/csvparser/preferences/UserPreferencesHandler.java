@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,6 +69,14 @@ public enum UserPreferencesHandler {
         userPreferences.setTransactionGroupingTimeframe(timeFrame);
     }
 
+    protected boolean storeUserPrefsFile() {
+        if (userPreferences.getCSVInputFolder() != null) {
+            userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getCSVInputFolder());
+        }
+        userPrefsFile.setProperty(TRANSACTION_GROUPING_TIMEFRAME, userPreferences.getTransactionGroupingTimeframe().name());
+        return storeProperties(USER_PREFERENCES_FILE_DEFAULT_NAME, userPrefsFile, COMMENTS);
+    }
+
     protected void loadCompanyNamesFile() {
         companyNamesFile.putAll(loadProperties(COMPANY_NAMES_FILE_DEFAULT_NAME));
         companyNamesFile.keySet().forEach(categoryName -> {
@@ -85,16 +92,8 @@ public enum UserPreferencesHandler {
         categoryNames.forEach((categoryName) -> {
             Set<String> categories = new HashSet<>(
                     convertPersistedStringToList(categoriesFile.getProperty(categoryName), SEPARATOR));
-            userPreferences.setDefinition(categoryName, categories);
+            userPreferences.appendDefinition(categoryName, categories);
         });
-    }
-
-    protected boolean storeUserPrefsFile() {
-        if (userPreferences.getCSVInputFolder() != null) {
-            userPrefsFile.setProperty(INPUT_FOLDER, userPreferences.getCSVInputFolder());
-        }
-        userPrefsFile.setProperty(TRANSACTION_GROUPING_TIMEFRAME, userPreferences.getTransactionGroupingTimeframe().name());
-        return storeProperties(USER_PREFERENCES_FILE_DEFAULT_NAME, userPrefsFile, COMMENTS);
     }
 
     protected boolean storeCompanyNamesFile() {
@@ -121,7 +120,7 @@ public enum UserPreferencesHandler {
     private void storeTopMostCategoryName(final String topMostCategory) {
         Collection<String> subCategories = userPreferences.getSubCategories(topMostCategory);
         if (subCategories != null) {
-            userPrefsFile.setProperty(topMostCategory, convertStringsForStorage(subCategories, SEPARATOR));
+            categoriesFile.setProperty(topMostCategory, convertStringsForStorage(subCategories, SEPARATOR));
             for (String category : subCategories) {
                 storeTopMostCategoryName(category);
             }

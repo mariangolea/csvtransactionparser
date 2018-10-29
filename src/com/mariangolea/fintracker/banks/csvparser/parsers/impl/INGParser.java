@@ -22,7 +22,7 @@ import org.apache.commons.csv.CSVRecord;
 public class INGParser extends AbstractBankParser {
 
     public INGParser() {
-        super(Bank.ING, new SimpleDateFormat("dd-MM-yyyy"), NumberFormat.getInstance(ROMANIAN_LOCALE));
+        super(Bank.ING, new SimpleDateFormat("yyyy-MM-dd"), NumberFormat.getInstance(ROMANIAN_LOCALE));
     }
 
     @Override

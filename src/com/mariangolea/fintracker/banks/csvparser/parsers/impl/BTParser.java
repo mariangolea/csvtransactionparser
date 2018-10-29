@@ -17,7 +17,7 @@ import org.apache.commons.csv.CSVRecord;
 public class BTParser extends AbstractBankParser {
 
     public BTParser() {
-        super(Bank.BT, new SimpleDateFormat("yyyy-mm-dd"), new SimpleDateFormat("yyyy-mm-dd"),
+        super(Bank.BT, new SimpleDateFormat("yyyy-MM-dd"), new SimpleDateFormat("yyyy-MM-dd"),
                 NumberFormat.getInstance(Bank.BT.locale));
     }
 

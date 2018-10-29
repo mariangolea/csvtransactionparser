@@ -22,7 +22,7 @@ public class BankTransactionEditHandler {
                 userPrefs.setCompanyDisplayName(userData.companyNameDefinition.getKey(), userData.companyNameDefinition.getValue());
             }
             if (userData.categoryNameDefinition != null) {
-                userPrefs.setDefinition(userData.categoryNameDefinition.getKey(), Arrays.asList(userData.categoryNameDefinition.getValue()));
+                userPrefs.appendDefinition(userData.categoryNameDefinition.getKey(), Arrays.asList(userData.categoryNameDefinition.getValue()));
             }
         });
     }

@@ -31,7 +31,7 @@ public class BTParserTest extends BTParser {
         Date output = parseCompletedDate("gibberish");
         assertTrue(output == null);
 
-        output = parseCompletedDate("12-08-2018");
+        output = parseCompletedDate("2018-08-12");
         assertTrue(output != null);
         Calendar calendar = Calendar.getInstance(Bank.BT.locale);
         calendar.setTime(output);
@@ -45,7 +45,7 @@ public class BTParserTest extends BTParser {
         Date output = parseStartDate("gibberish");
         assertTrue(output == null);
 
-        output = parseStartDate("12-08-2018");
+        output = parseStartDate("2018-08-12");
         assertTrue(output != null);
         Calendar calendar = Calendar.getInstance(Bank.BT.locale);
         calendar.setTime(output);

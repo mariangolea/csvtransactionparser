@@ -45,7 +45,7 @@ public class TransactionsCategorizedSlotter {
         slottedCompanyGroups = categorizeByCompanyNames();
         slottedCategorised = slotAndCategorize(slottedCompanyGroups);
     }
-    
+
     public Map<YearSlot, Collection<BankTransactionGroupInterface>> getUnmodifiableSlottedCategorized() {
         return FXCollections.observableMap(slottedCategorised);
     }

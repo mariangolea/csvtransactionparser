@@ -30,7 +30,7 @@ public class UserPreferencesHandlerTest {
         handler.deletePreferences();
         UserPreferences prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
-        prefs.setDefinition("category1", Arrays.asList("1", "2"));
+        prefs.appendDefinition("category1", Arrays.asList("1", "2"));
         prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.

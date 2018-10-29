@@ -44,7 +44,7 @@ public class INGParserTest extends INGParser{
         Date output = parseStartDate("gibberish");
         assertTrue(output == null);
 
-        output = parseStartDate("12-08-2018");
+        output = parseStartDate("2018-08-12");
         assertTrue(output != null);
         Calendar calendar = Calendar.getInstance(Bank.ING.locale);
         calendar.setTime(output);

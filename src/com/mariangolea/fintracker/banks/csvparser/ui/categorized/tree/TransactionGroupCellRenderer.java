@@ -2,6 +2,7 @@ package com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import java.util.Collection;
 import javafx.collections.MapChangeListener;
 
 import javafx.scene.control.TreeCell;
@@ -23,10 +24,9 @@ public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupI
 
         setText(value.toString());
         setStyle("-fx-background-color: lavender; selected: skyblue");
-        userPrefsHandler.getPreferences().addCompanyNamesMapListener(new UserPrefsChangeListener(value));
     }
 
-    private class UserPrefsChangeListener implements MapChangeListener<String, String> {
+    private class UserPrefsChangeListener implements MapChangeListener<String, Collection<String>> {
 
         BankTransactionGroupInterface value;
 
@@ -35,7 +35,7 @@ public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupI
         }
 
         @Override
-        public void onChanged(Change<? extends String, ? extends String> change) {
+        public void onChanged(Change<? extends String, ? extends Collection<String>> change) {
             updateItem(value, false);
         }
 

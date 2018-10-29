@@ -3,8 +3,10 @@ package com.mariangolea.fintracker.banks.csvparser.api.filters;
 import java.text.DateFormat;
 import java.util.Calendar;
 
+/**
+ * Calendar.MONTH equivalent (from 0 to 11)
+ */
 public class MonthSlot extends YearSlot {
-
     public final int month;
 
     public MonthSlot(int month, int year) {

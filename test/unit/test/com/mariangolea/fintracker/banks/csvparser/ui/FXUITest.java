@@ -23,5 +23,5 @@ public class FXUITest {
         }
     }
 
-    static boolean fxInitialized = false;
+    protected static boolean fxInitialized = false;
 }

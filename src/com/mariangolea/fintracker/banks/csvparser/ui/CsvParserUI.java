@@ -94,14 +94,12 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         this.primaryStage = primaryStage;
         primaryStage.setTitle("Bank Transactions Merger");
         primaryStage.setScene(new Scene(root, 1000, 600, Color.BISQUE));
-        primaryStage.setOnCloseRequest(eh -> {
-            UserPreferencesHandler.INSTANCE.storePreferences();
-        });
         primaryStage.show();
     }
 
     @Override
-    public void transactionEditApplyed() {
+    public void transactionEditApplied() {
+        UserPreferencesHandler.INSTANCE.storePreferences();
         updateView();
     }
     
@@ -116,7 +114,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         }
     }
 
-    public MenuBar createMenu() {
+    protected MenuBar createMenu() {
         MenuBar menu = constructSimpleMenuBar();
         Menu file = new Menu("File");
         file.setAccelerator(KeyCombination.keyCombination("Alt+f"));
@@ -132,11 +130,11 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         return menu;
     }
 
-    public MenuBar constructSimpleMenuBar() {
+    protected MenuBar constructSimpleMenuBar() {
         return new MenuBar();
     }
 
-    public void createUncategorizedView() {
+    protected void createUncategorizedView() {
         if (uncategorizedView == null) {
             uncategorizedView = new UncategorizedView(this);
         }

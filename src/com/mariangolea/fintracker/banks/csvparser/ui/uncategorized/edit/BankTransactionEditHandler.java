@@ -11,25 +11,31 @@ public class BankTransactionEditHandler {
 
     private final UserPreferences userPrefs = UserPreferencesHandler.INSTANCE.getPreferences();
     private BankTransactionEditDialog editPopup;
+    private BankTransactionEditPane editPane;
     private final UncategorizedTransactionApplyListener applyListener;
 
     public BankTransactionEditHandler(UncategorizedTransactionApplyListener applyListener) {
         this.applyListener = Objects.requireNonNull(applyListener);
     }
 
-    public void editTransaction(final BankTransaction group) {
+    public void editTransaction(final BankTransaction transaction) {
         if (editPopup == null) {
-            editPopup = new BankTransactionEditDialog();
+            editPane = new BankTransactionEditPane();
+            editPopup = new BankTransactionEditDialog(editPane);
         }
-        editPopup.setBankTransaction(group);
+        editPane.setBankTransaction(transaction);
         Optional<EditResult> result = editPopup.showAndWait();
         result.ifPresent(userData -> {
-            userPrefs.setCompanyDisplayName(userData.companyIdentifierString, userData.companyDisplayName);
-            userPrefs.appendDefinition(userData.categoryName, Arrays.asList(userData.companyDisplayName));
-            if (userData.parentCategory != null && !userData.parentCategory.isEmpty()) {
-                userPrefs.appendDefinition(userData.parentCategory, Arrays.asList(userData.categoryName));
-            }
-            applyListener.transactionEditApplyed();
+            applyResult(userData);
         });
+    }
+
+    protected void applyResult(final EditResult result) {
+        userPrefs.setCompanyDisplayName(result.companyIdentifierString, result.companyDisplayName);
+        userPrefs.appendDefinition(result.categoryName, Arrays.asList(result.companyDisplayName));
+        if (result.parentCategory != null && !result.parentCategory.isEmpty()) {
+            userPrefs.appendDefinition(result.parentCategory, Arrays.asList(result.categoryName));
+        }
+        applyListener.transactionEditApplied();
     }
 }

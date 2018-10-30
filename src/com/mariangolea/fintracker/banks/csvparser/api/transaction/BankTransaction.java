@@ -93,7 +93,4 @@ public final class BankTransaction implements Serializable, Comparable<BankTrans
         String descSubString = description.length() > 20 ? description.trim().substring(0, 20) : description;
         return descSubString + "\n" + amount.toString();
     }
-    
-    
-    
 }

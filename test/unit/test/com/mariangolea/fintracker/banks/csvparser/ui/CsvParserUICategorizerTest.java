@@ -16,7 +16,6 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFi
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVParserFactory;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
-import com.mariangolea.fintracker.banks.csvparser.ui.categorized.table.TransactionTableView;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -29,12 +28,9 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import static org.junit.Assert.assertTrue;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-@RunWith(MockitoJUnitRunner.class)
 public class CsvParserUICategorizerTest extends FXUITest {
 
     private final TestUtilities utils = new TestUtilities();
@@ -210,5 +206,9 @@ public class CsvParserUICategorizerTest extends FXUITest {
             return super.appendHyperlinkToFile(pre, sourceFile, post); //To change body of generated methods, choose Tools | Templates.
         }
 
+        @Override
+        protected void createUncategorizedView() {
+            super.createUncategorizedView(); //To change body of generated methods, choose Tools | Templates.
+        }
     }
 }

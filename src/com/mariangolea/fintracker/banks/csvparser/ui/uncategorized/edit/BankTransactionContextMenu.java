@@ -26,7 +26,7 @@ public class BankTransactionContextMenu extends ContextMenu {
         return edit;
     }
 
-    protected final void edit() {
+    protected void edit() {
         if (transaction == null) {
             return;
         }

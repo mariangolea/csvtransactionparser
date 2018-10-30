@@ -31,25 +31,25 @@ public abstract class AbstractBankParser {
     private final DateFormat startDateFormat;
     private final DateFormat completedDateFormat;
     private final Bank bank;
+    private final int[] mandatoryRecordIndexes;
+    private final int maxRecordSize;
 
     private final Map<String, Date> parsedCompletedDates = new HashMap<>();
     private final Map<String, Date> parsedStartedDates = new HashMap<>();
     private final Map<String, BigDecimal> parsedAmounts = new HashMap<>();
 
-    public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final NumberFormat numberFormat) {
-        this(bank, startDateFormat, DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE), numberFormat);
+    public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final NumberFormat numberFormat, final int[] mandatoryRecordIndexes, int maxRecordSize) {
+        this(bank, startDateFormat, DateFormat.getDateInstance(DateFormat.LONG, ROMANIAN_LOCALE), numberFormat, mandatoryRecordIndexes, maxRecordSize);
     }
 
     public AbstractBankParser(final Bank bank, final DateFormat startDateFormat, final DateFormat completedDateFormat,
-            final NumberFormat numberFormat) {
-        Objects.requireNonNull(startDateFormat);
-        Objects.requireNonNull(numberFormat);
-        Objects.requireNonNull(bank);
-
-        this.bank = bank;
-        this.startDateFormat = startDateFormat;
-        this.numberFormat = numberFormat;
-        this.completedDateFormat = completedDateFormat;
+            final NumberFormat numberFormat, final int[] mandatoryRecordIndexes, int maxRecordSize) {
+        this.startDateFormat = Objects.requireNonNull(startDateFormat);
+        this.numberFormat = Objects.requireNonNull(numberFormat);
+        this.bank = Objects.requireNonNull(bank);
+        this.completedDateFormat = Objects.requireNonNull(completedDateFormat);
+        this.mandatoryRecordIndexes = Objects.requireNonNull(mandatoryRecordIndexes);
+        this.maxRecordSize = maxRecordSize;
     }
 
     public abstract BankTransaction parseTransaction(List<String> toConsume);
@@ -163,10 +163,17 @@ public abstract class AbstractBankParser {
     }
 
     private boolean mandatoryChecks(final CSVRecord record) {
-        if (record == null || bank.mandatoryRecordsPerLine > record.size()) {
+        if (record == null || maxRecordSize > record.size()) {
             return false;
         }
-        return bank.mandatoryCSVRecordIndexes.stream().map((index) -> record.get(index)).noneMatch((temp) -> (temp == null));
+
+        for (int index : mandatoryRecordIndexes) {
+            if (record.get(index) == null) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     private BigDecimal searchTransactionsNumber(int transactionsIndex, List<String> toConsume) {

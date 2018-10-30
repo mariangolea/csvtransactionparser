@@ -1,22 +1,15 @@
 package com.mariangolea.fintracker.banks.csvparser.api;
 
 import com.mariangolea.fintracker.banks.csvparser.parsers.AbstractBankParser;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
 
 public enum Bank {
     ING(AbstractBankParser.ROMANIAN_LOCALE,
             "Data,,,Detalii tranzactie,,Debit,Credit",
-            "", 
-            Arrays.asList(0, 3, 5, 6), 
-            7),
+            ""),
     BT(Locale.ENGLISH,
             "Data tranzactie,Data valuta,Descriere,Referinta tranzactiei,Debit,Credit,Sold contabil",
-            "Gasit/e:", 
-            Arrays.asList(0,1,2,4,5), 
-            6);
+            "Gasit/e:");
 
     public final Locale locale;
     /**
@@ -34,18 +27,12 @@ public enum Bank {
      * order to next parse the transactions number, for validation purposes.
      */
     public final String transactionsNumberLabel;
-    public final Collection<Integer> mandatoryCSVRecordIndexes;
-    public final int mandatoryRecordsPerLine;
 
     private Bank(final Locale locale, 
             final String relevantContentHeaderLine, 
-            final String transactionsNumberLabel, 
-            final Collection<Integer> mandatoryCSVRecordIndexes,
-            final int recordsPerLine) {
+            final String transactionsNumberLabel) {
         this.locale = locale;
         this.relevantContentHeaderLine = relevantContentHeaderLine;
         this.transactionsNumberLabel = transactionsNumberLabel;
-        this.mandatoryCSVRecordIndexes = Collections.unmodifiableCollection(mandatoryCSVRecordIndexes);
-        this.mandatoryRecordsPerLine = recordsPerLine;
     }
 }

@@ -8,6 +8,8 @@ com.mariangolea.fintracker.banks.csvparser.parsers
 com.mariangolea.fintracker.banks.csvparser.parsers.impl
 com.mariangolea.fintracker.banks.csvparser.preferences
 com.mariangolea.fintracker.banks.csvparser.ui
-com.mariangolea.fintracker.banks.csvparser.ui.edit
-com.mariangolea.fintracker.banks.csvparser.ui.renderer
-com.mariangolea.fintracker.banks.csvparser.ui.transactions
+com.mariangolea.fintracker.banks.csvparser.ui.categorized.edit
+com.mariangolea.fintracker.banks.csvparser.ui.categorized.table
+com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree
+com.mariangolea.fintracker.banks.csvparser.ui.uncategorized
+com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit

@@ -10,6 +10,5 @@ com.mariangolea.fintracker.banks.csvparser.preferences
 com.mariangolea.fintracker.banks.csvparser.ui
 com.mariangolea.fintracker.banks.csvparser.ui.categorized.edit
 com.mariangolea.fintracker.banks.csvparser.ui.categorized.table
-com.mariangolea.fintracker.banks.csvparser.ui.categorized.tree
 com.mariangolea.fintracker.banks.csvparser.ui.uncategorized
 com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit

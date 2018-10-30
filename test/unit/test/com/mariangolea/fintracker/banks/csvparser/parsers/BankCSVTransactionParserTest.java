@@ -16,10 +16,6 @@ import java.util.List;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class BankCSVTransactionParserTest {
 
     private final BankCSVTransactionParser parser = new BankCSVTransactionParser();

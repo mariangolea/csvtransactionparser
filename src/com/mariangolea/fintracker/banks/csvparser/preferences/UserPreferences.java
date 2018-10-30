@@ -1,172 +1,124 @@
 package com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import java.util.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
-/**
- * Container of user preferences:
- * <br>User preferred input folder.</br>
- * <br>User defined transaction categories, as a map. Category name as key, {@link UserDefinedTransactionGroup} as value.<br/>
- * <br>User defined transaction display names, as a map. Substring of a transaction description as a key, user defined display name as value.</br>
- *
- * @author mariangolea@gmail.com
- */
 public class UserPreferences {
 
-    private final Map<String, UserDefinedTransactionGroup> transactionCategories = new HashMap<>();
+    public static final String UNCATEGORIZED = "Uncategorized";
+
+    private final CategoriesTree categories = new CategoriesTree();
     private String csvInputFolder;
-    private final Map<String, String> transactionDisplayNames = new HashMap<>();
+    private Timeframe transactionsTimeframe = Timeframe.MONTH;
+    //identifier string, display name.
+    private final ObservableMap<String, String> companyNames = FXCollections.observableMap(new HashMap<>());
+    //switched keys and values from previous map.
+    private final ObservableMap<String, String> companyNamesReversed = FXCollections.observableMap(new HashMap<>());
 
-    /**
-     * Get a ordered set of available user defined categories.
-     *
-     * @return user defined categories
-     */
-    public Set<String> getUserDefinedCategoryNames() {
-        return transactionCategories.keySet();
+    public enum Timeframe {
+        MONTH(Calendar.MONTH),
+        YEAR(Calendar.YEAR);
+
+        public final int timeframe;
+
+        private Timeframe(int timeframe) {
+            this.timeframe = timeframe;
+        }
     }
 
-    /**
-     * Get a ordered set of available transaction description substrings that
-     * may be used to identify a specific user defined company name.
-     *
-     * @return user defined transaction description substrings that
-     * may be used to identify a specific user defined company name.
-     */
-    public Set<String> getUserDefinedCompanyNames() {
-        return transactionDisplayNames.keySet();
+    public Collection<String> getUserDefinedCategoryNames() {
+        return categories.getAllSubCategoryNames();
     }
 
+    public Collection<String> getTopMostCategories() {
+        return categories.getNodeSubCategoryNames();
+    }
 
-    /**
-     * Get the user defined transaction group associated to specified user defined category name.
-     *
-     * @param categoryName user defined category name.
-     * @return transaction group
-     */
-    public UserDefinedTransactionGroup getDefinition(final String categoryName) {
+    public Collection<String> getCompanyIdentifierStrings() {
+        return companyNames.keySet();
+    }
+
+    public Collection<String> getSubCategories(final String categoryName) {
         Objects.requireNonNull(categoryName);
-        return transactionCategories.get(categoryName);
+        CategoriesTree tree = categories.getCategory(categoryName);
+        if (tree == null) {
+            return FXCollections.emptyObservableList();
+        }
+        return tree.getNodeSubCategoryNames();
     }
 
-    /**
-     * Set a user defined display name corresponding to a unique sub string found in a transaction description.
-     * <br>This association is used to automatically group transactions done to the same company, so please be careful to make the
-     * first argument as specific as possible.</br>
-     * <br>A good example is providing simple strings like "LIDL" or "SC NEPTUN SA".</br>
-     * <br> Avoid using POS identification numbers since these tend to change quite often in Romania.</br>
-     *
-     * @param transactionDesc
-     * @param displayName
-     */
-    public void setTransactionDisplayName(final String transactionDesc, final String displayName) {
-        Objects.requireNonNull(transactionDesc);
+    public void setCompanyDisplayName(final String company, final String displayName) {
+        Objects.requireNonNull(company);
         Objects.requireNonNull(displayName);
-        transactionDisplayNames.put(transactionDesc, displayName);
+        companyNames.put(company.toLowerCase(), displayName);
+        companyNamesReversed.put(displayName, company.toLowerCase());
     }
 
-    /**
-     * Get the display name corresponding to received transaction description relevant sub string.
-     * <br>A good example is providing simple strings like "LIDL" or "SC NEPTUN SA".</br>
-     * <br> Avoid using POS identification numbers since these tend to change quite often in Romania.</br>
-     *
-     * @param transactionDesc transaction description relevant sub string
-     * @return associated display name, may be null
-     */
-    public String getDisplayName(final String transactionDesc) {
-        Objects.requireNonNull(transactionDesc);
-        return transactionDisplayNames.get(transactionDesc);
+    public String getCompanyDisplayName(final String company) {
+        Objects.requireNonNull(company);
+        return companyNames.get(company.toLowerCase());
     }
 
+    public Collection<String> getCompanyDisplayNames() {
+        return FXCollections.observableSet(new HashSet<>(companyNames.values()));
+    }
 
-    /**
-     * Add a user defined category name for corresponding transaction group.
-     *
-     * @param categoryName  user defined category name
-     * @param newDefinition user defined transaction group.
-     * @return true if successful. false if one association already exists (calls updateDefinition instead).
-     */
-    public boolean addDefinition(final String categoryName, final UserDefinedTransactionGroup newDefinition) {
-        Objects.requireNonNull(categoryName);
-        Objects.requireNonNull(newDefinition);
-        if (transactionCategories.containsKey(categoryName)) {
-            return false;
+    public String getMatchingCategory(String companyDescriptionString) {
+        for (String companyIdentifier : getCompanyIdentifierStrings()) {
+            if (companyDescriptionString.toLowerCase().contains(companyIdentifier.toLowerCase())) {
+                return getCompanyDisplayName(companyIdentifier);
+            }
         }
 
-        transactionCategories.put(categoryName, newDefinition);
-        return true;
+        return UNCATEGORIZED;
     }
 
-    /**
-     * Remove the existing definition for a specific user defined category name.
-     *
-     * @param categoryName user defined category name.
-     * @return true if successful. false if no such association exists.
-     */
-    public boolean removeDefinition(final String categoryName) {
+    public String getCompanyIdentifierString(final String companyDisplayName) {
+        return companyNamesReversed.get(companyDisplayName);
+    }
+
+    public void appendDefinition(final String categoryName, final Collection<String> subCategories) {
         Objects.requireNonNull(categoryName);
-        if (!transactionCategories.containsKey(categoryName)) {
-            return false;
+        Objects.requireNonNull(subCategories);
+
+        CategoriesTree tree = categories.getCategory(categoryName);
+        if (tree == null) {
+            categories.addSubCategories(Arrays.asList(categoryName));
+            tree = categories.getCategory(categoryName);
         }
-        transactionCategories.remove(categoryName);
-        return true;
+        final Collection<String> newCategories = FXCollections.observableArrayList();
+        final Collection<CategoriesTree> existingCategories = FXCollections.observableArrayList();
+        subCategories.forEach(subcategory -> {
+            CategoriesTree existing = categories.getCategory(subcategory);
+            if (existing == null) {
+                newCategories.add(subcategory);
+            } else {
+                existingCategories.add(existing);
+            }
+        });
+        tree.reparent(existingCategories);
+        tree.addSubCategories(newCategories);
     }
 
-    /**
-     * Update the existing definition for a specific user defined category name.
-     *
-     * @param categoryName  user defined category name.
-     * @param newDefinition user defined transaction group.
-     * @return true if successful. false if no previous association existed.
-     */
-    public boolean updateDefinition(final String categoryName, final UserDefinedTransactionGroup newDefinition) {
-        Objects.requireNonNull(categoryName);
-        Objects.requireNonNull(newDefinition);
-        if (!transactionCategories.containsKey(categoryName)) {
-            return false;
-        }
-        transactionCategories.put(categoryName, newDefinition);
-        return true;
+    public String getParent(final String categoryName) {
+        CategoriesTree tree = categories.getCategory(categoryName);
+        return tree == null ? null : tree.getParentCategory().categoryName;
     }
 
-    /**
-     * Get the list of existing user defined transaction groups.
-     *
-     * @return list of existing user defined transaction groups.
-     */
-    public Collection<UserDefinedTransactionGroup> getUserDefinitions() {
-        return transactionCategories.values();
-    }
-
-    /**
-     * Get the user defined input folder for parsing csv files.
-     *
-     * @return may be null.
-     */
     public String getCSVInputFolder() {
         return csvInputFolder;
     }
 
-    /**
-     * Set the user defined input folder for parsing pd files.
-     *
-     * @param csvInputFolder csv input folder.
-     */
     public void setCSVInputFolder(final String csvInputFolder) {
         this.csvInputFolder = csvInputFolder;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserPreferences that = (UserPreferences) o;
-        return Objects.equals(transactionCategories, that.transactionCategories) &&
-                Objects.equals(csvInputFolder, that.csvInputFolder) &&
-                Objects.equals(transactionDisplayNames, that.transactionDisplayNames);
+    public Timeframe getTransactionGroupingTimeframe() {
+        return transactionsTimeframe;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(transactionCategories, csvInputFolder, transactionDisplayNames);
+    public void setTransactionGroupingTimeframe(Timeframe timeframe) {
+        this.transactionsTimeframe = timeframe;
     }
 }

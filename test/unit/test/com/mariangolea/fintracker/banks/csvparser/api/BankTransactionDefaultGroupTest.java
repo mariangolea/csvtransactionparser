@@ -1,83 +1,84 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser.api;
-
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collection;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-/**
- *
- * @author Marian Golea <marian.golea@microchip.com>
- */
-public class BankTransactionDefaultGroupTest {
+public class BankTransactionDefaultGroupTest extends BankTransactionCompanyGroupTest {
 
     @Test
     public void testGroup() {
-        BTParser bt = new BTParser();
-        Date date = bt.parseCompletedDate("19-08-2018");
-        BankTransaction first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ONE, "description",
-                BankTransaction.Type.IN, Arrays.asList("one", "two"));
-        BankTransaction second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ONE, "description",
-                BankTransaction.Type.IN, Arrays.asList("one", "two"));
+        BankTransaction[] legal = createTestTransactions();
+        Extension defaultGroup = new Extension("description");
+        defaultGroup.addTransactions(Arrays.asList(legal));
+        Extension firstGroup = new Extension("description");
+        firstGroup.addGroup(defaultGroup);
 
-        BankTransactionDefaultGroup firstGroup = new BankTransactionDefaultGroup(BTParser.OperationID.INCASARE.desc,
-                BankTransaction.Type.IN);
-        firstGroup.addTransaction(first);
-        firstGroup.addTransaction(second);
+        assertTrue(firstGroup.getContainedGroups() != null && firstGroup.getContainedGroups().size() == 1 && firstGroup.getContainedGroups().get(0) == defaultGroup);
+        assertTrue(firstGroup.getTransactionsNumber() == 2);
+        assertTrue(firstGroup.getGroupsNumber() == 1);
+    }
 
-        //different title
-        BankTransaction illegalOne = new BankTransaction(true, true, "title", date, date, BigDecimal.ONE, "description",
-                BankTransaction.Type.IN, Arrays.asList("one", "two"));
-        boolean success = firstGroup.addTransaction(illegalOne);
-        assertTrue(!success);
-        //different type
-        BankTransaction illegalTwo = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ONE, "description",
-                BankTransaction.Type.OUT, Arrays.asList("one", "two"));
-        success = firstGroup.addTransaction(illegalTwo);
-        assertTrue(!success);
+    @Test
+    public void testGetTotalAmount() {
+        BankTransaction[] legal = createTestTransactions();
+        Extension defaultGroup = new Extension("description");
+        defaultGroup.addTransactions(Arrays.asList(legal));
+        Extension firstGroup = new Extension("description");
+        firstGroup.addGroup(defaultGroup);
 
-        List<BankTransaction> badTransactions = firstGroup.addTransactions(Arrays.asList(illegalOne, illegalTwo));
-        assertTrue(badTransactions != null && badTransactions.size() == 2 && badTransactions.get(0) == illegalOne && badTransactions.get(1) == illegalTwo);
+        assertEquals(new BigDecimal(2), firstGroup.getTotalAmount());
+    }
 
-        assertTrue(firstGroup.getType() == BankTransaction.Type.IN);
-        assertTrue(firstGroup.getGroupIdentifier().equals(BTParser.OperationID.INCASARE.desc));
-        assertTrue(firstGroup.getTotalAmount().intValue() == 2);
-        assertTrue(firstGroup.getCompanyDescriptions().equals(Arrays.asList("description")));
-        assertTrue(firstGroup.getTransactionsForCompanyDesc("description").equals(Arrays.asList(first, second)));
-        assertTrue(firstGroup.toString() != null && !firstGroup.toString().isEmpty());
+    @Test
+    public void testEqualsHashCode() {
+        Extension first = createGroup();
+        assertTrue(first.equals(first));
 
-        first = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ONE, "description",
-                BankTransaction.Type.IN, Arrays.asList("one", "two"));
-        second = new BankTransaction(true, true, BTParser.OperationID.INCASARE.desc, date, date, BigDecimal.ONE, "description",
-                BankTransaction.Type.IN, Arrays.asList("one", "two"));
-        BankTransactionDefaultGroup secondGroup = new BankTransactionDefaultGroup(BTParser.OperationID.INCASARE.desc,
-                BankTransaction.Type.IN);
-        secondGroup.addTransaction(first);
-        secondGroup.addTransaction(second);
+        Extension second = createGroup();
+        assertTrue(first.equals(second));
+        assertTrue(first.hashCode() == second.hashCode());
 
-        assertTrue(firstGroup.equals(secondGroup));
-        assertTrue(firstGroup.hashCode() == secondGroup.hashCode());
-        BankTransactionDefaultGroup thirdGroup = new BankTransactionDefaultGroup(BTParser.OperationID.INCASARE.desc,
-                BankTransaction.Type.IN);
-        List<BankTransaction> incompatibleTransactions = thirdGroup.addTransactions(Arrays.asList(first, second));
-        assertTrue(incompatibleTransactions != null && incompatibleTransactions.isEmpty());
-        assertTrue(thirdGroup.equals(secondGroup));
+        Extension third = null;
+        assertFalse(first.equals(third));
         
-        second.getCsvContent().add("hello");
-        assertTrue(!secondGroup.equals(firstGroup));
-        assertTrue(secondGroup.hashCode() != firstGroup.hashCode());
+        assertEquals(0, first.compareTo(first));
+    }
+
+    private Extension createGroup() {
+        BankTransaction[] legal = createTestTransactions();
+        Extension defaultGroup = new Extension("description");
+        defaultGroup.addTransactions(Arrays.asList(legal));
+        return defaultGroup;
+    }
+
+    private class Extension extends BankTransactionDefaultGroup {
+
+        public Extension(String companyDesc) {
+            super(companyDesc);
+        }
+
+        @Override
+        public void addGroup(BankTransactionGroupInterface group) {
+            super.addGroup(group);
+        }
+
+        @Override
+        protected void addTransaction(BankTransaction parsedTransaction) {
+            super.addTransaction(parsedTransaction);
+        }
+
+        @Override
+        protected void addTransactions(Collection<BankTransaction> parsedTransactions) {
+            super.addTransactions(parsedTransactions);
+        }
     }
 }

@@ -1,37 +1,36 @@
 package com.mariangolea.fintracker.banks.csvparser.ui;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import com.mariangolea.fintracker.banks.csvparser.ui.categorized.table.TransactionTableView;
+import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.UncategorizedView;
+import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -39,19 +38,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
-public class CsvParserUI extends Application {
+public class CsvParserUI extends Application implements UncategorizedTransactionApplyListener {
 
     protected TextFlow feedbackPane;
-    private Label inResponseLabel;
-    private Label outResponseLabel;
-    protected final ObservableList<BankTransactionAbstractGroup> inModel = FXCollections.observableArrayList();
-    protected final ObservableList<BankTransactionAbstractGroup> outModel = FXCollections.observableArrayList();
+    protected final Collection<BankTransaction> model = FXCollections.observableArrayList();
+
+    private TransactionTableView tableView;
+    private UncategorizedView uncategorizedView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
-    private final UserPreferencesHandler preferences = new UserPreferencesHandler();
+    private final UserPreferencesHandler preferences = UserPreferencesHandler.INSTANCE;
     private final UserPreferences userPrefs;
     protected final List<File> parsedCsvFiles = new ArrayList<>();
     private Stage primaryStage;
@@ -61,13 +56,11 @@ public class CsvParserUI extends Application {
     protected static final String FINISHED_PARSING_CSV_FILES = "Finished parsing the CSV files: ";
 
     public CsvParserUI() {
-        userPrefs = preferences.loadUserPreferences();
+        userPrefs = preferences.getPreferences();
     }
 
     @Override
     public void init() throws Exception {
-        inResponseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
-        outResponseLabel = new Label(TransactionGroupListSelectionListener.LABEL_NOTHING_SELECTED);
         MenuBar menuBar = createMenu();
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -75,29 +68,20 @@ public class CsvParserUI extends Application {
         grid.setPadding(new Insets(10, 10, 10, 10));
         ColumnConstraints col = new ColumnConstraints();
         col.setFillWidth(true);
-        col.setHgrow(Priority.SOMETIMES);
-        grid.getColumnConstraints().add(col);
         col.setHgrow(Priority.ALWAYS);
-        col.setPercentWidth(80);
         grid.getColumnConstraints().add(col);
-        col.setHgrow(Priority.SOMETIMES);
-        grid.getColumnConstraints().add(col);
-        RowConstraints row = new RowConstraints();
-        row.setFillHeight(true);
-        row.setVgrow(Priority.ALWAYS);
-        grid.getRowConstraints().add(row);
-        grid.getRowConstraints().add(row);
 
-        ScrollPane centerScroll = createFeedbackView();
+        ScrollPane feedback = createFeedbackView();
 
-        ScrollPane scrollPaneIN = createTransactionView(BankTransaction.Type.IN);
-        ScrollPane scrollPaneOUT = createTransactionView(BankTransaction.Type.OUT);
+        GridPane display = new GridPane();
+        display.getColumnConstraints().add(col);
+        createTableView();
+        createUncategorizedView();
+        display.add(tableView, 0, 0, 12, 1);
+        display.add(uncategorizedView, 12, 0, 3, 1);
 
-        grid.add(inResponseLabel, 0, 0);
-        grid.add(scrollPaneIN, 0, 1);
-        grid.add(centerScroll, 1, 0, 1, 2);
-        grid.add(outResponseLabel, 2, 0);
-        grid.add(scrollPaneOUT, 2, 1);
+        grid.add(display, 0, 0, 15, 12);
+        grid.add(feedback, 0, 12, 15, 1);
         grid.setStyle("-fx-background-color: BEIGE;");
 
         root = new BorderPane();
@@ -113,24 +97,24 @@ public class CsvParserUI extends Application {
         primaryStage.show();
     }
 
+    @Override
+    public void transactionEditApplied() {
+        UserPreferencesHandler.INSTANCE.storePreferences();
+        updateView();
+    }
+    
     protected void loadData(final List<CsvFileParseResponse> parsedTransactions) {
         if (parsedTransactions != null) {
             parsedTransactions.forEach(csvFileResponse -> {
-                csvFileResponse.parsedTransactionGroups.forEach(transactionGroup -> {
-                    switch (transactionGroup.getType()) {
-                        case IN:
-                            inModel.add(transactionGroup);
-                            break;
-                        case OUT:
-                            outModel.add(transactionGroup);
-                            break;
-                    }
+                csvFileResponse.parsedTransactions.forEach(transaction -> {
+                    model.add(transaction);
                 });
             });
+            updateView();
         }
     }
 
-    public MenuBar createMenu() {
+    protected MenuBar createMenu() {
         MenuBar menu = constructSimpleMenuBar();
         Menu file = new Menu("File");
         file.setAccelerator(KeyCombination.keyCombination("Alt+f"));
@@ -146,8 +130,14 @@ public class CsvParserUI extends Application {
         return menu;
     }
 
-    public MenuBar constructSimpleMenuBar() {
+    protected MenuBar constructSimpleMenuBar() {
         return new MenuBar();
+    }
+
+    protected void createUncategorizedView() {
+        if (uncategorizedView == null) {
+            uncategorizedView = new UncategorizedView(this);
+        }
     }
 
     protected void popCSVFileChooser() {
@@ -167,7 +157,6 @@ public class CsvParserUI extends Application {
 
     protected void parseUserSelectedCSVFiles(List<File> csvFiles) {
         userPrefs.setCSVInputFolder(csvFiles.get(0).getParent());
-        preferences.storePreferences(userPrefs);
         parsedCsvFiles.addAll(csvFiles);
         startParsingCsvFiles(csvFiles);
     }
@@ -202,22 +191,6 @@ public class CsvParserUI extends Application {
         runThread.start();
     }
 
-    private ScrollPane createTransactionView(BankTransaction.Type type) {
-        ObservableList<BankTransactionAbstractGroup> model = BankTransaction.Type.IN == type ? inModel : outModel;
-        Label responseLabel = BankTransaction.Type.IN == type ? inResponseLabel : outResponseLabel;
-        ListView<BankTransactionAbstractGroup> listView = new ListView<>(model);
-        model.addListener(new TransactionGroupListSelectionListener(listView, responseLabel));
-        listView.setCellFactory((ListView<BankTransactionAbstractGroup> param) -> {
-            return new TransactionGroupCellRenderer(param);
-        });
-        listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        ScrollPane scrollPane = new ScrollPane(listView);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-
-        return scrollPane;
-    }
-
     protected ScrollPane createFeedbackView() {
         feedbackPane = constructFeedbackPane();
         ScrollPane scrollPane = new ScrollPane(feedbackPane);
@@ -227,19 +200,23 @@ public class CsvParserUI extends Application {
         return scrollPane;
     }
 
-    protected TextFlow constructFeedbackPane(){
+    protected void createTableView() {
+        if (tableView == null) {
+            tableView = new TransactionTableView(model);
+        }
+    }
+
+    protected TextFlow constructFeedbackPane() {
         return new TextFlow();
     }
-    
+
     protected void appendReportText(CsvFileParseResponse fileResponse) {
         appendHyperlinkToFile("\n", fileResponse.csvFile, ": ");
         if (fileResponse.allCsvContentProcessed && fileResponse.expectedTransactionsNumber == fileResponse.foundTransactionsNumber) {
             appendReportMessage("ALL OK!");
         } else if (!fileResponse.allCsvContentProcessed) {
             String message = "Find below CSV content lines unprocessed.\n";
-            for (String line : fileResponse.unprocessedStrings) {
-                message += "\t" + line;
-            }
+            message = fileResponse.unprocessedStrings.stream().map((line) -> "\t" + line).reduce(message, String::concat);
             appendReportMessage(message);
         } else {
             if (fileResponse.expectedTransactionsNumber == 0) {
@@ -279,5 +256,11 @@ public class CsvParserUI extends Application {
         }
         feedbackPane.getChildren().add(new Text(message));
         return true;
+    }
+
+    private void updateView() {
+        TransactionsCategorizedSlotter calc = new TransactionsCategorizedSlotter(model, userPrefs);
+        uncategorizedView.updateModel(calc.getUnmodifiableUnCategorized());
+        tableView.resetView(calc.getUnmodifiableSlottedCategorized());
     }
 }

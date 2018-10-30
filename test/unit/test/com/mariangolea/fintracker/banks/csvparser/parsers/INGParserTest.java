@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser.parsers;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
@@ -23,10 +18,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- *
- * @author Marian
- */
 public class INGParserTest extends INGParser{
 
     private final TestUtilities utils = new TestUtilities();
@@ -53,7 +44,7 @@ public class INGParserTest extends INGParser{
         Date output = parseStartDate("gibberish");
         assertTrue(output == null);
 
-        output = parseStartDate("12-08-2018");
+        output = parseStartDate("2018-08-12");
         assertTrue(output != null);
         Calendar calendar = Calendar.getInstance(Bank.ING.locale);
         calendar.setTime(output);
@@ -83,12 +74,11 @@ public class INGParserTest extends INGParser{
 
         // ING CSV files are dumber than BT ones. They end with a signature text which is irrelevant, but no way of taking it out programtically...
         assertTrue(response.unprocessedStrings.isEmpty());
-        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
+        assertTrue(response.parsedTransactions != null && response.parsedTransactions.size() == 3);
     }
 
     @Test
     public void testMethodsBasic() {
-        assertTrue(getListOfSupportedTransactionIDs() != null);
         assertTrue(findNextTransactionLineIndex(null) == -1);
         
         List<String> impropper = new ArrayList<>();

@@ -19,11 +19,6 @@ import java.math.BigDecimal;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
-/**
- * Tests individual methods in INGParser class.
- *
- * @author mariangolea@gmail.com
- */
 public class BTParserTest extends BTParser {
 
     private final TestUtilities utils = new TestUtilities();
@@ -36,7 +31,7 @@ public class BTParserTest extends BTParser {
         Date output = parseCompletedDate("gibberish");
         assertTrue(output == null);
 
-        output = parseCompletedDate("12-08-2018");
+        output = parseCompletedDate("2018-08-12");
         assertTrue(output != null);
         Calendar calendar = Calendar.getInstance(Bank.BT.locale);
         calendar.setTime(output);
@@ -50,7 +45,7 @@ public class BTParserTest extends BTParser {
         Date output = parseStartDate("gibberish");
         assertTrue(output == null);
 
-        output = parseStartDate("12-08-2018");
+        output = parseStartDate("2018-08-12");
         assertTrue(output != null);
         Calendar calendar = Calendar.getInstance(Bank.BT.locale);
         calendar.setTime(output);
@@ -80,12 +75,11 @@ public class BTParserTest extends BTParser {
 
         // we expect a unrecognized string.
         assertTrue(!response.allCsvContentProcessed);
-        assertTrue(response.parsedTransactionGroups != null && response.parsedTransactionGroups.size() == 3);
+        assertTrue(response.foundTransactionsNumber == 3);
     }
 
     @Test
     public void testMethodsBasic() {
-        assertTrue(getListOfSupportedTransactionIDs() != null);
         assertTrue(findNextTransactionLineIndex(null) == 1);
     }
 }

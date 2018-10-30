@@ -1,65 +1,40 @@
 package com.mariangolea.fintracker.banks.csvparser.api.transaction;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-/**
- * Group of transactions which were made with the same "target" entity.
- * @author mariangolea@gmail.com
- */
-public final class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
+public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
-    private final List<BankTransaction> list = new ArrayList<>();
-    private final String companyDesc;
-    
-    /**
-     * Create a instance of this class.
-     * @param transactionGroupIdentifier group identifier
-     * @param companyDesc company descriptor string
-     * @param type outgoing or incoming
-     */
-    public BankTransactionCompanyGroup(String transactionGroupIdentifier, String companyDesc, BankTransaction.Type type) {
-        super(transactionGroupIdentifier, type);
+    private final ObservableList<BankTransaction> list = FXCollections.observableArrayList();
+    private BigDecimal amount = BigDecimal.ZERO;
+
+    public BankTransactionCompanyGroup(String companyDesc) {
+        super(companyDesc);
         Objects.requireNonNull(companyDesc);
-
-        this.companyDesc = companyDesc;
-    }
-    
-    @Override
-    public int getTransactionsNumber() {
-        return list.size();
     }
 
     @Override
-    public void addTransactionImpl(final BankTransaction transaction) {
-        list.add(transaction);
+    public BigDecimal getTotalAmount() {
+        return amount;
     }
 
     @Override
-    public boolean matchesTransaction(final BankTransaction transaction) {
-        return super.matchesTransaction(transaction) && Objects.equals(companyDesc, transaction.getDescription());
-    }
-    
-    /**
-     * Get the company descriptor string.
-     * @return 
-     */
-    public String getCompanyDesc() {
-        return companyDesc;
-    }
-    
-    /**
-     * Get a copy of the transactions as a list.
-     * @return 
-     */
-    public List<BankTransaction> getTransactions() {
-        return new ArrayList<>(list);
+    public int getGroupsNumber() {
+        return 0;
     }
 
     @Override
-    public String toString() {
-        return companyDesc + "\n" + super.toString();
+    public List<BankTransactionGroupInterface> getContainedGroups() {
+        return null;
+    }
+
+    @Override
+    public List<BankTransaction> getContainedTransactions() {
+        return FXCollections.unmodifiableObservableList(list);
     }
 
     @Override
@@ -72,13 +47,23 @@ public final class BankTransactionCompanyGroup extends BankTransactionAbstractGr
         }
         BankTransactionCompanyGroup that = (BankTransactionCompanyGroup) o;
         return super.equals(that)
-                && Objects.equals(companyDesc, that.companyDesc) 
                 && Objects.equals(list, that.list);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), companyDesc, list);
+        return Objects.hash(super.hashCode(), list);
+    }
+
+    protected void addTransaction(final BankTransaction parsedTransaction) {
+        list.add(parsedTransaction);
+        amount = amount.add(parsedTransaction.creditAmount).subtract(parsedTransaction.debitAmount);
+    }
+
+    protected void addTransactions(final Collection<BankTransaction> parsedTransactions) {
+        parsedTransactions.forEach((transaction) -> {
+            addTransaction(transaction);
+        });
     }
 
 }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package test.com.mariangolea.fintracker.banks.csvparser;
 
 import java.io.File;
@@ -15,26 +10,22 @@ import java.util.logging.Logger;
 import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
+import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import org.apache.commons.csv.CSVFormat;
 
-/**
- *
- * @author Marian Golea <mariangolea@gmail.com>
- */
 public class TestUtilities {
 
     public TemporaryFolder folder = new TemporaryFolder();
 
-    /**
-     * Constructs csv text content as expected by the parser. <br>
-     * Adds bank swift code, relevant text delimiter, and line separator.
-     *
-     * @param bank bank
-     * @return whole csv page text content
-     */
     public String[] constructMockCSVContentForBank(Bank bank) {
         List<String> texts = new ArrayList<>();
         texts.add("Gibberish");
@@ -50,14 +41,56 @@ public class TestUtilities {
         return texts.toArray(new String[texts.size()]);
     }
 
-    /**
-     * Writes a single page csv file with received text.
-     *
-     * @param bank bank
-     * @param csv file
-     * @param records records
-     * @return csv file on disk, may be null
-     */
+    public static Collection<BankTransaction> constructMockDefaultTransactionsForCategorizer(final UserPreferences userPrefs) {
+        Collection<BankTransaction> transactions = new ArrayList<>();
+        populateUserPrefsWithCompanyAndGroupData(userPrefs);
+
+        transactions.add(createTransaction(createDate(6, 2016), BigDecimal.ZERO, BigDecimal.ONE, "  Carrefour SRL  Romania"));
+        transactions.add(createTransaction(createDate(1, 2017), BigDecimal.ZERO, BigDecimal.ONE, "Auchan Romania SRL"));
+        transactions.add(createTransaction(createDate(5, 2018), BigDecimal.ZERO, BigDecimal.ONE, "Limited Petrom SA"));
+        transactions.add(createTransaction(createDate(5, 2018), BigDecimal.TEN, BigDecimal.ZERO, "Employer Company SRL"));
+        transactions.add(createTransaction(createDate(5, 2018), BigDecimal.TEN, BigDecimal.ZERO, "Auchan Romania"));
+        transactions.add(createTransaction(createDate(2, 2019), BigDecimal.TEN, BigDecimal.ZERO, "Employer Company SRL"));
+        transactions.add(createTransaction(createDate(2, 2016), BigDecimal.ZERO, BigDecimal.ONE, "  No Category..."));
+
+        return transactions;
+    }
+
+    public static void populateUserPrefsWithCompanyAndGroupData(final UserPreferences userPrefs) {
+        userPrefs.setCompanyDisplayName("  Carrefour SRL ", "Carrefour");
+        userPrefs.setCompanyDisplayName("Petrom SA", "Petrom");
+        userPrefs.setCompanyDisplayName("Auchan Romania", "Auchan");
+        userPrefs.setCompanyDisplayName("Employer Company SRL", "Employer");
+
+        userPrefs.appendDefinition("Food", createList("Auchan", "Carrefour"));
+        userPrefs.appendDefinition("Fuel", createList("Petrom"));
+        userPrefs.appendDefinition("Existential", createList("Food", "Fuel"));
+        userPrefs.appendDefinition("Revenues", createList("Employer"));
+    }
+
+    public static Date createDate(int month, int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.YEAR, year);
+        //depending on when these tests are ran, day int might be larger than supported by set month.
+        //so set a day that is supported by all months!
+        cal.set(Calendar.DAY_OF_MONTH, 2);
+        return cal.getTime();
+    }
+
+    public static Date createDate(int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        //depending on when these tests are ran, day int might be larger than supported by set month.
+        //so set a day that is supported by all months!
+        cal.set(Calendar.DAY_OF_MONTH, 2);
+        return cal.getTime();
+    }
+
+    public static BankTransaction createTransaction(final Date completed, final BigDecimal credit, final BigDecimal debit, final String description) {
+        return new BankTransaction(completed, completed, credit, debit, description, Arrays.asList("one", "two"));
+    }
+
     public File writeCSVFile(Bank bank, File csv, final String... records) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(csv))) {
             for (String record : records) {
@@ -74,15 +107,6 @@ public class TestUtilities {
         return csv;
     }
 
-    /**
-     * Creates a standard set of lines corresponding to 1 of each types of
-     * transactions for a specific bank. <br>
-     * These lines can be written to a text file, then attempted to read from a
-     * CSV file.
-     *
-     * @param bank bank
-     * @return list of string lines
-     */
     public List<String> constructSimplestPositiveLinesInput(final Bank bank) {
         switch (bank) {
             case BT:
@@ -131,5 +155,14 @@ public class TestUtilities {
         lines.add(third);
         lines.add("Pointless");
         return lines;
+    }
+
+    public static Collection<String> createList(final String... args) {
+        Collection<String> list = new ArrayList<>();
+        for (String arg : args) {
+            list.add(arg);
+        }
+
+        return list;
     }
 }

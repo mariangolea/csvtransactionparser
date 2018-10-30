@@ -12,21 +12,8 @@ import java.util.logging.Logger;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-/**
- * Uses apache's CSVBox to read the text from a csv file containing transactions
- * report from any supported banks.
- *
- * @author mariangolea@gmail.com
- */
 public final class BankCSVTransactionParser {
 
-    /**
-     * Parse contained bank transactions in associated csv file object.
-     *
-     * @param file has to represent the path to a csv file containing bank
-     * generated transactions report.
-     * @return parse response, may be null.
-     */
     public CsvFileParseResponse parseTransactions(final File file) {
         CsvFileParseResponse fileResponse = null;
         if (file == null) {
@@ -49,13 +36,6 @@ public final class BankCSVTransactionParser {
         return fileResponse;
     }
 
-    /**
-     * Reads all file content, each line of text as a string within the response
-     * list.
-     *
-     * @param csvFile csv file
-     * @return may be null;
-     */
     public List<String> loadCSVFile(final File csvFile) {
         final List<String> response = new ArrayList<>();
         try (BufferedReader csvReader = new BufferedReader(new FileReader(csvFile))) {
@@ -70,12 +50,6 @@ public final class BankCSVTransactionParser {
         return response;
     }
 
-    /**
-    Look ahead in all CSV file content and match strings against
-    all Bank instances relevant content header line fields.
-    @param fileLines
-    @return may return null if bank not supported yet
-     */
     public Bank recognizeBank(final List<String> fileLines) {
         int index;
         for (Bank bank : Bank.values()) {

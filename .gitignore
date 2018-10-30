@@ -1,6 +1,5 @@
-userprefs.properties
-companynames.properties
 /target
+/preferences
 
 # Compiled class file
 *.class

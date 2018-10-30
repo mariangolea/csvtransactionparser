@@ -1,13 +1,16 @@
 package com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit;
 
-import javafx.util.Pair;
-
 public class EditResult {
-    public final Pair<String,String> companyNameDefinition;
-    public final Pair<String,String> categoryNameDefinition;
+    public final String companyIdentifierString;
+    public final String companyDisplayName;
+    public final String categoryName;
+    public final String parentCategory;
 
-    public EditResult(Pair<String, String> companyNameDefinition, Pair<String, String> categoryNameDefinition) {
-        this.companyNameDefinition = companyNameDefinition;
-        this.categoryNameDefinition = categoryNameDefinition;
+    public EditResult(String companyIdentifierString, String companyName, String categoryName, String parentCategory) {
+        this.companyDisplayName = companyName;
+        this.categoryName = categoryName;
+        this.parentCategory = parentCategory;
+        this.companyIdentifierString = companyIdentifierString;
     }
+
 }

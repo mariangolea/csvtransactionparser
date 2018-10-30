@@ -27,11 +27,6 @@ public class BTParser extends AbstractBankParser {
     }
 
     @Override
-    public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
-        return super.parseCsvResponse(split, file); 
-    }
-
-    @Override
     public BankTransaction parseTransaction(List<String> toConsume) {
         Objects.requireNonNull(toConsume);
         if (toConsume.size() != 1 || toConsume.get(0).isEmpty()) {

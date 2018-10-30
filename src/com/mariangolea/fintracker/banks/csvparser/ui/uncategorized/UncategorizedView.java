@@ -3,7 +3,9 @@ package com.mariangolea.fintracker.banks.csvparser.ui.uncategorized;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.BankTransactionContextMenu;
 import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.BankTransactionEditHandler;
+import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import java.util.Collection;
+import java.util.Objects;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -25,9 +27,11 @@ public class UncategorizedView extends FlowPane {
     private Label responseLabel;
     private TextField searchField;
     private ListView<BankTransaction> listView;
+    private final UncategorizedTransactionApplyListener applyListener;
 
-    public UncategorizedView() {
+    public UncategorizedView(final UncategorizedTransactionApplyListener applyListener) {
         super(Orientation.VERTICAL);
+        this.applyListener = Objects.requireNonNull(applyListener);
         createComponents();
     }
 
@@ -53,7 +57,7 @@ public class UncategorizedView extends FlowPane {
             filtered.addListener(new UncategorizedTransactionListSelectionListener(listView, responseLabel));
         }
         if (editHandler == null) {
-            editHandler = new BankTransactionEditHandler();
+            editHandler = new BankTransactionEditHandler(applyListener);
         }
         if (contextMenu == null) {
             contextMenu = new BankTransactionContextMenu(editHandler);
@@ -87,8 +91,7 @@ public class UncategorizedView extends FlowPane {
 
             return renderer;
         });
-        ScrollPane scrollPane = new ScrollPane(listView);
-        return scrollPane;
+        return new ScrollPane(listView);
     }
 
     public void updateModel(Collection<BankTransaction> newModel) {

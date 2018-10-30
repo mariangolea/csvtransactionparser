@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
-import java.util.Arrays;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;

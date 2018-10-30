@@ -83,12 +83,4 @@ public class TransactionTableView extends TableView<TableViewData> {
         }
 
     }
-
-//    private class PropertyCellValueFactoryHack implements Callback<CellDataFeatures<TableViewData,SimpleObjectProperty<List<String>>>,ObservableValue<SimpleObjectProperty<List<String>>>> {
-//
-//        @Override
-//        public ObservableValue<SimpleObjectProperty<List<String>>> call(CellDataFeatures<TableViewData, SimpleObjectProperty<List<String>>> param) {
-//            return param.getValue().getAmountsProperty();
-//        }
-//    }
 }

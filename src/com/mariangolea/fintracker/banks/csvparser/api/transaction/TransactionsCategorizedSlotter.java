@@ -94,7 +94,7 @@ public class TransactionsCategorizedSlotter {
 
     protected final BankTransactionGroupInterface createSlottedGroup(final YearSlot timeSlot, final String category) {
         Collection<String> subCategories = userPrefs.getSubCategories(category);
-        if (subCategories == null) {
+        if (subCategories.isEmpty()) {
             return slottedCompanyGroups.get(new Pair(timeSlot, category));
         }
 
@@ -125,10 +125,7 @@ public class TransactionsCategorizedSlotter {
                 slottedCompanyGroupsLocal.put(key, group);
             }
 
-            int startingTransactionsNumber = group.getTransactionsNumber();
-            if (startingTransactionsNumber == 0) {
-                group.addTransaction(transaction);
-            }
+            group.addTransaction(transaction);
         });
 
         return slottedCompanyGroupsLocal;

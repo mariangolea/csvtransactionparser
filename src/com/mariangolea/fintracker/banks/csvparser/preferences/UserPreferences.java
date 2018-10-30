@@ -42,7 +42,7 @@ public class UserPreferences {
     public Collection<String> getSubCategories(final String categoryName) {
         Objects.requireNonNull(categoryName);
         CategoriesTree tree = categories.getCategory(categoryName);
-        if (tree == null){
+        if (tree == null) {
             return FXCollections.emptyObservableList();
         }
         return tree.getNodeSubCategoryNames();
@@ -58,6 +58,10 @@ public class UserPreferences {
     public String getCompanyDisplayName(final String company) {
         Objects.requireNonNull(company);
         return companyNames.get(company.toLowerCase());
+    }
+
+    public Collection<String> getCompanyDisplayNames() {
+        return FXCollections.observableSet(new HashSet<>(companyNames.values()));
     }
 
     public String getMatchingCategory(String companyDescriptionString) {
@@ -77,19 +81,19 @@ public class UserPreferences {
     public void appendDefinition(final String categoryName, final Collection<String> subCategories) {
         Objects.requireNonNull(categoryName);
         Objects.requireNonNull(subCategories);
-        
+
         CategoriesTree tree = categories.getCategory(categoryName);
-        if (tree == null){
+        if (tree == null) {
             categories.addSubCategories(Arrays.asList(categoryName));
             tree = categories.getCategory(categoryName);
         }
         final Collection<String> newCategories = FXCollections.observableArrayList();
         final Collection<CategoriesTree> existingCategories = FXCollections.observableArrayList();
-        subCategories.forEach(subcategory ->{
+        subCategories.forEach(subcategory -> {
             CategoriesTree existing = categories.getCategory(subcategory);
-            if (existing == null){
+            if (existing == null) {
                 newCategories.add(subcategory);
-            } else{
+            } else {
                 existingCategories.add(existing);
             }
         });

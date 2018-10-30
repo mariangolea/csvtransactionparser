@@ -2,95 +2,168 @@ package com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import java.util.Arrays;
+import java.util.Collection;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.util.Pair;
+import org.controlsfx.control.textfield.TextFields;
 
 public class BankTransactionEditDialog extends Dialog<EditResult> {
 
-    private TextField companyNameField;
-    private TextField companyNameSubstringField;
+    private TextArea companyDescriptionField;
+    private TextField companyNameIdentifierField;
     private TextField displayNameField;
-    private ComboBox<String> existingCategories;
-    private TextField newCategory;
+    private ComboBox<String> categoryPicker;
+    private ComboBox<String> parentCategoryPicker;
     private final UserPreferencesHandler handler = UserPreferencesHandler.INSTANCE;
+    private final ObservableList<String> originalCategories = FXCollections.observableArrayList();
+    private final static String INVALID_STYLE = "-fx-border-color: red";
 
     public BankTransactionEditDialog() {
         super();
         setTitle("Edit company name and apply to similar transactions");
+        createComponents();
 
-        //current transaction unedited data.
-        GridPane currentGroup = new GridPane();
-        Label companyNameFieldLabel = new Label("Company name text:");
-        companyNameField = new TextField();
-        companyNameField.setEditable(false);
-        companyNameField.setPrefWidth(Control.USE_COMPUTED_SIZE);
-        currentGroup.add(companyNameFieldLabel, 0, 0);
-        currentGroup.add(companyNameField, 1, 0);
-        currentGroup.setStyle("-fx-border-color: lavender");
+        TitledPane transactionDescriptionGroup = new TitledPane("Uneditable transaction data", companyDescriptionField);
+        transactionDescriptionGroup.autosize();
+        transactionDescriptionGroup.setCollapsible(false);
 
-        //user edit fields.
-        GridPane newAssociation = new GridPane();
-        newAssociation.setStyle("-fx-border-color: lavender");
-        Label companyNameSubstringLabel = new Label("Company name substring for similar transactions:");
-        companyNameSubstringField = new TextField();
-        Label displayNameLabel = new Label("Company display name:");
-        displayNameField = new TextField();
-        newAssociation.add(companyNameSubstringLabel, 0, 0);
-        newAssociation.add(companyNameSubstringField, 1, 0);
-        newAssociation.add(displayNameLabel, 0, 1);
-        newAssociation.add(displayNameField, 1, 1);
-        existingCategories = new ComboBox<>();
-        newCategory = new TextField();
-        newAssociation.add(existingCategories, 0, 2);
-        newAssociation.add(newCategory, 0, 3);
+        Label first = new Label("Company name substring:", companyNameIdentifierField);
+        Label second = new Label("Company display name:", displayNameField);
+        FlowPane group = createFlowPane(Orientation.VERTICAL, first, second);
+        TitledPane companyNameGroup = new TitledPane("Company name picker", group);
+        companyNameGroup.setCollapsible(false);
 
-        //main Content
-        FlowPane main = new FlowPane();
-        main.getChildren().addAll(currentGroup, newAssociation);
+        first = new Label("Pick a category name", categoryPicker);
+        second = new Label("Category's parent category if needed", parentCategoryPicker);
+        group = createFlowPane(Orientation.VERTICAL, first, second);
+        TitledPane categoryGroup = new TitledPane("Category picker", group);
+        categoryGroup.setCollapsible(false);
 
         ButtonType apply = new ButtonType("Apply", ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(apply, ButtonType.CANCEL);
+
+        GridPane main = new GridPane();
+        main.add(transactionDescriptionGroup, 0, 0);
+        main.add(companyNameGroup, 0, 1);
+        main.add(categoryGroup, 0, 2);
+
         getDialogPane().setContent(main);
-        Platform.runLater(() -> companyNameSubstringField.requestFocus());
+
+        Platform.runLater(() -> companyNameIdentifierField.requestFocus());
         setResultConverter(dialogButton -> {
             if (dialogButton == apply) {
                 handler.storePreferences();
-                Pair<String, String> company = new Pair<>(companyNameSubstringField.getText(), displayNameField.getText());
-                Pair<String, String> category = new Pair<>(getCategoryName(), displayNameField.getText());
-                return new EditResult(company, category);
+                return new EditResult(
+                        companyNameIdentifierField.getText(), 
+                        displayNameField.getText(), 
+                        categoryPicker.getValue(), 
+                        parentCategoryPicker.getValue());
             }
             return null;
+        });
+
+        final Button applyButton = (Button) getDialogPane().lookupButton(apply);
+        applyButton.addEventFilter(ActionEvent.ACTION, ae -> {
+            if (!isValid()) {
+                ae.consume();
+            }
         });
     }
 
     public void setBankTransaction(final BankTransaction transaction) {
+        companyDescriptionField.clear();
+        categoryPicker.setStyle(null);
+        displayNameField.setStyle(null);
+        parentCategoryPicker.setStyle(null);
+
         String categoryName = transaction.description;
-        companyNameField.setText(categoryName);
-        companyNameField.setPrefColumnCount(categoryName.length());
-        companyNameSubstringField.setPromptText("Company name substring to apply when looking for ismilar transactions");
+        splitLines(categoryName);
+        companyNameIdentifierField.setPromptText("Company name substring to apply when looking for ismilar transactions");
         final String substring = handler.getPreferences().getCompanyIdentifierString(categoryName);
-        companyNameSubstringField.setText(substring);
+        companyNameIdentifierField.setText(substring);
         displayNameField.setPromptText("Short company name for all other similar company descriptions.");
-        ObservableList<String> categories = FXCollections.observableArrayList(UserPreferencesHandler.INSTANCE.getPreferences().getUserDefinedCategoryNames());
-        existingCategories.setItems(categories);
-        newCategory.setPromptText("Type a category name if no existing one is of interest.");
+        originalCategories.clear();
+        originalCategories.addAll(UserPreferencesHandler.INSTANCE.getPreferences().getUserDefinedCategoryNames());
+        Collection<String> companyDisplayNames = UserPreferencesHandler.INSTANCE.getPreferences().getCompanyDisplayNames();
+        originalCategories.removeAll(companyDisplayNames);
+        categoryPicker.setItems(originalCategories);
+        parentCategoryPicker.setItems(originalCategories);
+        TextFields.bindAutoCompletion(categoryPicker.getEditor(), categoryPicker.getItems());
+        TextFields.bindAutoCompletion(parentCategoryPicker.getEditor(), parentCategoryPicker.getItems());
     }
 
-    private String getCategoryName() {
-        if (newCategory.getText().isEmpty()) {
-            return existingCategories.getValue();
+    private boolean isValid() {
+        String companyName = displayNameField.getText();
+        String category = categoryPicker.getValue();
+        String parentcategory = parentCategoryPicker.getValue();
+
+        if (companyName == null || companyName.isEmpty()) {
+            displayNameField.setStyle(INVALID_STYLE);
+            return false;
         }
-        return newCategory.getText();
+        displayNameField.setStyle(null);
+
+        if (category == null || category.isEmpty()) {
+            categoryPicker.setStyle(INVALID_STYLE);
+            return false;
+        }
+        categoryPicker.setStyle(null);
+        if (parentcategory == null || parentcategory.isEmpty()) {
+            parentCategoryPicker.setStyle(INVALID_STYLE);
+            return false;
+        }
+        parentCategoryPicker.setStyle(null);
+
+        return true;
+    }
+
+    protected final void createComponents() {
+        companyDescriptionField = new TextArea();
+        companyDescriptionField.setEditable(false);
+        companyDescriptionField.autosize();
+
+        companyNameIdentifierField = new TextField();
+        displayNameField = new TextField();
+
+        categoryPicker = new ComboBox<>();
+        categoryPicker.setEditable(true);
+        categoryPicker.setTooltip(new Tooltip("Pick a category for this company name"));
+
+        parentCategoryPicker = new ComboBox<>();
+        parentCategoryPicker.setEditable(true);
+        parentCategoryPicker.setTooltip(new Tooltip("Pick a parent category for selected category, or leave blank"));
+    }
+
+    private FlowPane createFlowPane(Orientation orientation, Node... controls) {
+        final FlowPane flow = new FlowPane(orientation);
+        flow.getChildren().addAll(Arrays.asList(controls));
+        return flow;
+    }
+
+    private void splitLines(String text) {
+        if (text.length() <= 50) {
+            companyDescriptionField.appendText(text);
+        } else {
+            companyDescriptionField.appendText(text.substring(0, 50));
+            companyDescriptionField.appendText("\n");
+            splitLines(text.substring(50));
+        }
     }
 }

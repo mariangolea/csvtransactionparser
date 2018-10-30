@@ -47,8 +47,6 @@ public class BankTransactionDefaultGroup extends BankTransactionCompanyGroup {
             return number;
         }
     }
-    
-    
 
     @Override
     public int getGroupsNumber() {
@@ -56,12 +54,10 @@ public class BankTransactionDefaultGroup extends BankTransactionCompanyGroup {
     }
 
     @Override
-    public String toString() {
-        return super.toString();
-    }
-
-    @Override
     public boolean equals(Object o) {
+        if (!super.equals(o)){
+            return false;
+        }
         if (this == o) {
             return true;
         }
@@ -69,8 +65,7 @@ public class BankTransactionDefaultGroup extends BankTransactionCompanyGroup {
             return false;
         }
         BankTransactionDefaultGroup that = (BankTransactionDefaultGroup) o;
-        return super.equals(that)
-                && Objects.equals(groups, that.groups);
+        return Objects.equals(groups, that.groups);
     }
 
     @Override

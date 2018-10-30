@@ -2,7 +2,6 @@ package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -10,6 +9,7 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
 public class UserPreferencesHandlerTest {
 
@@ -30,7 +30,7 @@ public class UserPreferencesHandlerTest {
         handler.deletePreferences();
         UserPreferences prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
-        prefs.appendDefinition("category1", Arrays.asList("1", "2"));
+        prefs.appendDefinition("category1", TestUtilities.createList("1", "2"));
         prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.

@@ -16,11 +16,11 @@ public class TableViewData {
     public final SimpleObjectProperty<String> timeSlotString;
     public final SimpleObjectProperty<List<String>> amountStrings;
     public final int columns;
-    private final static Calendar CAL = Calendar.getInstance(Bank.ING.locale);
-    private final static DateFormat FORMAT = new SimpleDateFormat("MMMM-yyyy", Bank.ING.locale);
+    private final Calendar cal = Calendar.getInstance(Bank.ING.locale);
+    private final DateFormat format = new SimpleDateFormat("MMMM-yyyy", Bank.ING.locale);
 
     public TableViewData(final YearSlot timeSlot, final Collection<BankTransactionGroupInterface> groups) {
-        this.timeSlotString = new SimpleObjectProperty<>(timeSlot.toString(CAL, FORMAT));
+        this.timeSlotString = new SimpleObjectProperty<>(timeSlot.toString(cal, format));
         this.amountStrings = new SimpleObjectProperty<>();
         final List<String> amounts = new ArrayList<>();
         groups.forEach(group -> {

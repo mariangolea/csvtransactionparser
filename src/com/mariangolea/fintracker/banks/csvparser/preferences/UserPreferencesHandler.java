@@ -172,7 +172,9 @@ public enum UserPreferencesHandler {
         Properties properties = new Properties();
         try {
             if (!propertiesFile.exists()) {
-                propertiesFile.createNewFile();
+                if (!propertiesFile.createNewFile()){
+                    return properties;
+                }
             }
             try (FileReader reader = new FileReader(propertiesFile)) {
                 properties.load(reader);

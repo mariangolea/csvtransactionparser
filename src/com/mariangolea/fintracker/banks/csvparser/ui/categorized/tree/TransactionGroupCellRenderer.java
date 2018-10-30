@@ -11,9 +11,6 @@ public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupI
 
     UserPreferencesHandler userPrefsHandler = UserPreferencesHandler.INSTANCE;
 
-    public TransactionGroupCellRenderer() {
-    }
-
     @Override
     protected void updateItem(BankTransactionGroupInterface value, boolean empty) {
         super.updateItem(value, empty);
@@ -24,20 +21,5 @@ public class TransactionGroupCellRenderer extends TreeCell<BankTransactionGroupI
 
         setText(value.toString());
         setStyle("-fx-background-color: lavender; selected: skyblue");
-    }
-
-    private class UserPrefsChangeListener implements MapChangeListener<String, Collection<String>> {
-
-        BankTransactionGroupInterface value;
-
-        UserPrefsChangeListener(BankTransactionGroupInterface value) {
-            this.value = value;
-        }
-
-        @Override
-        public void onChanged(Change<? extends String, ? extends Collection<String>> change) {
-            updateItem(value, false);
-        }
-
     }
 }

@@ -8,6 +8,7 @@ import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
 import com.mariangolea.fintracker.banks.csvparser.ui.categorized.table.TransactionTableView;
 import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.UncategorizedView;
+import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +38,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class CsvParserUI extends Application {
+public class CsvParserUI extends Application implements UncategorizedTransactionApplyListener {
 
     protected TextFlow feedbackPane;
     protected final Collection<BankTransaction> model = FXCollections.observableArrayList();
@@ -99,6 +100,11 @@ public class CsvParserUI extends Application {
         primaryStage.show();
     }
 
+    @Override
+    public void transactionEditApplyed() {
+        updateView();
+    }
+    
     protected void loadData(final List<CsvFileParseResponse> parsedTransactions) {
         if (parsedTransactions != null) {
             parsedTransactions.forEach(csvFileResponse -> {
@@ -132,7 +138,7 @@ public class CsvParserUI extends Application {
 
     public void createUncategorizedView() {
         if (uncategorizedView == null) {
-            uncategorizedView = new UncategorizedView();
+            uncategorizedView = new UncategorizedView(this);
         }
     }
 

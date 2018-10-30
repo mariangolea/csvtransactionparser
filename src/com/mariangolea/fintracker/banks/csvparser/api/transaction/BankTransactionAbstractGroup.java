@@ -27,7 +27,7 @@ public abstract class BankTransactionAbstractGroup implements BankTransactionGro
         if (this == o) {
             return true;
         }
-        if (o == null || !(o instanceof BankTransactionAbstractGroup)) {
+        if (!(o instanceof BankTransactionAbstractGroup)) {
             return false;
         }
         BankTransactionAbstractGroup that = (BankTransactionAbstractGroup) o;

@@ -6,6 +6,8 @@ import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
 
 public class BankCSVParserFactory {
     
+    private BankCSVParserFactory(){}
+    
     public static AbstractBankParser getInstance(final Bank bank) {
         if (bank == null){
             return null;

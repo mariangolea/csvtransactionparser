@@ -6,8 +6,7 @@ import javafx.application.Application;
 public class BankCsvReportsParser {
 
     public CsvParserUI initApplication(){
-        CsvParserUI application = new CsvParserUI();
-        return application;
+        return new CsvParserUI();
     }
     
     public static void main(String[] args) {

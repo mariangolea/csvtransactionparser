@@ -30,10 +30,10 @@ public class INGParser extends AbstractBankParser {
         Reader in;
         CSVRecord record;
         String test;
-        if (toConsume == null || toConsume.isEmpty()){
+        if (toConsume == null || toConsume.isEmpty()) {
             return -1;
         }
-        
+
         for (int i = 1; i < toConsume.size(); i++) {
             test = toConsume.get(i);
             if (test == null || test.isEmpty()) {
@@ -61,43 +61,15 @@ public class INGParser extends AbstractBankParser {
     @Override
     public BankTransaction parseTransaction(List<String> toConsume) {
         Objects.requireNonNull(toConsume);
-        /**
-           Data,,,Detalii tranzactie,,Debit,Credit
-         * 07 septembrie 2018,,,Transfer Home'Bank,,"4.400,00",
-         * ,,,Beneficiar: Marian Golea,,,
-         * ,,,In contul: RO52BTRLRONVGLD120898001,,,
-           ,,,Banca: BTRA CENTRALA,,,
-         * ,,,Detalii: acoperire card credit BT,,,
-         * ,,,Referinta: 233640525,,,
-         */
         CSVRecord record = parseSingleLine(toConsume.get(0));
-
-        if (record == null || record.size() < 7) {
+        if (record == null) {
             return null;
         }
 
-        String temp = record.get(0);
-        Date completedDate = parseCompletedDate(temp.trim());
-        if (completedDate == null){
-            return null;
-        }
-        Date startedDate = completedDate;
+        Date completedDate = parseCompletedDate(record.get(0));
         String desc = record.get(3);
-        if (desc == null || desc.isEmpty()){
-            return null;
-        }
-        
-        temp = record.get(5);
-        BigDecimal debitAmount =  BigDecimal.ZERO;
-        if (temp != null && !temp.trim().isEmpty()){
-            debitAmount = parseAmount(temp);
-        }
-        
-        temp = record.get(6);
-        BigDecimal creditAmount =  BigDecimal.ZERO;
-        if (temp != null && !temp.trim().isEmpty()){
-            creditAmount = parseAmount(temp);
-        }
+        BigDecimal debitAmount = parseAmount(record.get(5));
+        BigDecimal creditAmount = parseAmount(record.get(6));
         if (creditAmount == BigDecimal.ZERO && debitAmount == BigDecimal.ZERO) {
             return null;
         }
@@ -108,14 +80,10 @@ public class INGParser extends AbstractBankParser {
             for (int i = 0; i < detailsLinesNumber; i++) {
                 record = parseSingleLine(toConsume.get(i + 1));
                 if (record != null && record.size() > 3) {
-                    temp = record.get(3);
-                    if (temp != null && !temp.isEmpty()) {
-                        details += temp + ",";
-                    }
+                    details += record.get(3) + ",";
                 }
             }
         }
-        return createTransaction(startedDate, completedDate, creditAmount.abs(), debitAmount.abs(), desc + details, toConsume);
+        return createTransaction(completedDate, completedDate, creditAmount.abs(), debitAmount.abs(), desc + details, toConsume);
     }
-
 }

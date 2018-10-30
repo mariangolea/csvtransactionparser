@@ -104,6 +104,71 @@ public abstract class AbstractBankParser {
         return new CsvFileParseResponse(this, expectedTransactions.intValue(), foundTransactionsNumber, file, result, unrecognizedStrings);
     }
 
+    public Date parseCompletedDate(final String dateString) {
+        return parseDate(dateString, parsedCompletedDates, completedDateFormat);
+    }
+
+    public Date parseStartDate(final String dateString) {
+        return parseDate(dateString, parsedStartedDates, startDateFormat);
+    }
+
+    public BigDecimal parseAmount(final String amountString) {
+        if (amountString == null || amountString.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        final String preparedString = amountString.trim();
+        BigDecimal amount = parsedAmounts.get(preparedString);
+        if (amount != null) {
+            return amount;
+        }
+
+        try {
+            Number attempt = numberFormat.parse(preparedString);
+            if (null != attempt) {
+                amount = new BigDecimal(attempt.toString());
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if (amount == null) {
+            amount = BigDecimal.ZERO;
+        }
+        parsedAmounts.put(preparedString, amount);
+        return amount;
+    }
+
+    public final CSVRecord parseSingleLine(final String singleLine) {
+        Reader in = new StringReader(singleLine);
+        CSVRecord record = null;
+        try {
+            CSVParser parser = new CSVParser(in, CSVFormat.EXCEL);
+            List<CSVRecord> list = parser.getRecords();
+            record = list.get(0);
+            if (!mandatoryChecks(record)) {
+                return null;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(AbstractBankParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return record;
+    }
+
+    public BankTransaction createTransaction(final Date startDate, final Date completedDate,
+            BigDecimal creditAmount, BigDecimal debitAmount, final String description, final List<String> csvContent) {
+        return new BankTransaction(startDate, completedDate, creditAmount, debitAmount, description,
+                csvContent);
+    }
+
+    private boolean mandatoryChecks(final CSVRecord record) {
+        if (record == null || bank.mandatoryRecordsPerLine > record.size()) {
+            return false;
+        }
+        return bank.mandatoryCSVRecordIndexes.stream().map((index) -> record.get(index)).noneMatch((temp) -> (temp == null));
+    }
+
     private BigDecimal searchTransactionsNumber(int transactionsIndex, List<String> toConsume) {
         BigDecimal expectedTransactions = BigDecimal.ZERO;
         if (!bank.transactionsNumberLabel.isEmpty()) {
@@ -135,79 +200,26 @@ public abstract class AbstractBankParser {
         return -1;
     }
 
-    public Date parseCompletedDate(final String dateString) {
-        Date completedDate = dateString == null ? null : parsedCompletedDates.get(dateString);
-        if (completedDate != null) {
-            return completedDate;
-        }
-        try {
-            completedDate = completedDateFormat.parse(dateString);
-        } catch (ParseException ex) {
-            Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
+    private Date parseDate(final String dateString, final Map<String, Date> cache, final DateFormat dateFormat) {
+        if (dateString == null || dateString.isEmpty()) {
+            return null;
         }
 
-        if (completedDate != null) {
-            parsedCompletedDates.put(dateString, completedDate);
-        }
-        return completedDate;
-    }
-
-    public Date parseStartDate(final String dateString) {
-        Date startedDate = dateString == null ? null : parsedStartedDates.get(dateString);
+        final String prepared = dateString.trim();
+        Date startedDate = cache.get(prepared);
         if (startedDate != null) {
             return startedDate;
         }
         try {
-            startedDate = startDateFormat.parse(dateString);
+            startedDate = dateFormat.parse(prepared);
         } catch (ParseException ex) {
-            Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AbstractBankParser.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if (startedDate != null) {
-            parsedStartedDates.put(dateString, startedDate);
+            cache.put(prepared, startedDate);
         }
         return startedDate;
     }
 
-    public BigDecimal parseAmount(final String amountString) {
-        BigDecimal amount = amountString == null ? null : parsedAmounts.get(amountString);
-        if (amount != null) {
-            return amount;
-        }
-
-        try {
-            Number attempt = numberFormat.parse(amountString);
-            if (null != attempt) {
-                amount = new BigDecimal(attempt.toString());
-            }
-        } catch (ParseException ex) {
-            Logger.getLogger(INGParser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (amount == null) {
-            amount = BigDecimal.ZERO;
-        }
-        parsedAmounts.put(amountString, amount);
-        return amount;
-    }
-
-    public final CSVRecord parseSingleLine(String singleLine) {
-        Reader in = new StringReader(singleLine);
-        CSVRecord record = null;
-        try {
-            CSVParser parser = new CSVParser(in, CSVFormat.EXCEL);
-            List<CSVRecord> list = parser.getRecords();
-            record = list.get(0);
-        } catch (IOException ex) {
-            Logger.getLogger(AbstractBankParser.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return record;
-    }
-
-    public BankTransaction createTransaction(final Date startDate, final Date completedDate,
-            BigDecimal creditAmount, BigDecimal debitAmount, final String description, final List<String> csvContent) {
-        return new BankTransaction(startDate, completedDate, creditAmount, debitAmount, description,
-                csvContent);
-    }
 }

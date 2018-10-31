@@ -1,10 +1,10 @@
 package test.com.mariangolea.fintracker.banks.csvparser.parsers;
 
-import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import static com.mariangolea.fintracker.banks.csvparser.api.parser.AbstractBankParser.ROMANIAN_LOCALE;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
-import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.INGParser;
+import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.ing.INGParser;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -46,7 +46,7 @@ public class INGParserTest extends INGParser{
 
         output = parseStartDate("2018-08-12");
         assertTrue(output != null);
-        Calendar calendar = Calendar.getInstance(Bank.ING.locale);
+        Calendar calendar = Calendar.getInstance(ROMANIAN_LOCALE);
         calendar.setTime(output);
         assertTrue(calendar.get(Calendar.DAY_OF_MONTH) == 12);
         assertTrue(calendar.get(Calendar.MONTH) == 7);
@@ -65,11 +65,11 @@ public class INGParserTest extends INGParser{
 
     @Test
     public void testSupportedTransactionsINGRoundTrip() throws IOException {
-        String[] mockData = utils.constructMockCSVContentForBank(Bank.ING);
-        File csvFile = utils.writeCSVFile(Bank.ING, folder.newFile("test.csv"), mockData);
+        String[] mockData = utils.constructMockCSVContentForING();
+        File csvFile = utils.writeCSVFile(folder.newFile("test.csv"), mockData);
         assertTrue(null != csvFile);
 
-        CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(csvFile);
+        CsvFileParseResponse response = new BankTransactionsParser().parseTransactions(csvFile);
         assertTrue(null != response);
 
         // ING CSV files are dumber than BT ones. They end with a signature text which is irrelevant, but no way of taking it out programtically...

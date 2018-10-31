@@ -2,13 +2,14 @@ package test.com.mariangolea.fintracker.banks.csvparser.api;
 
 import com.mariangolea.fintracker.banks.csvparser.api.filters.MonthSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.filters.YearSlot;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesHandlerInterface;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.TransactionsCategorizedSlotter;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
+import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsCategorizedSlotter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,16 +17,18 @@ import java.util.Map;
 import javafx.util.Pair;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsCategorizerTest {
-
-    private UserPreferences userPrefs;
+    
+    private UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
+    private final UserPreferencesHandlerInterface userPrefsHandler= factory.getUserPreferencesHandler();
+    private UserPreferencesInterface userPrefs;
     private Collection<BankTransaction> transactions;
 
     @Rule
@@ -33,7 +36,7 @@ public class TransactionsCategorizerTest {
 
     @Before
     public void init() {
-        userPrefs = UserPreferencesHandler.INSTANCE.getPreferences();
+        userPrefs = userPrefsHandler.getPreferences();
         TestUtilities.populateUserPrefsWithCompanyAndGroupData(userPrefs);
         transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefs);
     }
@@ -154,7 +157,7 @@ public class TransactionsCategorizerTest {
 
     private class Extension extends TransactionsCategorizedSlotter {
 
-        public Extension(final Collection<BankTransaction> transactions, final UserPreferences userPrefs) {
+        public Extension(final Collection<BankTransaction> transactions, final UserPreferencesInterface userPrefs) {
             super(transactions, userPrefs);
         }
 

@@ -11,11 +11,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.mariangolea.fintracker.banks.csvparser.api.Bank;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
-import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.api.parser.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
 import java.math.BigDecimal;
+import java.util.Locale;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
@@ -33,7 +34,7 @@ public class BTParserTest extends BTParser {
 
         output = parseCompletedDate("2018-08-12");
         assertTrue(output != null);
-        Calendar calendar = Calendar.getInstance(Bank.BT.locale);
+        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTime(output);
         assertTrue(calendar.get(Calendar.DAY_OF_MONTH) == 12);
         assertTrue(calendar.get(Calendar.MONTH) == 7);
@@ -47,7 +48,7 @@ public class BTParserTest extends BTParser {
 
         output = parseStartDate("2018-08-12");
         assertTrue(output != null);
-        Calendar calendar = Calendar.getInstance(Bank.BT.locale);
+        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTime(output);
         assertTrue(calendar.get(Calendar.DAY_OF_MONTH) == 12);
         assertTrue(calendar.get(Calendar.MONTH) == 7);
@@ -66,11 +67,11 @@ public class BTParserTest extends BTParser {
 
     @Test
     public void testSupportedTransactionsBTRoundTrip() throws IOException {
-        String[] mockData = utils.constructMockCSVContentForBank(Bank.BT);
-        File csvFile = utils.writeCSVFile(Bank.BT, folder.newFile("test.csv"), mockData);
+        String[] mockData = utils.constructMockCSVContentForBT();
+        File csvFile = utils.writeCSVFile(folder.newFile("test.csv"), mockData);
         assertTrue(null != csvFile);
 
-        CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(csvFile);
+        CsvFileParseResponse response = new BankTransactionsParser().parseTransactions(csvFile);
         assertTrue(null != response);
 
         // we expect a unrecognized string.

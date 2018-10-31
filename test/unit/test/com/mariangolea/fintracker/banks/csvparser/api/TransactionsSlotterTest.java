@@ -2,10 +2,11 @@ package test.com.mariangolea.fintracker.banks.csvparser.api;
 
 import com.mariangolea.fintracker.banks.csvparser.api.filters.MonthSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.filters.YearSlot;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesHandlerInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.TransactionsSlotter;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsSlotter;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandler;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -15,6 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsSlotterTest {
 
@@ -22,10 +24,12 @@ public class TransactionsSlotterTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
+    private UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
+    private final UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
 
     @Before
     public void init() {
-        transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(UserPreferencesHandler.INSTANCE.getPreferences());
+        transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefsHandler.getPreferences());
     }
 
     @Test

@@ -3,7 +3,7 @@ package test.com.mariangolea.fintracker.banks.csvparser.api;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionDefaultGroup;
+import com.mariangolea.fintracker.banks.csvparser.transaction.BankTransactionDefaultGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import java.math.BigDecimal;
 import java.util.Arrays;

@@ -1,7 +1,7 @@
 package test.com.mariangolea.fintracker.banks.csvparser.ui;
 
-import com.mariangolea.fintracker.banks.csvparser.BankCsvReportsParser;
-import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import com.mariangolea.fintracker.banks.csvparser.impl.BankCsvReportsParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.CsvParserUI;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.rules.TemporaryFolder;
-
-import com.mariangolea.fintracker.banks.csvparser.api.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.ing.INGParser;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -21,18 +20,27 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import org.apache.commons.csv.CSVFormat;
+import org.junit.rules.TemporaryFolder;
 
 public class TestUtilities {
 
-    public TemporaryFolder folder = new TemporaryFolder();
-
-    public String[] constructMockCSVContentForBank(Bank bank) {
+    public static String createFolder(TemporaryFolder folder, final String folderName){
+        try {
+            return folder.newFolder("test").getAbsolutePath();
+        } catch (IOException ex) {
+            Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    public String[] constructMockCSVContentForING() {
+        INGParser parser = new INGParser();
         List<String> texts = new ArrayList<>();
         texts.add("Gibberish");
         texts.add("More Gibberish");
-        texts.add(bank.transactionsNumberLabel + "," + 2 + " Tranzactii.");
-        texts.add(bank.relevantContentHeaderLine);
-        List<String> mockData = constructSimplestPositiveLinesInput(bank);
+        texts.add(parser.bank.transactionsNumberLabel + "," + 2 + " Tranzactii.");
+        texts.add(parser.bank.relevantContentHeaderLine);
+        List<String> mockData = constructSimplestPositiveLinesInputING();
         for (String line : mockData) {
             texts.add(line);
         }
@@ -41,7 +49,23 @@ public class TestUtilities {
         return texts.toArray(new String[texts.size()]);
     }
 
-    public static Collection<BankTransaction> constructMockDefaultTransactionsForCategorizer(final UserPreferences userPrefs) {
+    public String[] constructMockCSVContentForBT() {
+        BTParser parser = new BTParser();
+        List<String> texts = new ArrayList<>();
+        texts.add("Gibberish");
+        texts.add("More Gibberish");
+        texts.add(parser.bank.transactionsNumberLabel + "," + 2 + " Tranzactii.");
+        texts.add(parser.bank.relevantContentHeaderLine);
+        List<String> mockData = constructSimplestPositiveLinesInputBT();
+        for (String line : mockData) {
+            texts.add(line);
+        }
+        texts.add("Gibberish");
+
+        return texts.toArray(new String[texts.size()]);
+    }
+
+    public static Collection<BankTransaction> constructMockDefaultTransactionsForCategorizer(final UserPreferencesInterface userPrefs) {
         Collection<BankTransaction> transactions = new ArrayList<>();
         populateUserPrefsWithCompanyAndGroupData(userPrefs);
 
@@ -56,7 +80,7 @@ public class TestUtilities {
         return transactions;
     }
 
-    public static void populateUserPrefsWithCompanyAndGroupData(final UserPreferences userPrefs) {
+    public static void populateUserPrefsWithCompanyAndGroupData(final UserPreferencesInterface userPrefs) {
         userPrefs.setCompanyDisplayName("  Carrefour SRL ", "Carrefour");
         userPrefs.setCompanyDisplayName("Petrom SA", "Petrom");
         userPrefs.setCompanyDisplayName("Auchan Romania", "Auchan");
@@ -91,7 +115,7 @@ public class TestUtilities {
         return new BankTransaction(completed, completed, credit, debit, description, Arrays.asList("one", "two"));
     }
 
-    public File writeCSVFile(Bank bank, File csv, final String... records) {
+    public File writeCSVFile(File csv, final String... records) {
         try (BufferedWriter printer = new BufferedWriter(new FileWriter(csv))) {
             for (String record : records) {
                 printer.write(record);
@@ -105,17 +129,6 @@ public class TestUtilities {
         }
 
         return csv;
-    }
-
-    public List<String> constructSimplestPositiveLinesInput(final Bank bank) {
-        switch (bank) {
-            case BT:
-                return constructSimplestPositiveLinesInputBT();
-            case ING:
-                return constructSimplestPositiveLinesInputING();
-            default:
-                throw new RuntimeException("No test support for chosen bank: " + bank.name());
-        }
     }
 
     private List<String> constructSimplestPositiveLinesInputBT() {

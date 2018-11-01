@@ -8,7 +8,7 @@ import java.util.Date;
 import org.junit.Test;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.parsers.impl.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
 import java.math.BigDecimal;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 

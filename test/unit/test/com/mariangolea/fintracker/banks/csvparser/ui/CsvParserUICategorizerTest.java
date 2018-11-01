@@ -10,12 +10,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.mariangolea.fintracker.banks.csvparser.api.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
-import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVParserFactory;
-import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
-import com.mariangolea.fintracker.banks.csvparser.ui.CsvParserUI;
+import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.CsvParserUI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +45,9 @@ public class CsvParserUICategorizerTest extends FXUITest {
         }
 
         Platform.setImplicitExit(false);
-        File mockCSV = utils.writeCSVFile(Bank.BT, folder.newFile("testUI.csv"), utils.constructMockCSVContentForBank(Bank.BT));
+        File mockCSV = utils.writeCSVFile(folder.newFile("testUI.csv"), utils.constructMockCSVContentForBT());
         assertTrue(mockCSV != null);
-        CsvFileParseResponse response = new BankCSVTransactionParser().parseTransactions(mockCSV);
+        CsvFileParseResponse response = new BankTransactionsParser().parseTransactions(mockCSV);
         // tests in other files ensure response integrity, no need to do that in here.
         LocalUI local = new LocalUI();
         local.createTableView();
@@ -67,7 +66,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
             local.getFeedbackPane().getChildren().addListener(new LocalListChangeListener(latch));
         });
         int initialParsedCSVFiles = local.getParsedCsvFiles().size();
-        final File mockCSV2 = utils.writeCSVFile(Bank.ING, folder.newFile("test.csv"), utils.constructMockCSVContentForBank(Bank.ING));
+        final File mockCSV2 = utils.writeCSVFile(folder.newFile("test.csv"), utils.constructMockCSVContentForBT());
         Platform.runLater(() -> {
             local.parseUserSelectedCSVFiles(Arrays.asList(mockCSV2));
         });
@@ -107,19 +106,19 @@ public class CsvParserUICategorizerTest extends FXUITest {
         assertTrue(local.appendReportMessage(""));
 
         local.getFeedbackPane().getChildren().clear();
-        CsvFileParseResponse res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 1, 1, new File("mock"), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        CsvFileParseResponse res = new CsvFileParseResponse(new BTParser(), 1, 1, new File("mock"), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
         local.appendReportText(res);
         assertTrue(local.getFeedbackPane().getChildren().size() == 4);
         local.getFeedbackPane().getChildren().clear();
-        res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 1, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
+        res = new CsvFileParseResponse(new BTParser(), 1, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
         local.appendReportText(res);
         assertTrue(local.getFeedbackPane().getChildren().size() == 4);
         local.getFeedbackPane().getChildren().clear();
-        res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 0, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
+        res = new CsvFileParseResponse(new BTParser(), 0, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
         local.appendReportText(res);
         assertTrue(local.getFeedbackPane().getChildren().size() == 4);
         local.getFeedbackPane().getChildren().clear();
-        res = new CsvFileParseResponse(BankCSVParserFactory.getInstance(Bank.BT), 1, 0, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
+        res = new CsvFileParseResponse(new BTParser(), 1, 0, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
         local.appendReportText(res);
         assertTrue(local.getFeedbackPane().getChildren().size() == 4);
     }
@@ -147,6 +146,10 @@ public class CsvParserUICategorizerTest extends FXUITest {
      */
     private class LocalUI extends CsvParserUI {
 
+        public LocalUI() {
+            super();
+        }
+
         @Override
         protected void loadData(List<CsvFileParseResponse> parsedTransactions) {
             super.loadData(parsedTransactions);
@@ -154,28 +157,26 @@ public class CsvParserUICategorizerTest extends FXUITest {
 
         @Override
         public MenuBar createMenu() {
-            return super.createMenu(); 
+            return super.createMenu();
         }
 
         @Override
         protected ScrollPane createFeedbackView() {
-            return super.createFeedbackView(); 
+            return super.createFeedbackView();
         }
 
         @Override
         protected void createTableView() {
-            super.createTableView(); 
+            super.createTableView();
         }
 
-        
-        
         public TextFlow getFeedbackPane() {
             return feedbackPane;
         }
 
         @Override
         protected void parseUserSelectedCSVFiles(List<File> csvFiles) {
-            super.parseUserSelectedCSVFiles(csvFiles); //To change body of generated methods, choose Tools | Templates.
+            super.parseUserSelectedCSVFiles(csvFiles);
         }
 
         public Collection<BankTransaction> getModel() {
@@ -193,22 +194,22 @@ public class CsvParserUICategorizerTest extends FXUITest {
 
         @Override
         protected void appendReportText(CsvFileParseResponse fileResponse) {
-            super.appendReportText(fileResponse); //To change body of generated methods, choose Tools | Templates.
+            super.appendReportText(fileResponse);
         }
 
         @Override
         protected boolean appendReportMessage(String message) {
-            return super.appendReportMessage(message); //To change body of generated methods, choose Tools | Templates.
+            return super.appendReportMessage(message);
         }
 
         @Override
         protected boolean appendHyperlinkToFile(String pre, File sourceFile, String post) {
-            return super.appendHyperlinkToFile(pre, sourceFile, post); //To change body of generated methods, choose Tools | Templates.
+            return super.appendHyperlinkToFile(pre, sourceFile, post);
         }
 
         @Override
         protected void createUncategorizedView() {
-            super.createUncategorizedView(); //To change body of generated methods, choose Tools | Templates.
+            super.createUncategorizedView();
         }
     }
 }

@@ -9,16 +9,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.mariangolea.fintracker.banks.csvparser.api.Bank;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.response.CsvFileParseResponse;
-import com.mariangolea.fintracker.banks.csvparser.parsers.BankCSVTransactionParser;
+import com.mariangolea.fintracker.banks.csvparser.api.parser.Bank;
+import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
 import java.util.List;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 
 public class BankCSVTransactionParserTest {
 
-    private final BankCSVTransactionParser parser = new BankCSVTransactionParser();
+    private final BankTransactionsParser parser = new BankTransactionsParser();
     private final TestUtilities utils = new TestUtilities();
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
@@ -30,7 +30,7 @@ public class BankCSVTransactionParserTest {
         
         // will be written to and read from a csv file.
         String[] mockLines = {"One", "Two"};
-        File csvFile = utils.writeCSVFile(Bank.BT, folder.newFile("file.csv"), mockLines);
+        File csvFile = utils.writeCSVFile(folder.newFile("file.csv"), mockLines);
         assertTrue(csvFile != null);
 
         List<String> readString = parser.loadCSVFile(csvFile);

@@ -1,25 +1,30 @@
 package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesHandlerInterface;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import static org.junit.Assert.assertTrue;
-
 
 import org.junit.Test;
 
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferences;
-import com.mariangolea.fintracker.banks.csvparser.preferences.UserPreferencesHandler;
+import java.io.File;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class UserPreferencesHandlerTest {
 
-    private final UserPreferencesHandler handler = UserPreferencesHandler.INSTANCE;
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testFirstLoadPreferences() {
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
         // delete preferences file to verify initial app behavior.
-        handler.deletePreferences();
-        UserPreferences prefs = handler.getPreferences();
+        UserPreferencesInterface prefs = handler.getPreferences();
         assertNotNull(prefs.getUserDefinedCategoryNames());
         assertTrue(prefs.getUserDefinedCategoryNames().isEmpty());
         assertNull(prefs.getCSVInputFolder());
@@ -27,8 +32,9 @@ public class UserPreferencesHandlerTest {
 
     @Test
     public void testBehaviorStorePreferences() {
-        handler.deletePreferences();
-        UserPreferences prefs = handler.getPreferences();
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
+        UserPreferencesInterface prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
         prefs.appendDefinition("category1", TestUtilities.createList("1", "2"));
         prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
@@ -36,10 +42,7 @@ public class UserPreferencesHandlerTest {
         // contents.
         boolean stored = handler.storePreferences();
         assertTrue(stored);
-        UserPreferences loaded = handler.getPreferences();
+        UserPreferencesInterface loaded = handler.getPreferences();
         assertTrue(prefs.equals(loaded));
-
-        boolean deleted = handler.deletePreferences();
-        assertTrue(deleted);
     }
 }

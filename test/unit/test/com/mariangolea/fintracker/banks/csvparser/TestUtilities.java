@@ -20,11 +20,17 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import org.apache.commons.csv.CSVFormat;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class TestUtilities {
 
-    public static String createFolder(TemporaryFolder folder, final String folderName){
+    @Test
+    public void junitisStupid() {
+        //find a way not to need this mock test case....
+    }
+
+    public static String createFolder(TemporaryFolder folder, final String folderName) {
         try {
             return folder.newFolder("test").getAbsolutePath();
         } catch (IOException ex) {
@@ -32,7 +38,7 @@ public class TestUtilities {
         }
         return null;
     }
-    
+
     public String[] constructMockCSVContentForING() {
         INGParser parser = new INGParser();
         List<String> texts = new ArrayList<>();

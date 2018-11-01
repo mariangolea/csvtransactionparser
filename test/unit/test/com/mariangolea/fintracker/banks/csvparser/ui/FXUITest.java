@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.embed.swing.JFXPanel;
 import javax.swing.SwingUtilities;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class FXUITest {
 
@@ -24,4 +25,9 @@ public class FXUITest {
     }
 
     protected static boolean fxInitialized = false;
+    
+    @Test
+    public void junitisStupid(){
+        //find a way not to need this mock test case....
+    }
 }

@@ -48,30 +48,4 @@ public abstract class Bank {
         this.mandatoryRecordIndexes = Objects.requireNonNull(mandatoryRecordIndexes);
         this.maxRecordSize = maxRecordSize;
     }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 61 * hash + Objects.hashCode(this.relevantContentHeaderLine);
-        hash = 61 * hash + this.maxRecordSize;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Bank other = (Bank) obj;
-        if (this.maxRecordSize != other.maxRecordSize) {
-            return false;
-        }
-        return (Objects.equals(this.relevantContentHeaderLine, other.relevantContentHeaderLine));
-    }
 }

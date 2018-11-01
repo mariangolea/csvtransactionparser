@@ -18,7 +18,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import org.controlsfx.control.textfield.TextFields;
 
 public class BankTransactionEditPane extends GridPane {

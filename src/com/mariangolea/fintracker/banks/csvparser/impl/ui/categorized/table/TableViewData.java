@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class TableViewData {
@@ -23,7 +24,7 @@ public class TableViewData {
         this.timeSlotString = new SimpleObjectProperty<>(timeSlot.toString(cal, format));
         this.amountStrings = new SimpleObjectProperty<>();
         final List<String> amounts = new ArrayList<>();
-        groups.forEach(group -> {
+        Objects.requireNonNull(groups).forEach(group -> {
             amounts.add(group.getTotalAmount() + "");
             });
         columns = groups.size();

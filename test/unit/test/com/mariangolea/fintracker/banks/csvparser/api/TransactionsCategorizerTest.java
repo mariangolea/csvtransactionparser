@@ -25,17 +25,16 @@ import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsCategorizerTest {
-    
-    private UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
-    private final UserPreferencesHandlerInterface userPrefsHandler= factory.getUserPreferencesHandler();
-    private UserPreferencesInterface userPrefs;
-    private Collection<BankTransaction> transactions;
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
+    private UserPreferencesInterface userPrefs;
+    private Collection<BankTransaction> transactions;
 
     @Before
     public void init() {
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
         userPrefs = userPrefsHandler.getPreferences();
         TestUtilities.populateUserPrefsWithCompanyAndGroupData(userPrefs);
         transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefs);
@@ -179,9 +178,10 @@ public class TransactionsCategorizerTest {
         protected final BankTransactionGroupInterface createSlottedGroupLocal(final YearSlot timeSlot, final String category) {
             return createSlottedGroup(timeSlot, category);
         }
+
         protected final Map<YearSlot, BankTransactionGroupInterface> createSlottedGroupsLocal(final String category) {
             return createSlottedGroups(category);
         }
-        
+
     }
 }

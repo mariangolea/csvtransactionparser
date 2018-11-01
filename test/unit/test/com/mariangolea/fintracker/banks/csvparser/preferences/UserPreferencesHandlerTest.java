@@ -4,24 +4,26 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import static org.junit.Assert.assertTrue;
 
-
 import org.junit.Test;
 
 import java.io.File;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class UserPreferencesHandlerTest {
 
-    private UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
-    private final UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testFirstLoadPreferences() {
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
         // delete preferences file to verify initial app behavior.
-        TestUtilities.deletePreferences();
         UserPreferencesInterface prefs = handler.getPreferences();
         assertNotNull(prefs.getUserDefinedCategoryNames());
         assertTrue(prefs.getUserDefinedCategoryNames().isEmpty());
@@ -30,7 +32,8 @@ public class UserPreferencesHandlerTest {
 
     @Test
     public void testBehaviorStorePreferences() {
-        TestUtilities.deletePreferences();
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
         UserPreferencesInterface prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
         prefs.appendDefinition("category1", TestUtilities.createList("1", "2"));
@@ -41,7 +44,5 @@ public class UserPreferencesHandlerTest {
         assertTrue(stored);
         UserPreferencesInterface loaded = handler.getPreferences();
         assertTrue(prefs.equals(loaded));
-
-        TestUtilities.deletePreferences();
     }
 }

@@ -20,14 +20,19 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import org.apache.commons.csv.CSVFormat;
+import org.junit.rules.TemporaryFolder;
 
 public class TestUtilities {
 
-    public static void deletePreferences() {
-        File file = new File(UserPreferencesTestFactory.TEST_FOLDER_NAME);
-        file.delete();
+    public static String createFolder(TemporaryFolder folder, final String folderName){
+        try {
+            return folder.newFolder("test").getAbsolutePath();
+        } catch (IOException ex) {
+            Logger.getLogger(TestUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
-
+    
     public String[] constructMockCSVContentForING() {
         INGParser parser = new INGParser();
         List<String> texts = new ArrayList<>();

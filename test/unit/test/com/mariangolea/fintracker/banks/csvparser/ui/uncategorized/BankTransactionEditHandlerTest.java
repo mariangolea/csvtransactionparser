@@ -5,18 +5,23 @@ import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.Ban
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.EditResult;
 import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import static org.junit.Assert.assertEquals;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class BankTransactionEditHandlerTest {
-    private final UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testApplyEditResult() {
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefTest"));
         UncategorizedTransactionApplyListener listener = () -> {
         };
-        Extension handler = new Extension(listener);
+        Extension handler = new Extension(listener, factory);
         EditResult result = new EditResult("a", "b", "c", "d");
         handler.applyResult(result);
 
@@ -24,12 +29,11 @@ public class BankTransactionEditHandlerTest {
         assertEquals("b", prefs.getCompanyDisplayName("a"));
         assertEquals("c", prefs.getParent("b"));
         assertEquals("d", prefs.getParent("c"));
-        TestUtilities.deletePreferences();
     }
 
     private class Extension extends BankTransactionEditHandler {
 
-        public Extension(UncategorizedTransactionApplyListener applyListener) {
+        public Extension(UncategorizedTransactionApplyListener applyListener, UserPreferencesTestFactory factory) {
             super(applyListener, factory.getUserPreferencesHandler().getPreferences());
         }
 

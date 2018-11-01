@@ -24,11 +24,11 @@ public class TransactionsSlotterTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
-    private UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
-    private final UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
 
     @Before
     public void init() {
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
         transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefsHandler.getPreferences());
     }
 

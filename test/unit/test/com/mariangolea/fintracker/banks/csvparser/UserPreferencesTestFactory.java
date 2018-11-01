@@ -5,11 +5,18 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandler;
 
 public class UserPreferencesTestFactory implements UserPreferencesAbstractFactory {
-
-    public static final String TEST_FOLDER_NAME = "unittests";
-
+    private final String folderPath;
+    private UserPreferencesHandler handler;
+    
+    public UserPreferencesTestFactory(final String folderPath){
+        this.folderPath = folderPath;
+    }
+    
     @Override
     public UserPreferencesHandlerInterface getUserPreferencesHandler() {
-        return new UserPreferencesHandler(TEST_FOLDER_NAME);
+        if (handler == null){
+            handler = new UserPreferencesHandler(folderPath);
+        }
+        return handler;
     }
 }

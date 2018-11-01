@@ -16,6 +16,7 @@ public class UserPreferencesTest {
 
     @Test
     public void testMethods() {
+        TestUtilities.deletePreferences();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
         other.setCompanyDisplayName("company", "name");
         String expected = other.getCompanyIdentifierString("name");

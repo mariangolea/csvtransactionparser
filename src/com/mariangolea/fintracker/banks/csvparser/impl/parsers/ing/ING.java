@@ -12,8 +12,8 @@ class ING extends Bank {
         super(AbstractBankParser.ROMANIAN_LOCALE,
                 "Data,,,Detalii tranzactie,,Debit,Credit",
                 "", 
-                new SimpleDateFormat("yyyy-MM-dd"),
-                new SimpleDateFormat("yyyy-MM-dd"),
+                new SimpleDateFormat("dd MMM yyyy", AbstractBankParser.ROMANIAN_LOCALE),
+                new SimpleDateFormat("dd MMM yyyy", AbstractBankParser.ROMANIAN_LOCALE),
                 NumberFormat.getInstance(ROMANIAN_LOCALE),
                 new int[]{0, 3, 5, 6},
                 7);

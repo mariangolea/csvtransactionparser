@@ -40,20 +40,6 @@ public class INGParserTest extends INGParser{
     }
 
     @Test
-    public void testStartedDateParser() {
-        Date output = parseStartDate("gibberish");
-        assertTrue(output == null);
-
-        output = parseStartDate("2018-08-12");
-        assertTrue(output != null);
-        Calendar calendar = Calendar.getInstance(ROMANIAN_LOCALE);
-        calendar.setTime(output);
-        assertTrue(calendar.get(Calendar.DAY_OF_MONTH) == 12);
-        assertTrue(calendar.get(Calendar.MONTH) == 7);
-        assertTrue(calendar.get(Calendar.YEAR) == 2018);
-    }
-
-    @Test
     public void testAmount() {
         String input = "1.195,60";
         BigDecimal output = parseAmount(input);

@@ -21,7 +21,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import org.controlsfx.control.textfield.TextFields;
 
-public class BankTransactionEditPane extends Pane {
+public class BankTransactionEditPane extends GridPane {
 
     private TextArea companyDescriptionField;
     private TextField companyNameIdentifierField;
@@ -127,10 +127,9 @@ public class BankTransactionEditPane extends Pane {
         TitledPane categoryGroup = new TitledPane("Category picker", group);
         categoryGroup.setCollapsible(false);
 
-        GridPane main = new GridPane();
-        main.add(transactionDescriptionGroup, 0, 0);
-        main.add(companyNameGroup, 0, 1);
-        main.add(categoryGroup, 0, 2);
+        add(transactionDescriptionGroup, 0, 0);
+        add(companyNameGroup, 0, 1);
+        add(categoryGroup, 0, 2);
 
         Platform.runLater(() -> companyNameIdentifierField.requestFocus());
     }

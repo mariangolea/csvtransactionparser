@@ -26,6 +26,8 @@ public class BankTransactionEditPaneTest extends FXUITest {
         }
         Extension dialog = new Extension(new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest")));
         assertNotNull(dialog);
+        
+        assertNotNull(dialog.getEditResult());
     }
 
     @Test

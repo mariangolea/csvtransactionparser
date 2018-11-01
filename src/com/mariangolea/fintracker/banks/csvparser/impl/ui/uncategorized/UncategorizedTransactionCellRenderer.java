@@ -1,4 +1,4 @@
-package com.mariangolea.fintracker.banks.csvparser.ui.uncategorized;
+package com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import javafx.scene.control.ListCell;

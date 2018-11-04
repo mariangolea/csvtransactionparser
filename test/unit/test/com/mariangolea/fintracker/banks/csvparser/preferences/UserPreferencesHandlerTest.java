@@ -21,7 +21,7 @@ public class UserPreferencesHandlerTest {
 
     @Test
     public void testFirstLoadPreferences() {
-        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
         // delete preferences file to verify initial app behavior.
         UserPreferencesInterface prefs = handler.getPreferences();
@@ -32,7 +32,7 @@ public class UserPreferencesHandlerTest {
 
     @Test
     public void testBehaviorStorePreferences() {
-        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
         UserPreferencesInterface prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");

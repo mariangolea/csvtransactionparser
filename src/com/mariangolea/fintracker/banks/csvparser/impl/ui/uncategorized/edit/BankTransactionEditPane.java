@@ -60,14 +60,14 @@ public class BankTransactionEditPane extends GridPane {
         parentCategoryPicker.setItems(originalCategories);
         TextFields.bindAutoCompletion(categoryPicker.getEditor(), categoryPicker.getItems());
         TextFields.bindAutoCompletion(parentCategoryPicker.getEditor(), parentCategoryPicker.getItems());
-        autosize();
     }
 
     protected void clearFields() {
         companyDescriptionField.setText(null);
         companyDisplayNameField.setText(null);
-        categoryPicker.setItems(null);
-        parentCategoryPicker.setItems(null);
+        categoryPicker.setValue(null);
+        categoryPicker.getItems().clear();
+        parentCategoryPicker.getItems().clear();
     }
 
     protected boolean isValid() {
@@ -80,9 +80,6 @@ public class BankTransactionEditPane extends GridPane {
         valid &= tempValid;
         
         tempValid = validateControl(categoryPicker, categoryPicker.getValue());
-        valid &= tempValid;
-        
-        tempValid = validateControl(parentCategoryPicker, parentCategoryPicker.getValue());
         valid &= tempValid;
         
         return valid;

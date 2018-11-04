@@ -8,7 +8,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class BankTransactionEditHandlerTest {
@@ -18,7 +17,7 @@ public class BankTransactionEditHandlerTest {
 
     @Test
     public void testApplyEditResult() {
-        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefTest"));
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UncategorizedTransactionApplyListener listener = () -> {
         };
         Extension handler = new Extension(listener, factory);

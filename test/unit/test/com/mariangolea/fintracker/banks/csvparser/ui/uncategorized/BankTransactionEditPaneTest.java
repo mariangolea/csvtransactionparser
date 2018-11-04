@@ -24,7 +24,7 @@ public class BankTransactionEditPaneTest extends FXUITest {
             assertTrue("Useless in headless mode", true);
             return;
         }
-        Extension dialog = new Extension(new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest")));
+        Extension dialog = new Extension(new UserPreferencesTestFactory());
         assertNotNull(dialog);
         
         assertNotNull(dialog.getEditResult());
@@ -36,7 +36,7 @@ public class BankTransactionEditPaneTest extends FXUITest {
             assertTrue("Useless in headless mode", true);
             return;
         }
-        Extension dialog = new Extension(new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest")));
+        Extension dialog = new Extension(new UserPreferencesTestFactory());
         dialog.setBankTransaction(TestUtilities.createTransaction(new Date(), BigDecimal.ONE, BigDecimal.ZERO, "aloha"));
         assertFalse(dialog.isValid());
     }

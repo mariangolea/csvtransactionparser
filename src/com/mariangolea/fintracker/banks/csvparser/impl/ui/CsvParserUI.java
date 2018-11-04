@@ -49,20 +49,14 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
     private TransactionTableView tableView;
     private UncategorizedView uncategorizedView;
     private final List<CsvFileParseResponse> parsedTransactionsCopy = new ArrayList<>();
-    private final UserPreferencesHandlerInterface userPrefsHandler;
-    private final UserPreferencesInterface userPrefs;
+    private UserPreferencesHandlerInterface userPrefsHandler;
+    private UserPreferencesInterface userPrefs;
     protected final List<File> parsedCsvFiles = new ArrayList<>();
     private Stage primaryStage;
     private BorderPane root;
 
     protected static final String START_PARSE_MESSAGE = "Started parsing the selected CSV files ...";
     protected static final String FINISHED_PARSING_CSV_FILES = "Finished parsing the CSV files: ";
-
-    public CsvParserUI() {
-        UserPreferencesAbstractFactory factory = new UserPreferencesHandlerFactory();
-        userPrefsHandler = Objects.requireNonNull(Objects.requireNonNull(factory).getUserPreferencesHandler());
-        userPrefs = userPrefsHandler.getPreferences();
-    }
 
     @Override
     public void init() throws Exception {
@@ -76,6 +70,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         col.setHgrow(Priority.ALWAYS);
         grid.getColumnConstraints().add(col);
 
+        initUserPrefs();
         ScrollPane feedback = createFeedbackView();
 
         GridPane display = new GridPane();
@@ -107,7 +102,11 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         userPrefsHandler.storePreferences();
         updateView();
     }
-    
+
+    protected UserPreferencesAbstractFactory initUserPreferencesFactory() {
+        return new UserPreferencesHandlerFactory();
+    }
+
     protected void loadData(final List<CsvFileParseResponse> parsedTransactions) {
         if (parsedTransactions != null) {
             parsedTransactions.forEach(csvFileResponse -> {
@@ -262,6 +261,12 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         }
         feedbackPane.getChildren().add(new Text(message));
         return true;
+    }
+
+    protected void initUserPrefs() {
+        UserPreferencesAbstractFactory factory = initUserPreferencesFactory();
+        userPrefsHandler = Objects.requireNonNull(Objects.requireNonNull(factory).getUserPreferencesHandler());
+        userPrefs = userPrefsHandler.getPreferences();
     }
 
     private void updateView() {

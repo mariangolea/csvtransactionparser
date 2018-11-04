@@ -6,7 +6,6 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
-import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandler;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,7 +26,7 @@ public class TransactionsSlotterTest {
 
     @Before
     public void init() {
-        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
         transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefsHandler.getPreferences());
     }

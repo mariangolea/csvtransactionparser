@@ -12,8 +12,10 @@ import org.junit.rules.TemporaryFolder;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesAbstractFactory;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.CsvParserUI;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +29,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import static org.junit.Assert.assertTrue;
+import org.omg.CORBA.INITIALIZE;
 
 import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class CsvParserUICategorizerTest extends FXUITest {
 
@@ -50,6 +54,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         CsvFileParseResponse response = new BankTransactionsParser().parseTransactions(mockCSV);
         // tests in other files ensure response integrity, no need to do that in here.
         LocalUI local = new LocalUI();
+        local.initUserPrefs();
         local.createTableView();
         local.createUncategorizedView();
         local.loadData(Arrays.asList(response));
@@ -148,6 +153,16 @@ public class CsvParserUICategorizerTest extends FXUITest {
 
         public LocalUI() {
             super();
+        }
+
+        @Override
+        protected UserPreferencesAbstractFactory initUserPreferencesFactory() {
+            return new UserPreferencesTestFactory();
+        }
+
+        @Override
+        protected void initUserPrefs() {
+            super.initUserPrefs(); 
         }
 
         @Override

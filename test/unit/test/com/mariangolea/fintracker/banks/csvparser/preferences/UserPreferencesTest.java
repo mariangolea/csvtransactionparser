@@ -19,7 +19,7 @@ public class UserPreferencesTest {
 
     @Test
     public void testMethods() {
-        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
         other.setCompanyDisplayName("company", "name");
         String expected = other.getCompanyIdentifierString("name");

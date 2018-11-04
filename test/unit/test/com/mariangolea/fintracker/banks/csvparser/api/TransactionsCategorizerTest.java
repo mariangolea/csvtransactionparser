@@ -33,7 +33,7 @@ public class TransactionsCategorizerTest {
 
     @Before
     public void init() {
-        UserPreferencesTestFactory factory = new UserPreferencesTestFactory(TestUtilities.createFolder(folder, "prefsTest"));
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
         userPrefs = userPrefsHandler.getPreferences();
         TestUtilities.populateUserPrefsWithCompanyAndGroupData(userPrefs);

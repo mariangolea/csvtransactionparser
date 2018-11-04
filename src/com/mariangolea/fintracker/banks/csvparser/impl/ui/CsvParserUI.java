@@ -61,7 +61,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
     public CsvParserUI() {
         UserPreferencesAbstractFactory factory = new UserPreferencesHandlerFactory();
         userPrefsHandler = Objects.requireNonNull(Objects.requireNonNull(factory).getUserPreferencesHandler());
-        userPrefs = factory.getUserPreferencesHandler().getPreferences();
+        userPrefs = userPrefsHandler.getPreferences();
     }
 
     @Override
@@ -162,6 +162,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
 
     protected void parseUserSelectedCSVFiles(List<File> csvFiles) {
         userPrefs.setCSVInputFolder(csvFiles.get(0).getParent());
+        userPrefsHandler.storePreferences();
         parsedCsvFiles.addAll(csvFiles);
         startParsingCsvFiles(csvFiles);
     }

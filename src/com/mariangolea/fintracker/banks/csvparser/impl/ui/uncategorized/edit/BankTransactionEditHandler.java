@@ -22,9 +22,9 @@ public class BankTransactionEditHandler {
     public void editTransaction(final BankTransaction transaction) {
         if (editPopup == null) {
             editPane = new BankTransactionEditPane(userPrefs);
-            editPane.setBankTransaction(transaction);
             editPopup = new BankTransactionEditDialog(editPane);
         }
+        editPane.setBankTransaction(transaction);
         Optional<EditResult> result = editPopup.showAndWait();
         result.ifPresent(userData -> {
             applyResult(userData);

@@ -40,7 +40,7 @@ public class UserPreferencesHandler implements UserPreferencesHandlerInterface {
     public UserPreferencesHandler() {
         this.prefsFolder = SUB_FOLDER;
     }
-    
+
     public UserPreferencesHandler(final String preferencesFolder) {
         prefsFolder = Objects.requireNonNull(preferencesFolder);
     }
@@ -64,6 +64,7 @@ public class UserPreferencesHandler implements UserPreferencesHandlerInterface {
 
     private void loadPreferences() {
         loadUserPrefsFile();
+        //company names must be read before categories.
         loadCompanyNamesFile();
         loadCategoryNamesFile();
     }
@@ -95,10 +96,9 @@ public class UserPreferencesHandler implements UserPreferencesHandlerInterface {
         String categoryNamesString = categoriesFile.getProperty(CATEGORY_NAMES);
         Set<String> categoryNames = new HashSet<>(
                 convertPersistedStringToList(categoryNamesString, SEPARATOR));
-        categoryNames.forEach((categoryName) -> {
-            Set<String> categories = new HashSet<>(
-                    convertPersistedStringToList(categoriesFile.getProperty(categoryName), SEPARATOR));
-            userPreferences.appendDefinition(categoryName, categories);
+        userPreferences.appendDefinition(CategoriesTree.ROOT, categoryNames);
+        categoryNames.forEach((topMostCategory) -> {
+            loadCategoryName(topMostCategory);
         });
     }
 
@@ -125,12 +125,25 @@ public class UserPreferencesHandler implements UserPreferencesHandlerInterface {
 
     private void storeTopMostCategoryName(final String topMostCategory) {
         Collection<String> subCategories = userPreferences.getSubCategories(topMostCategory);
-        if (subCategories != null) {
+        if (subCategories != null && !subCategories.isEmpty()) {
             categoriesFile.setProperty(topMostCategory, convertStringsForStorage(subCategories, SEPARATOR));
             subCategories.forEach((category) -> {
                 storeTopMostCategoryName(category);
             });
         }
+    }
+
+    private void loadCategoryName(final String category) {
+        String categoryNamesString = categoriesFile.getProperty(category);
+        Set<String> subCategories = new HashSet<>(
+                convertPersistedStringToList(categoryNamesString, SEPARATOR));
+        if (subCategories.isEmpty()){
+            return;
+        }
+        userPreferences.appendDefinition(category, subCategories);
+        subCategories.forEach((subCategoy) -> {
+            loadCategoryName(subCategoy);
+        });
     }
 
     protected String convertStringsForStorage(final Collection<String> strings, final String separator) {

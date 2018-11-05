@@ -33,6 +33,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -60,33 +61,8 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
 
     @Override
     public void init() throws Exception {
-        MenuBar menuBar = createMenu();
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
-        ColumnConstraints col = new ColumnConstraints();
-        col.setFillWidth(true);
-        col.setHgrow(Priority.ALWAYS);
-        grid.getColumnConstraints().add(col);
-
         initUserPrefs();
-        ScrollPane feedback = createFeedbackView();
-
-        GridPane display = new GridPane();
-        display.getColumnConstraints().add(col);
-        createTableView();
-        createUncategorizedView();
-        display.add(tableView, 0, 0, 12, 1);
-        display.add(uncategorizedView, 12, 0, 3, 1);
-
-        grid.add(display, 0, 0, 15, 12);
-        grid.add(feedback, 0, 12, 15, 1);
-        grid.setStyle("-fx-background-color: BEIGE;");
-
-        root = new BorderPane();
-        root.setTop(menuBar);
-        root.setCenter(grid);
+        layoutComponents();
     }
 
     @Override
@@ -207,7 +183,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
 
     protected void createTableView() {
         if (tableView == null) {
-            tableView = new TransactionTableView(model, userPrefs);
+            tableView = new TransactionTableView(userPrefs);
         }
     }
 
@@ -273,5 +249,38 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         TransactionsCategorizedSlotter calc = new TransactionsCategorizedSlotter(model, userPrefs);
         uncategorizedView.updateModel(calc.getUnmodifiableUnCategorized());
         tableView.resetView(calc.getUnmodifiableSlottedCategorized());
+    }
+
+    protected void layoutComponents() {
+        MenuBar menuBar = createMenu();
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        ColumnConstraints col = new ColumnConstraints();
+        col.setFillWidth(true);
+        col.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().add(col);
+
+        ScrollPane feedback = createFeedbackView();
+
+        GridPane display = new GridPane();
+        display.getColumnConstraints().add(col);
+        createTableView();
+        createUncategorizedView();
+        display.add(tableView, 0, 0, 12, 1);
+        display.add(uncategorizedView, 12, 0, 3, 1);
+
+        grid.add(display, 0, 0, 15, 12);
+        grid.add(feedback, 0, 12, 15, 1);
+        grid.setStyle("-fx-background-color: BEIGE;");
+
+        root = new BorderPane();
+        root.setTop(menuBar);
+        root.setCenter(grid);
+    }
+    
+    protected Pane getRoot(){
+        return root;
     }
 }

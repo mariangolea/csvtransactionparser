@@ -1,49 +1,46 @@
 package test.com.mariangolea.fintracker.banks.csvparser.ui;
 
+import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
+import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesAbstractFactory;
+import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.CsvParserUI;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
-import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesAbstractFactory;
-import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
-import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
-import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
-import com.mariangolea.fintracker.banks.csvparser.impl.ui.CsvParserUI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.omg.CORBA.INITIALIZE;
-
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
-public class CsvParserUICategorizerTest extends FXUITest {
+public class CsvParserUITest {
 
-    private final TestUtilities utils = new TestUtilities();
+    private final Utilities utils = new Utilities();
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testSimpleDataBT() throws IOException {
-        if (!fxInitialized) {
+        if (!FXUITest.FX_INITIALIZED) {
             assertTrue("Useless in headless mode", true);
             return;
         }
@@ -78,7 +75,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
         try {
             latch.await();
         } catch (InterruptedException ex) {
-            Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CsvParserUITest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         //test parsed the same file content twice, so double expected values.
@@ -88,8 +85,27 @@ public class CsvParserUICategorizerTest extends FXUITest {
     }
 
     @Test
+    public void testLayoutComponents(){
+        if (!FXUITest.FX_INITIALIZED) {
+            assertTrue("Useless in headless mode", true);
+            return;
+        }
+        LocalUI local = new LocalUI();
+        local.initUserPrefs();
+        local.layoutComponents();
+        assertNotNull(local.getRoot());
+    }
+    
+    @Test
+    public void testUserPreferencesFactory(){
+        LocalUI local = new LocalUI();
+        UserPreferencesAbstractFactory factory = local.originalInitUserPreferencesFactory();
+        assertNotNull(factory);
+    }
+    
+    @Test
     public void testAppendMessages() {
-        if (!fxInitialized) {
+        if (!FXUITest.FX_INITIALIZED) {
             assertTrue("Useless in headless mode", true);
             return;
         }
@@ -104,7 +120,7 @@ public class CsvParserUICategorizerTest extends FXUITest {
             assertTrue(result);
             assertTrue(local.getFeedbackPane().getChildren().size() == 3);
         } catch (IOException ex) {
-            Logger.getLogger(CsvParserUICategorizerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CsvParserUITest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         assertTrue(!local.appendReportMessage(null));
@@ -159,6 +175,10 @@ public class CsvParserUICategorizerTest extends FXUITest {
         protected UserPreferencesAbstractFactory initUserPreferencesFactory() {
             return new UserPreferencesTestFactory();
         }
+        
+        protected UserPreferencesAbstractFactory originalInitUserPreferencesFactory() {
+            return super.initUserPreferencesFactory();
+        }
 
         @Override
         protected void initUserPrefs() {
@@ -183,6 +203,11 @@ public class CsvParserUICategorizerTest extends FXUITest {
         @Override
         protected void createTableView() {
             super.createTableView();
+        }
+
+        @Override
+        protected void layoutComponents() {
+            super.layoutComponents(); 
         }
 
         public TextFlow getFeedbackPane() {
@@ -225,6 +250,11 @@ public class CsvParserUICategorizerTest extends FXUITest {
         @Override
         protected void createUncategorizedView() {
             super.createUncategorizedView();
+        }
+
+        @Override
+        protected Pane getRoot() {
+            return super.getRoot();
         }
     }
 }

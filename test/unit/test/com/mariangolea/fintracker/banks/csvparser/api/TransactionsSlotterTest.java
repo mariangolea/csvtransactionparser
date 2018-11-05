@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsSlotterTest {
@@ -28,30 +28,30 @@ public class TransactionsSlotterTest {
     public void init() {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
-        transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefsHandler.getPreferences());
+        transactions = Utilities.constructMockDefaultTransactionsForCategorizer(userPrefsHandler.getPreferences());
     }
 
     @Test
     public void testGetSlotYear() {
         TransactionsSlotter slotter = getSlotter(UserPreferences.Timeframe.YEAR);
-        YearSlot slot = slotter.getSlot(TestUtilities.createDate(2018));
+        YearSlot slot = slotter.getSlot(Utilities.createDate(2018));
         assertNotNull(slot);
         assertEquals(slot, new YearSlot(2018));
 
         //second time around result is cached!
-        YearSlot slot2 = slotter.getSlot(TestUtilities.createDate(2018));
+        YearSlot slot2 = slotter.getSlot(Utilities.createDate(2018));
         assertTrue(slot == slot2);
     }
 
     @Test
     public void testGetSlotMonth() {
         TransactionsSlotter slotter = getSlotter(UserPreferences.Timeframe.MONTH);
-        YearSlot slot = slotter.getSlot(TestUtilities.createDate(1, 2018));
+        YearSlot slot = slotter.getSlot(Utilities.createDate(1, 2018));
         assertNotNull(slot);
         assertEquals(new MonthSlot(1, 2018), slot);
 
         //second time around result is cached!
-        YearSlot slot2 = slotter.getSlot(TestUtilities.createDate(1, 2018));
+        YearSlot slot2 = slotter.getSlot(Utilities.createDate(1, 2018));
         assertTrue(slot == slot2);
     }
 

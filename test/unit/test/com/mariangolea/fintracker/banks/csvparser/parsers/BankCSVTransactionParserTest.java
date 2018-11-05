@@ -14,12 +14,12 @@ import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseRespons
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
 import java.util.List;
 
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 
 public class BankCSVTransactionParserTest {
 
     private final BankTransactionsParser parser = new BankTransactionsParser();
-    private final TestUtilities utils = new TestUtilities();
+    private final Utilities utils = new Utilities();
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 

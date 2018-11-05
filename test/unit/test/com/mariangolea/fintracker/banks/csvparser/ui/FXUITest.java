@@ -4,10 +4,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javafx.embed.swing.JFXPanel;
 import javax.swing.SwingUtilities;
+import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class FXUITest {
+
 
     @BeforeClass
     public static void initToolkit()
@@ -20,14 +22,15 @@ public class FXUITest {
                 latch.countDown();
             });
 
-            fxInitialized = latch.await(10L, TimeUnit.SECONDS);
+            FX_INITIALIZED = latch.await(10L, TimeUnit.SECONDS);
         }
     }
+    protected static boolean FX_INITIALIZED = false;
 
-    protected static boolean fxInitialized = false;
-    
     @Test
-    public void junitisStupid(){
-        //find a way not to need this mock test case....
+    public void testSilly() {
+        //this class needs a test method to avoid it being marked as a fail...
+        assertTrue(true);
     }
+
 }

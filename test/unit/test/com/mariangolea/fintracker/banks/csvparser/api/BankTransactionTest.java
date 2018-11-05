@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
 import java.math.BigDecimal;
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 
 public class BankTransactionTest {
 
@@ -37,14 +37,14 @@ public class BankTransactionTest {
 
     @Test
     public void testSort() {
-        BankTransaction first = createTransaction("a", BigDecimal.ONE, TestUtilities.createDate(1, 2018));
-        BankTransaction second = createTransaction("a", BigDecimal.ONE, TestUtilities.createDate(2, 2018));
+        BankTransaction first = createTransaction("a", BigDecimal.ONE, Utilities.createDate(1, 2018));
+        BankTransaction second = createTransaction("a", BigDecimal.ONE, Utilities.createDate(2, 2018));
         
         assertTrue(first.compareTo(second) < 0);
         assertTrue(first.compareTo(first) == 0);
         assertTrue(second.compareTo(first) > 0);
         
-        second = createTransaction("ab", BigDecimal.ONE, TestUtilities.createDate(1, 2018));
+        second = createTransaction("ab", BigDecimal.ONE, Utilities.createDate(1, 2018));
         assertTrue(first.compareTo(second) < 0);
     }
 

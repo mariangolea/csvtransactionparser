@@ -36,10 +36,6 @@ public abstract class AbstractBankParser {
 
     public abstract int findNextTransactionLineIndex(List<String> toConsume);
 
-    public Bank getBank() {
-        return bank;
-    }
-
     public CsvFileParseResponse parseCsvResponse(List<String> split, File file) {
         List<BankTransaction> result = new ArrayList<>();
 

@@ -18,7 +18,7 @@ public class UserPreferencesTestFactory implements UserPreferencesAbstractFactor
     public UserPreferencesTestFactory(){
         try {
             folder.create();
-            handler = new UserPreferencesHandler(TestUtilities.createFolder(folder, "prefsTest"));
+            handler = new UserPreferencesHandler(Utilities.createFolder(folder, "prefsTest"));
         } catch (IOException ex) {
             Logger.getLogger(UserPreferencesTestFactory.class.getName()).log(Level.SEVERE, null, ex);
             handler = new UserPreferencesHandler("prefsTest");

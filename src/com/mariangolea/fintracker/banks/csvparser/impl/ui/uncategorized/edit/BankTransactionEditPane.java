@@ -25,7 +25,7 @@ public class BankTransactionEditPane extends GridPane {
 
     private TextArea companyDescriptionField;
     private TextField companyNameIdentifierField;
-    private TextField companyDisplayNameField;
+    private ComboBox<String> companyDisplayNameField;
     private ComboBox<String> categoryPicker;
     private ComboBox<String> parentCategoryPicker;
     private final UserPreferencesInterface userPrefs;
@@ -40,7 +40,7 @@ public class BankTransactionEditPane extends GridPane {
     public EditResult getEditResult() {
         return new EditResult(
                 companyNameIdentifierField.getText(),
-                companyDisplayNameField.getText(),
+                companyDisplayNameField.getValue(),
                 categoryPicker.getValue(),
                 parentCategoryPicker.getValue());
     }
@@ -64,7 +64,8 @@ public class BankTransactionEditPane extends GridPane {
 
     protected void clearFields() {
         companyDescriptionField.setText(null);
-        companyDisplayNameField.setText(null);
+        companyDisplayNameField.setValue(null);
+        companyDisplayNameField.getItems().clear();
         categoryPicker.setValue(null);
         categoryPicker.getItems().clear();
         parentCategoryPicker.getItems().clear();
@@ -76,7 +77,7 @@ public class BankTransactionEditPane extends GridPane {
         boolean tempValid = validateControl(companyNameIdentifierField, companyNameIdentifierField.getText());
         valid &= tempValid;
 
-        tempValid = validateControl(companyDisplayNameField, companyDisplayNameField.getText());
+        tempValid = validateControl(companyDisplayNameField, companyDisplayNameField.getValue());
         valid &= tempValid;
         
         tempValid = validateControl(categoryPicker, categoryPicker.getValue());
@@ -98,16 +99,22 @@ public class BankTransactionEditPane extends GridPane {
 
         companyNameIdentifierField = new TextField();
         companyNameIdentifierField.setPromptText("Company name substring to apply when looking for similar transactions");
-        companyDisplayNameField = new TextField();
+        companyDisplayNameField = new ComboBox<>();
         companyDisplayNameField.setPromptText("Short company name for all other similar company descriptions.");
+        companyDisplayNameField.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                categoryPicker.setValue(null);
+            } else {
+                String category = userPrefs.getMatchingCategory(companyDescriptionField.getText());
+                if (!Objects.equals(CategoriesTree.ROOT, category)) {
+                    categoryPicker.setValue(category);
+                }
+            }
+        });
 
         categoryPicker = new ComboBox<>();
         categoryPicker.setEditable(true);
         categoryPicker.setTooltip(new Tooltip("Pick a category for this company name"));
-
-        parentCategoryPicker = new ComboBox<>();
-        parentCategoryPicker.setEditable(true);
-        parentCategoryPicker.setTooltip(new Tooltip("Pick a parent category for selected category, or leave blank"));
         categoryPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 parentCategoryPicker.setValue(null);
@@ -118,6 +125,10 @@ public class BankTransactionEditPane extends GridPane {
                 }
             }
         });
+
+        parentCategoryPicker = new ComboBox<>();
+        parentCategoryPicker.setEditable(true);
+        parentCategoryPicker.setTooltip(new Tooltip("Pick a parent category for selected category, or leave blank"));
     }
 
     private void layoutComponents() {

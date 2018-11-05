@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsCategorizerTest {
@@ -36,8 +36,8 @@ public class TransactionsCategorizerTest {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesHandlerInterface userPrefsHandler = factory.getUserPreferencesHandler();
         userPrefs = userPrefsHandler.getPreferences();
-        TestUtilities.populateUserPrefsWithCompanyAndGroupData(userPrefs);
-        transactions = TestUtilities.constructMockDefaultTransactionsForCategorizer(userPrefs);
+        Utilities.populateUserPrefsWithCompanyAndGroupData(userPrefs);
+        transactions = Utilities.constructMockDefaultTransactionsForCategorizer(userPrefs);
     }
 
     @Test

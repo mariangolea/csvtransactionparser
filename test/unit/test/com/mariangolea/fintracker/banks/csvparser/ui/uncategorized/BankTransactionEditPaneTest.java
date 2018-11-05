@@ -9,18 +9,18 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.ui.FXUITest;
 
-public class BankTransactionEditPaneTest extends FXUITest {
+public class BankTransactionEditPaneTest  extends FXUITest{
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testConstructor() {
-        if (!fxInitialized) {
+        if (!FXUITest.FX_INITIALIZED) {
             assertTrue("Useless in headless mode", true);
             return;
         }
@@ -32,12 +32,12 @@ public class BankTransactionEditPaneTest extends FXUITest {
 
     @Test
     public void testIsValid() {
-        if (!fxInitialized) {
+        if (!FXUITest.FX_INITIALIZED) {
             assertTrue("Useless in headless mode", true);
             return;
         }
         Extension dialog = new Extension(new UserPreferencesTestFactory());
-        dialog.setBankTransaction(TestUtilities.createTransaction(new Date(), BigDecimal.ONE, BigDecimal.ZERO, "aloha"));
+        dialog.setBankTransaction(Utilities.createTransaction(new Date(), BigDecimal.ONE, BigDecimal.ZERO, "aloha"));
         assertFalse(dialog.isValid());
     }
 

@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import test.com.mariangolea.fintracker.banks.csvparser.TestUtilities;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class UserPreferencesHandlerTest {
@@ -36,7 +36,7 @@ public class UserPreferencesHandlerTest {
         UserPreferencesHandlerInterface handler = factory.getUserPreferencesHandler();
         UserPreferencesInterface prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
-        prefs.appendDefinition("category1", TestUtilities.createList("1", "2"));
+        prefs.appendDefinition("category1", Utilities.createList("1", "2"));
         prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
         // after this store, next load should retrieve a different objects with same
         // contents.

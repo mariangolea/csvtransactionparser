@@ -2,7 +2,6 @@ package com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table;
 
 import com.mariangolea.fintracker.banks.csvparser.api.filters.YearSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,12 +19,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class TransactionTableView extends TableView<TableViewData> {
 
     private final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedModel = FXCollections.observableHashMap();
-    protected final Collection<BankTransaction> model;
     private final ObservableList<TableViewData> data = FXCollections.observableArrayList();
     private final UserPreferencesInterface prefs;
 
-    public TransactionTableView(final Collection<BankTransaction> model, final UserPreferencesInterface prefs) {
-        this.model = model;
+    public TransactionTableView(final UserPreferencesInterface prefs) {
         this.prefs = Objects.requireNonNull(prefs);
     }
 
@@ -38,8 +35,8 @@ public class TransactionTableView extends TableView<TableViewData> {
         final List<String> indexed = new ArrayList<>(columnHeaders);
         for (String header : columnHeaders) {
             TableColumn<TableViewData, SimpleObjectProperty<List<String>>> col = new TableColumn<>(header);
-            col.setCellFactory(column -> {
-                return new PropertyValueFactoryHack(indexed.indexOf(header));
+            col.setCellFactory(callback -> {
+                return new AmountStringPropertyValueFactory(indexed.indexOf(header));
             });
             col.setCellValueFactory(
                     new PropertyValueFactory("amountStrings"));
@@ -64,11 +61,11 @@ public class TransactionTableView extends TableView<TableViewData> {
         setItems(data);
     }
 
-    private class PropertyValueFactoryHack extends TableCell<TableViewData, SimpleObjectProperty<List<String>>> {
+    public static class AmountStringPropertyValueFactory extends TableCell<TableViewData, SimpleObjectProperty<List<String>>> {
 
         private final int col;
 
-        public PropertyValueFactoryHack(int column) {
+        public AmountStringPropertyValueFactory(int column) {
             col = column;
         }
 
@@ -82,6 +79,5 @@ public class TransactionTableView extends TableView<TableViewData> {
                 setText(item.get().get(col));
             }
         }
-
     }
 }

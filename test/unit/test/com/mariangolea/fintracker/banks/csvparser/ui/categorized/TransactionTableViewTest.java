@@ -6,7 +6,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView.AmountStringPropertyValueFactory;
-import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsCategorizedSlotter;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,7 +41,7 @@ public class TransactionTableViewTest extends FXUITest{
         Map<YearSlot, Collection<BankTransactionGroupInterface>> model = slotter.getUnmodifiableSlottedCategorized();
         view.resetView(model);
 
-        assertEquals(2, view.getColumns().size());
+        assertEquals(3, view.getColumns().size());
         
         Extension cellFactory = new Extension(1);
         SimpleObjectProperty<List<String>> props = new SimpleObjectProperty<>(Arrays.asList("","CompanyGroup"));

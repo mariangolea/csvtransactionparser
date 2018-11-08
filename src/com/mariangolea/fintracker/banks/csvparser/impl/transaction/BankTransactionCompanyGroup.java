@@ -1,4 +1,4 @@
-package com.mariangolea.fintracker.banks.csvparser.transaction;
+package com.mariangolea.fintracker.banks.csvparser.impl.transaction;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;

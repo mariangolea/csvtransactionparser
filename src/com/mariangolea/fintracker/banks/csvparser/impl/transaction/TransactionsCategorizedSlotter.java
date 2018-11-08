@@ -1,10 +1,11 @@
-package com.mariangolea.fintracker.banks.csvparser.transaction;
+package com.mariangolea.fintracker.banks.csvparser.impl.transaction;
 
 import com.mariangolea.fintracker.banks.csvparser.api.filters.YearSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
+import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsSlotter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,7 +53,7 @@ public class TransactionsCategorizedSlotter {
     public Map<YearSlot, Collection<BankTransactionGroupInterface>> getUnmodifiableSlottedCategorized() {
         return FXCollections.observableMap(slottedCategorised);
     }
-
+    
     public Collection<BankTransaction> getUnmodifiableUnCategorized() {
         return FXCollections.observableArrayList(unCategorised);
     }
@@ -81,7 +82,7 @@ public class TransactionsCategorizedSlotter {
         });
         return slotted;
     }
-
+    
     protected final Map<YearSlot, BankTransactionGroupInterface> createSlottedGroups(final String category) {
         Collection<YearSlot> timeSlots = slotter.getTimeSlots();
         Map<YearSlot, BankTransactionGroupInterface> slotted = new ConcurrentHashMap<>();

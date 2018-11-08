@@ -6,10 +6,10 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionAbstractGroup;
-import com.mariangolea.fintracker.banks.csvparser.transaction.BankTransactionCompanyGroup;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
-import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsCategorizedSlotter;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

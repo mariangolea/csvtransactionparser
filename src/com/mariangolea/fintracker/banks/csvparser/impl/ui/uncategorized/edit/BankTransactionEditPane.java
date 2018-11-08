@@ -55,7 +55,8 @@ public class BankTransactionEditPane extends GridPane {
         splitLines(categoryName);
         final String substring = userPrefs.getCompanyIdentifierString(categoryName);
         companyNameIdentifierField.setText(substring);
-        
+        companyDisplayNameField.setItems(FXCollections.observableArrayList(userPrefs.getCompanyDisplayNames()));
+        companyDisplayNameField.setValue(substring == null ? null : userPrefs.getCompanyDisplayName(substring));
         categoryPicker.setItems(originalCategories);
         parentCategoryPicker.setItems(originalCategories);
         TextFields.bindAutoCompletion(categoryPicker.getEditor(), categoryPicker.getItems());
@@ -79,10 +80,10 @@ public class BankTransactionEditPane extends GridPane {
 
         tempValid = validateControl(companyDisplayNameField, companyDisplayNameField.getValue());
         valid &= tempValid;
-        
+
         tempValid = validateControl(categoryPicker, categoryPicker.getValue());
         valid &= tempValid;
-        
+
         return valid;
     }
 
@@ -100,13 +101,16 @@ public class BankTransactionEditPane extends GridPane {
         companyNameIdentifierField = new TextField();
         companyNameIdentifierField.setPromptText("Company name substring to apply when looking for similar transactions");
         companyDisplayNameField = new ComboBox<>();
-        companyDisplayNameField.setPromptText("Short company name for all other similar company descriptions.");
+        companyDisplayNameField.setEditable(true);
+        companyDisplayNameField.setTooltip(new Tooltip("Select a substring that will be used to identify similar transactions"));
         companyDisplayNameField.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
                 categoryPicker.setValue(null);
             } else {
                 String category = userPrefs.getMatchingCategory(companyDescriptionField.getText());
-                if (!Objects.equals(CategoriesTree.ROOT, category)) {
+                if (Objects.equals(CategoriesTree.ROOT, category) || Objects.equals(UserPreferencesInterface.UNCATEGORIZED, category)) {
+                    categoryPicker.setValue(null);
+                } else {
                     categoryPicker.setValue(category);
                 }
             }

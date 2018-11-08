@@ -7,9 +7,9 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.UncategorizedView;
-import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import java.io.File;
 import java.util.ArrayList;

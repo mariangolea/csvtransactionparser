@@ -1,7 +1,6 @@
-package com.mariangolea.fintracker.banks.csvparser.transaction;
+package com.mariangolea.fintracker.banks.csvparser.impl.transaction;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
-import com.mariangolea.fintracker.banks.csvparser.transaction.BankTransactionCompanyGroup;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,7 @@
 package test.com.mariangolea.fintracker.banks.csvparser.api;
 
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.transaction.BankTransactionCompanyGroup;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.BankTransactionCompanyGroup;
 import java.util.Arrays;
 import java.util.Collection;
 import static org.junit.Assert.assertNull;

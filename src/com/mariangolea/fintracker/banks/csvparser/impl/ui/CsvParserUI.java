@@ -9,6 +9,8 @@ import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsP
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
 import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.EditCompanyNamesDialog;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.EditCompanyNamesPane;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.UncategorizedView;
 import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import java.io.File;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -99,12 +102,23 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         Menu file = new Menu("File");
         file.setAccelerator(KeyCombination.keyCombination("Alt+f"));
         MenuItem load = new MenuItem("Load data from CSV file.");
-        load.setAccelerator(KeyCombination.keyCombination("Alt+l"));
+        load.setAccelerator(KeyCombination.keyCombination("l"));
         load.setOnAction((ActionEvent e) -> {
             popCSVFileChooser();
         });
         file.getItems().add(load);
         menu.getMenus().add(file);
+
+        Menu edit = new Menu("Edit");
+        edit.setAccelerator(KeyCombination.keyCombination("Alt+e"));
+        MenuItem editCompanies = new MenuItem("Edit company names");
+        editCompanies.setAccelerator(KeyCombination.keyCombination("c"));
+        editCompanies.setOnAction((ActionEvent e) -> {
+            editCompanyNames();
+        });
+        edit.getItems().add(editCompanies);
+        menu.getMenus().add(edit);
+        
         menu.setUseSystemMenuBar(true);
 
         return menu;
@@ -133,6 +147,15 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         if (csvFiles != null && csvFiles.size() > 0) {
             parseUserSelectedCSVFiles(csvFiles);
         }
+    }
+    
+    protected void editCompanyNames(){
+        EditCompanyNamesDialog popup = new EditCompanyNamesDialog(new EditCompanyNamesPane(userPrefs));
+        Optional<UserPreferencesInterface> result = popup.showAndWait();
+        result.ifPresent(userData -> {
+            userPrefs.applyChanges(Objects.requireNonNull(userData));
+            userPrefsHandler.storePreferences();
+        });
     }
 
     protected void parseUserSelectedCSVFiles(List<File> csvFiles) {

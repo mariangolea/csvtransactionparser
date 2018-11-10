@@ -1,6 +1,6 @@
 package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
-import com.mariangolea.fintracker.banks.csvparser.impl.preferences.CategoriesTree;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.categories.CategoriesTree;
 import java.util.Arrays;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;

@@ -1,4 +1,4 @@
-package com.mariangolea.fintracker.banks.csvparser.impl.preferences;
+package com.mariangolea.fintracker.banks.csvparser.impl.preferences.categories;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import javafx.collections.FXCollections;
 public class CategoriesTree {
 
     public static final String ROOT = "Root";
-    public final String categoryName;
+    public String categoryName;
     private CategoriesTree parent;
     private final List<CategoriesTree> subCategoriesTrees = FXCollections.observableArrayList();
 
@@ -29,7 +29,15 @@ public class CategoriesTree {
         this.categoryName = categoryName;
         this.parent = parent;
     }
-
+    
+    public void clearSubCategories(){
+        subCategoriesTrees.clear();
+    }
+    
+    public void setCategoryName(final String categoryName){
+        this.categoryName = Objects.requireNonNull(categoryName);
+    }
+    
     public CategoriesTree getCategory(final String category) {
         Objects.requireNonNull(category);
         if (Objects.equals(categoryName, category)) {
@@ -88,5 +96,15 @@ public class CategoriesTree {
             CategoriesTree subcategory = new CategoriesTree(subCategoryName, this);
             subCategoriesTrees.add(subcategory);
         });
+    }
+
+    @Override
+    protected CategoriesTree clone(){
+        final CategoriesTree tree = new CategoriesTree(categoryName, parent);
+        subCategoriesTrees.forEach(subTree -> {
+            tree.subCategoriesTrees.add(subTree.clone());
+        });
+        
+        return tree;
     }
 }

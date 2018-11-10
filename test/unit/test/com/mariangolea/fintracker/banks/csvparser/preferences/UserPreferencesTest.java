@@ -1,6 +1,7 @@
 package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
+import java.util.Arrays;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -22,9 +23,9 @@ public class UserPreferencesTest {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
         other.setCompanyDisplayName("company", "name");
-        String expected = other.getCompanyIdentifierString("name");
-        assertEquals(expected, "company");
-        assertTrue(other.getCompanyIdentifierStrings().containsAll(Utilities.createList("company")));
+        Collection<String> expected = other.getCompanyIdentifierStrings("name");
+        assertEquals(expected, Arrays.asList("company"));
+        assertTrue(other.getAllCompanyIdentifierStrings().containsAll(Utilities.createList("company")));
 
         other.appendDefinition("two", Utilities.createList("one"));
         other.appendDefinition("three", Utilities.createList("two"));

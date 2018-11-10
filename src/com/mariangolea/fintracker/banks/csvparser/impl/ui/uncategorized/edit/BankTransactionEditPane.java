@@ -2,8 +2,9 @@ package com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit;
 
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.impl.preferences.CategoriesTree;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.categories.CategoriesTree;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -51,9 +52,15 @@ public class BankTransactionEditPane extends GridPane {
         originalCategories.addAll(userPrefs.getUserDefinedCategoryNames());
         originalCategories.removeAll(userPrefs.getCompanyDisplayNames());
 
-        String categoryName = transaction.description;
-        splitLines(categoryName);
-        final String substring = userPrefs.getCompanyIdentifierString(categoryName);
+        String transactionDescription = transaction.description;
+        splitLines(transactionDescription);
+        final Collection<String> substrings = userPrefs.getCompanyIdentifierStrings(transactionDescription);
+        String substring = null;
+        for (String sub : substrings){
+            if (transactionDescription.contains(sub)){
+                substring = sub;
+            }
+        }
         companyNameIdentifierField.setText(substring);
         companyDisplayNameField.setItems(FXCollections.observableArrayList(userPrefs.getCompanyDisplayNames()));
         companyDisplayNameField.setValue(substring == null ? null : userPrefs.getCompanyDisplayName(substring));

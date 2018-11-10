@@ -10,7 +10,6 @@ import javafx.scene.control.Dialog;
 public class BankTransactionEditDialog extends Dialog<EditResult> {
 
     public BankTransactionEditDialog(final BankTransactionEditPane editPane) {
-        super();
         Objects.requireNonNull(editPane);
         
         setTitle("Edit company name and apply to similar transactions");

@@ -13,10 +13,19 @@ public class UserPreferences extends CategoriesPreferences implements UserPrefer
     protected UserPreferences() {
     }
 
-    protected UserPreferences(final CategoriesPreferences prefs) {
-        super(Objects.requireNonNull(prefs));
+    public UserPreferences(final UserPreferences prefs) {
+        super(prefs);
+        csvInputFolder = prefs.getCSVInputFolder();
+        transactionsTimeframe = prefs.getTransactionGroupingTimeframe();
     }
 
+    @Override
+    public UserPreferencesInterface deepClone() {
+        return new UserPreferences(this);
+    }
+
+    
+    
     @Override
     public String getCSVInputFolder() {
         return csvInputFolder;
@@ -38,19 +47,10 @@ public class UserPreferences extends CategoriesPreferences implements UserPrefer
     }
 
     @Override
-    public UserPreferences clone() {
-        UserPreferences prefs = new UserPreferences(super.clone());
-        prefs.csvInputFolder = csvInputFolder;
-        prefs.transactionsTimeframe = transactionsTimeframe;
-        return prefs;
-    }
-
-    @Override
     public void applyChanges(final UserPreferencesInterface userEdited) {
         setTransactionGroupingTimeframe(userEdited.getTransactionGroupingTimeframe());
         setCSVInputFolder(userEdited.getCSVInputFolder());
         super.applyChanges(userEdited);
     }
-    
-    
+
 }

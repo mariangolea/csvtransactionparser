@@ -10,7 +10,6 @@ import org.junit.Test;
 
 public class FXUITest {
 
-
     @BeforeClass
     public static void initToolkit()
             throws InterruptedException {

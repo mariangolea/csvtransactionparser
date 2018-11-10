@@ -13,11 +13,11 @@ public class CategoriesTreeTests {
     @Test
     public void testConstructor() {
         CategoriesTree root = new CategoriesTree();
-        assertEquals(CategoriesTree.ROOT, root.categoryName);
+        assertEquals(CategoriesTree.ROOT, root.getCategoryName());
         assertNull(root.getParentCategory());
 
         CategoriesTree child = new CategoriesTree("child");
-        assertEquals("child", child.categoryName);
+        assertEquals("child", child.getCategoryName());
         assertNull(root.getParentCategory());
     }
 

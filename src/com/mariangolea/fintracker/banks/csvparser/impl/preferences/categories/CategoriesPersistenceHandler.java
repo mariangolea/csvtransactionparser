@@ -1,6 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.impl.preferences.categories;
 
-import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerBase;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,11 +16,11 @@ public class CategoriesPersistenceHandler extends UserPreferencesHandlerBase {
 
     private final Properties categoriesFile = new Properties();
 
-    public CategoriesPersistenceHandler(final UserPreferencesInterface userPreferences) {
+    public CategoriesPersistenceHandler(final UserPreferences userPreferences) {
         super(userPreferences);
     }
 
-    public CategoriesPersistenceHandler(final UserPreferencesInterface userPreferences, final String preferencesFolder) {
+    public CategoriesPersistenceHandler(final UserPreferences userPreferences, final String preferencesFolder) {
         super(userPreferences, preferencesFolder);
     }
 

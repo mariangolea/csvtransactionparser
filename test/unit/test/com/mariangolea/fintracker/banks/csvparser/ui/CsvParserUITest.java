@@ -31,7 +31,7 @@ import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
-public class CsvParserUITest {
+public class CsvParserUITest extends FXUITest{
 
     private final Utilities utils = new Utilities();
 

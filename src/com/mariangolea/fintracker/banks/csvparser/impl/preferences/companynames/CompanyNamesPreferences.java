@@ -113,11 +113,6 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
     }
 
     @Override
-    protected CompanyNamesPreferences clone() throws CloneNotSupportedException {
-        return new CompanyNamesPreferences(this);
-    }
-
-    @Override
     public void applyChanges(final UserPreferencesInterface userEdited) {
         companyIdentifiers.clear();
         companyNames.clear();

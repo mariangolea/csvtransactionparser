@@ -24,7 +24,7 @@ public class EditCompanyNamesPane extends FlowPane {
 
     public EditCompanyNamesPane(final UserPreferencesInterface prefs) {
         super(Orientation.VERTICAL);
-        this.prefs = Objects.requireNonNull(Objects.requireNonNull(prefs).clone());
+        this.prefs = Objects.requireNonNull(Objects.requireNonNull(prefs).deepClone());
         createComponents();
     }
 

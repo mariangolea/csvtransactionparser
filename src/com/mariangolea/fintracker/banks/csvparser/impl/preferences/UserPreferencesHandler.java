@@ -66,4 +66,9 @@ public class UserPreferencesHandler extends UserPreferencesHandlerBase implement
     public UserPreferencesInterface getPreferences() {
         return userPreferences;
     }
+
+    @Override
+    public UserPreferencesInterface deepCopyPreferences(UserPreferencesInterface original) {
+        return new UserPreferences(userPreferences);
+    }
 }

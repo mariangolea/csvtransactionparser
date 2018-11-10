@@ -13,12 +13,19 @@ import javafx.collections.FXCollections;
 public class CategoriesTree {
 
     public static final String ROOT = "Root";
-    public String categoryName;
+    private String categoryName;
     private CategoriesTree parent;
     private final List<CategoriesTree> subCategoriesTrees = FXCollections.observableArrayList();
 
     public CategoriesTree() {
         this(ROOT);
+    }
+    
+    public CategoriesTree(final CategoriesTree copiedTree) {
+        this(copiedTree.categoryName, copiedTree.parent);
+        subCategoriesTrees.forEach(subTree -> {
+            copiedTree.subCategoriesTrees.add(new CategoriesTree(subTree));
+        });
     }
     
     public CategoriesTree(final String categoryName) {
@@ -28,6 +35,10 @@ public class CategoriesTree {
     private CategoriesTree(final String categoryName, final CategoriesTree parent){
         this.categoryName = categoryName;
         this.parent = parent;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
     }
     
     public void clearSubCategories(){
@@ -96,15 +107,5 @@ public class CategoriesTree {
             CategoriesTree subcategory = new CategoriesTree(subCategoryName, this);
             subCategoriesTrees.add(subcategory);
         });
-    }
-
-    @Override
-    protected CategoriesTree clone(){
-        final CategoriesTree tree = new CategoriesTree(categoryName, parent);
-        subCategoriesTrees.forEach(subTree -> {
-            tree.subCategoriesTrees.add(subTree.clone());
-        });
-        
-        return tree;
     }
 }

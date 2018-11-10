@@ -1,6 +1,5 @@
 package com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.single;
 
-import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;

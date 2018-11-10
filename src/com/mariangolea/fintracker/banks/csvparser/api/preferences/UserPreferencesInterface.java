@@ -24,5 +24,5 @@ public interface UserPreferencesInterface extends CategoriesInterface{
 
     public void setTransactionGroupingTimeframe(Timeframe timeframe);
     
-    public UserPreferencesInterface clone();
+    public UserPreferencesInterface deepClone();
 }

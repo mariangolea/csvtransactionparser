@@ -1,6 +1,5 @@
 package com.mariangolea.fintracker.banks.csvparser.impl.preferences;
 
-import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,14 +18,14 @@ public abstract class UserPreferencesHandlerBase {
     protected final static String COMMENTS = "Automatically generated. DO NOT EDIT YOURSELF!!!";
     protected static final String SUB_FOLDER = "preferences";
 
-    protected final UserPreferencesInterface userPreferences;
+    protected final UserPreferences userPreferences;
     private final String prefsFolder;
 
-    public UserPreferencesHandlerBase(final UserPreferencesInterface userPreferences) {
+    public UserPreferencesHandlerBase(final UserPreferences userPreferences) {
         this(userPreferences, SUB_FOLDER);
     }
 
-    public UserPreferencesHandlerBase(final UserPreferencesInterface userPreferences, final String preferencesFolder) {
+    public UserPreferencesHandlerBase(final UserPreferences userPreferences, final String preferencesFolder) {
         this.userPreferences = Objects.requireNonNull(userPreferences);
         prefsFolder = Objects.requireNonNull(preferencesFolder);
         File folder = new File(prefsFolder);

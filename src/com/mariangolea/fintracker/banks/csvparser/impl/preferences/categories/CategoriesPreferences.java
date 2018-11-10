@@ -20,10 +20,9 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
         this.categories = Objects.requireNonNull(categories);
     }
 
-    protected CategoriesPreferences(
-            final CategoriesPreferences prefs) {
+    protected CategoriesPreferences(final CategoriesPreferences prefs) {
         super(prefs);
-        this.categories = Objects.requireNonNull(prefs.categories.clone());
+        this.categories = new CategoriesTree(Objects.requireNonNull(prefs.categories));
     }
 
     @Override
@@ -84,12 +83,7 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
     @Override
     public String getParent(final String categoryName) {
         CategoriesTree tree = categories.getCategory(categoryName);
-        return tree == null ? null : tree.getParentCategory().categoryName;
-    }
-
-    @Override
-    protected CategoriesPreferences clone() {
-        return new CategoriesPreferences(this);
+        return tree == null ? null : tree.getParentCategory().getCategoryName();
     }
 
     @Override

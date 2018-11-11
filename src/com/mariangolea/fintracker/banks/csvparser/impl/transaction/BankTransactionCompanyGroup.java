@@ -32,7 +32,7 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
 
     @Override
     public List<BankTransactionGroupInterface> getContainedGroups() {
-        return null;
+        return FXCollections.emptyObservableList();
     }
 
     @Override
@@ -64,9 +64,7 @@ public class BankTransactionCompanyGroup extends BankTransactionAbstractGroup {
     }
 
     protected void addTransactions(final Collection<BankTransaction> parsedTransactions) {
-        parsedTransactions.forEach((transaction) -> {
-            addTransaction(transaction);
-        });
+        parsedTransactions.forEach(transaction -> addTransaction(transaction));
     }
 
 }

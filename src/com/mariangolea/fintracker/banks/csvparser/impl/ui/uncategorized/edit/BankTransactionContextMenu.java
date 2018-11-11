@@ -6,7 +6,7 @@ import javafx.scene.control.MenuItem;
 
 public class BankTransactionContextMenu extends ContextMenu {
 
-    BankTransaction transaction;
+    private BankTransaction transaction;
     private final BankTransactionEditHandler editHandler;
 
     public BankTransactionContextMenu(final BankTransactionEditHandler editHandler) {

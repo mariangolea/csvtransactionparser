@@ -3,7 +3,7 @@ package test.com.mariangolea.fintracker.banks.csvparser.ui.uncategorized;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.BankTransactionEditHandler;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.EditResult;
-import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import static org.junit.Assert.assertEquals;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,9 +11,6 @@ import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class BankTransactionEditHandlerTest {
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testApplyEditResult() {

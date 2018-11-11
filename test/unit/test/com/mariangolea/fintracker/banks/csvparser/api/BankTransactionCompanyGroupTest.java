@@ -4,7 +4,7 @@ import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactio
 import com.mariangolea.fintracker.banks.csvparser.impl.transaction.BankTransactionCompanyGroup;
 import java.util.Arrays;
 import java.util.Collection;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class BankTransactionCompanyGroupTest extends BankTransactionTest {
         assertTrue(firstGroup.getGroupsNumber() == 0);
         assertTrue(firstGroup.getCategoryName().equals("description"));
         assertTrue(firstGroup.getContainedTransactions().equals(Arrays.asList(legal)));
-        assertNull(firstGroup.getContainedGroups());
+        assertNotNull(firstGroup.getContainedGroups());
         String toString = firstGroup.toString();
         assertTrue(toString != null
                 && !toString.isEmpty()

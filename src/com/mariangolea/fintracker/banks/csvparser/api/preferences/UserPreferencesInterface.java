@@ -8,10 +8,10 @@ public interface UserPreferencesInterface extends CategoriesInterface{
         MONTH(Calendar.MONTH),
         YEAR(Calendar.YEAR);
 
-        public final int timeframe;
+        public final int timeFrame;
 
         private Timeframe(int timeframe) {
-            this.timeframe = timeframe;
+            this.timeFrame = timeframe;
         }
     }
 

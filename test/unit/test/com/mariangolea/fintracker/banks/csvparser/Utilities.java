@@ -41,9 +41,9 @@ public class Utilities {
         texts.add(parser.bank.transactionsNumberLabel + "," + 2 + " Tranzactii.");
         texts.add(parser.bank.relevantContentHeaderLine);
         List<String> mockData = constructSimplestPositiveLinesInputING();
-        for (String line : mockData) {
-            texts.add(line);
-        }
+        mockData.forEach(line -> 
+            texts.add(line)
+        );
         texts.add("Gibberish");
 
         return texts.toArray(new String[texts.size()]);
@@ -57,9 +57,9 @@ public class Utilities {
         texts.add(parser.bank.transactionsNumberLabel + "," + 2 + " Tranzactii.");
         texts.add(parser.bank.relevantContentHeaderLine);
         List<String> mockData = constructSimplestPositiveLinesInputBT();
-        for (String line : mockData) {
-            texts.add(line);
-        }
+        mockData.forEach(line -> 
+            texts.add(line)
+        );
         texts.add("Gibberish");
 
         return texts.toArray(new String[texts.size()]);
@@ -172,10 +172,7 @@ public class Utilities {
 
     public static Collection<String> createList(final String... args) {
         Collection<String> list = new ArrayList<>();
-        for (String arg : args) {
-            list.add(arg);
-        }
-
+        list.addAll(Arrays.asList(args));
         return list;
     }
 }

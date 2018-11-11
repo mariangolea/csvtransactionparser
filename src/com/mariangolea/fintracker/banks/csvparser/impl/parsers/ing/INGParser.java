@@ -71,15 +71,15 @@ public class INGParser extends AbstractBankParser {
         }
 
         int detailsLinesNumber = toConsume.size() - 1;
-        String details = "";
+        StringBuilder details = new StringBuilder();
         if (detailsLinesNumber > 0) {
             for (int i = 0; i < detailsLinesNumber; i++) {
                 record = parseSingleLine(toConsume.get(i + 1));
                 if (record != null && record.size() > 3) {
-                    details += record.get(3) + ",";
+                    details.append(record.get(3)).append(",");
                 }
             }
         }
-        return createTransaction(completedDate, completedDate, creditAmount.abs(), debitAmount.abs(), desc + details, toConsume);
+        return createTransaction(completedDate, completedDate, creditAmount.abs(), debitAmount.abs(), desc + details.toString(), toConsume);
     }
 }

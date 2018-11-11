@@ -1,4 +1,4 @@
-package com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit;
+package com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit;
 
 public interface UncategorizedTransactionApplyListener {
 

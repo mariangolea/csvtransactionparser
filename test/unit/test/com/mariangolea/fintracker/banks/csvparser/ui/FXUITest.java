@@ -17,7 +17,7 @@ public class FXUITest {
         if (!Boolean.parseBoolean(headless)) {
             final CountDownLatch latch = new CountDownLatch(1);
             SwingUtilities.invokeLater(() -> {
-                new JFXPanel();
+                JFXPanel panel = new JFXPanel();
                 latch.countDown();
             });
 

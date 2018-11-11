@@ -18,16 +18,12 @@ import javafx.util.Pair;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsCategorizerTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
     private UserPreferencesInterface userPrefs;
     private Collection<BankTransaction> transactions;
 

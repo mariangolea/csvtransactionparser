@@ -4,25 +4,20 @@ import com.mariangolea.fintracker.banks.csvparser.api.filters.MonthSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.filters.YearSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesHandlerInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsSlotter;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class TransactionsSlotterTest {
 
     private Collection<BankTransaction> transactions;
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
 
     @Before
     public void init() {

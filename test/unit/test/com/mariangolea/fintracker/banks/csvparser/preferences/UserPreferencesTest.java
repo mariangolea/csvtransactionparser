@@ -8,15 +8,10 @@ import org.junit.Test;
 
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class UserPreferencesTest {
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testMethods() {

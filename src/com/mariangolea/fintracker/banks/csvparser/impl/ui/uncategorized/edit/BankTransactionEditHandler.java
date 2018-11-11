@@ -2,7 +2,7 @@ package com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit;
 
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
-import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.EditCompanyDialog;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,11 +10,11 @@ import java.util.Optional;
 public class BankTransactionEditHandler {
 
     private final UserPreferencesInterface userPrefs;
-    private BankTransactionEditDialog editPopup;
+    private EditCompanyDialog editPopup;
     private BankTransactionEditPane editPane;
     private final UncategorizedTransactionApplyListener applyListener;
 
-    public BankTransactionEditHandler(UncategorizedTransactionApplyListener applyListener, final UserPreferencesInterface userPrefs) {
+    public BankTransactionEditHandler(final UncategorizedTransactionApplyListener applyListener, final UserPreferencesInterface userPrefs) {
         this.applyListener = Objects.requireNonNull(applyListener);
         this.userPrefs = Objects.requireNonNull(userPrefs);
     }
@@ -22,7 +22,7 @@ public class BankTransactionEditHandler {
     public void editTransaction(final BankTransaction transaction) {
         if (editPopup == null) {
             editPane = new BankTransactionEditPane(userPrefs);
-            editPopup = new BankTransactionEditDialog(editPane);
+            editPopup = new EditCompanyDialog<>("Edit company name and apply to similar transactions", editPane, BankTransactionEditPane::getEditResult, BankTransactionEditPane::isValid);
         }
         editPane.setBankTransaction(transaction);
         Optional<EditResult> result = editPopup.showAndWait();

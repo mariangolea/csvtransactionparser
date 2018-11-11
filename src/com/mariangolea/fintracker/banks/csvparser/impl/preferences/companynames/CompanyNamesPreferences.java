@@ -25,9 +25,9 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
         this.companyIdentifiers = FXCollections.observableHashMap();
         companyIdentifiers.putAll(Objects.requireNonNull(companyNamesPreferences.companyIdentifiers));
         this.companyNames = FXCollections.observableHashMap();
-        Objects.requireNonNull(companyNamesPreferences.companyNames).entrySet().forEach(entry ->{
-            companyNames.put(entry.getKey(), FXCollections.observableArrayList(entry.getValue()));
-        });
+        Objects.requireNonNull(companyNamesPreferences.companyNames).entrySet().forEach(entry ->
+            companyNames.put(entry.getKey(), FXCollections.observableArrayList(entry.getValue()))
+        );
     }
 
     @Override
@@ -56,14 +56,14 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
     public void resetCompanyIdentifierStrings(final String companyName, final Collection<String> newIdentifiers) {
         //remove existing identifiers
         final Collection<String> existingIdentifiers = FXCollections.observableArrayList(companyNames.get(companyName));
-        existingIdentifiers.forEach(former ->{
-            deleteCompanyIdentifier(former);
-        });
+        existingIdentifiers.forEach(former ->
+            deleteCompanyIdentifier(former)
+        );
         
         //set up the new ones.
-        newIdentifiers.forEach(identifier ->{
-            setCompanyDisplayName(identifier, companyName);
-        });
+        newIdentifiers.forEach(identifier ->
+            setCompanyDisplayName(identifier, companyName)
+        );
     }
     
     @Override
@@ -120,8 +120,8 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
             final Collection<String> companyLocalIdentifiers = Objects.requireNonNull(userEdited.getCompanyIdentifierStrings(companyName));
             companyNames.put(companyName, FXCollections.observableArrayList(companyLocalIdentifiers));
         });
-        userEdited.getAllCompanyIdentifierStrings().forEach(identifier ->{
-            companyIdentifiers.put(identifier, Objects.requireNonNull(userEdited.getCompanyDisplayName(identifier)));
-        });
+        userEdited.getAllCompanyIdentifierStrings().forEach(identifier ->
+            companyIdentifiers.put(identifier, Objects.requireNonNull(userEdited.getCompanyDisplayName(identifier)))
+        );
     }
 }

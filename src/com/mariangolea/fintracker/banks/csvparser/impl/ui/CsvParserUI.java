@@ -9,10 +9,9 @@ import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsP
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
 import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView;
-import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.EditCompanyNamesDialog;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.EditCompanyNamesPane;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.UncategorizedView;
-import com.mariangolea.fintracker.banks.csvparser.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +31,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -87,14 +85,10 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
     }
 
     protected void loadData(final List<CsvFileParseResponse> parsedTransactions) {
-        if (parsedTransactions != null) {
-            parsedTransactions.forEach(csvFileResponse -> {
-                csvFileResponse.parsedTransactions.forEach(transaction -> {
-                    model.add(transaction);
-                });
-            });
-            updateView();
-        }
+        Objects.requireNonNull(parsedTransactions).forEach(csvFileResponse
+                -> csvFileResponse.parsedTransactions.forEach(transaction -> model.add(transaction))
+        );
+        updateView();
     }
 
     protected MenuBar createMenu() {
@@ -103,9 +97,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         file.setAccelerator(KeyCombination.keyCombination("Alt+f"));
         MenuItem load = new MenuItem("Load data from CSV file.");
         load.setAccelerator(KeyCombination.keyCombination("l"));
-        load.setOnAction((ActionEvent e) -> {
-            popCSVFileChooser();
-        });
+        load.setOnAction((ActionEvent e) -> popCSVFileChooser());
         file.getItems().add(load);
         menu.getMenus().add(file);
 
@@ -113,12 +105,10 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         edit.setAccelerator(KeyCombination.keyCombination("Alt+e"));
         MenuItem editCompanies = new MenuItem("Edit company names");
         editCompanies.setAccelerator(KeyCombination.keyCombination("c"));
-        editCompanies.setOnAction((ActionEvent e) -> {
-            editCompanyNames();
-        });
+        editCompanies.setOnAction((ActionEvent e) -> editCompanyNames());
         edit.getItems().add(editCompanies);
         menu.getMenus().add(edit);
-        
+
         menu.setUseSystemMenuBar(true);
 
         return menu;
@@ -137,20 +127,27 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
     protected void popCSVFileChooser() {
         String inputFolder = userPrefs.getCSVInputFolder();
         FileChooser chooser = new FileChooser();
-        File inputFolderFile = inputFolder == null ? null : new File(inputFolder);
-        chooser.setInitialDirectory(inputFolderFile == null ? null : inputFolderFile.exists() ? inputFolderFile : null);
+        File inputFolderFile = null;
+        if (inputFolder != null) {
+            inputFolderFile = new File(inputFolder);
+            if (inputFolderFile.exists()) {
+                chooser.setInitialDirectory(inputFolderFile);
+            }
+        }
+
         ExtensionFilter filter = new ExtensionFilter(
                 "CSV files only", "*.csv");
         chooser.getExtensionFilters().add(filter);
         chooser.setSelectedExtensionFilter(filter);
         List<File> csvFiles = chooser.showOpenMultipleDialog(primaryStage);
-        if (csvFiles != null && csvFiles.size() > 0) {
+        if (csvFiles != null && !csvFiles.isEmpty()) {
             parseUserSelectedCSVFiles(csvFiles);
         }
     }
-    
-    protected void editCompanyNames(){
-        EditCompanyNamesDialog popup = new EditCompanyNamesDialog(new EditCompanyNamesPane(userPrefs));
+
+    protected void editCompanyNames() {
+        final EditCompanyNamesPane pane = new EditCompanyNamesPane(userPrefs);
+        EditCompanyDialog popup = new EditCompanyDialog<>("Edit global company names preferences", pane, EditCompanyNamesPane::getResult, null);
         Optional<UserPreferencesInterface> result = popup.showAndWait();
         result.ifPresent(userData -> {
             userPrefs.applyChanges(Objects.requireNonNull(userData));
@@ -172,9 +169,8 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
             protected List<CsvFileParseResponse> call() throws Exception {
                 BankTransactionsParser fac = new BankTransactionsParser();
                 final List<CsvFileParseResponse> res = new ArrayList<>();
-                csvFiles.stream().map((csvFile) -> fac.parseTransactions(csvFile)).filter((response) -> (response != null)).forEachOrdered((response) -> {
-                    res.add(response);
-                });
+                csvFiles.stream().map((csvFile) -> fac.parseTransactions(csvFile)).filter((response) -> 
+                        (response != null)).forEachOrdered((response) -> res.add(response));
                 return res;
             }
         };
@@ -184,9 +180,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
                 appendReportMessage(FINISHED_PARSING_CSV_FILES);
                 List<CsvFileParseResponse> values = (List<CsvFileParseResponse>) e.getSource().getValue();
                 loadData(values);
-                values.forEach((response) -> {
-                    appendReportText(response);
-                });
+                values.forEach((response) -> appendReportText(response));
                 parsedTransactionsCopy.clear();
                 parsedTransactionsCopy.addAll(values);
             });
@@ -220,7 +214,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
             appendReportMessage("ALL OK!");
         } else if (!fileResponse.allCsvContentProcessed) {
             String message = "Find below CSV content lines unprocessed.\n";
-            message = fileResponse.unprocessedStrings.stream().map((line) -> "\t" + line).reduce(message, String::concat);
+            message = fileResponse.unprocessedStrings.stream().map(line -> "\t" + line).reduce(message, String::concat);
             appendReportMessage(message);
         } else {
             if (fileResponse.expectedTransactionsNumber == 0) {
@@ -242,9 +236,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         }
 
         Hyperlink hyperlink = new Hyperlink(sourceFile.getName());
-        hyperlink.setOnMouseClicked((MouseEvent event) -> {
-            getHostServices().showDocument(sourceFile.toURI().toString());
-        });
+        hyperlink.setOnMouseClicked(event -> getHostServices().showDocument(sourceFile.toURI().toString()));
         feedbackPane.getChildren().add(hyperlink);
 
         if (post != null && !post.isEmpty()) {
@@ -302,8 +294,8 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         root.setTop(menuBar);
         root.setCenter(grid);
     }
-    
-    protected Pane getRoot(){
+
+    protected Pane getRoot() {
         return root;
     }
 }

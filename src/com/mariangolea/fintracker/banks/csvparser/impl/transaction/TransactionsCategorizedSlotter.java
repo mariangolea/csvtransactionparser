@@ -5,7 +5,6 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferences;
-import com.mariangolea.fintracker.banks.csvparser.transaction.TransactionsSlotter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,7 +46,7 @@ public class TransactionsCategorizedSlotter {
         //create a slotted map of company grouped transactions.
         slotter = new TransactionsSlotter(userPrefs.getTransactionGroupingTimeframe(), this.categorizableTransactions);
         slottedCompanyGroups = categorizeByCompanyNames();
-        slottedCategorised = slotAndCategorize(slottedCompanyGroups);
+        slottedCategorised = slotAndCategorize();
     }
 
     public Map<YearSlot, Collection<BankTransactionGroupInterface>> getUnmodifiableSlottedCategorized() {
@@ -62,7 +61,7 @@ public class TransactionsCategorizedSlotter {
         return FXCollections.unmodifiableObservableMap(slottedCompanyGroups);
     }
 
-    protected final Map<YearSlot, Collection<BankTransactionGroupInterface>> slotAndCategorize(ObservableMap<Pair<YearSlot, String>, BankTransactionCompanyGroup> slottedCompanyGroups) {
+    protected final Map<YearSlot, Collection<BankTransactionGroupInterface>> slotAndCategorize() {
         Map<YearSlot, Collection<BankTransactionGroupInterface>> slotted = FXCollections.observableHashMap();
         Collection<String> topMostCategories = userPrefs.getTopMostCategories();
         topMostCategories.forEach((topMostCategory) -> {

@@ -9,7 +9,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import com.mariangolea.fintracker.banks.csvparser.api.parser.Bank;
 import com.mariangolea.fintracker.banks.csvparser.api.parser.CsvFileParseResponse;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsParser;
 import java.util.List;

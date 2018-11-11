@@ -30,10 +30,12 @@ public class TableViewData {
     public final SimpleObjectProperty<String> subCategoryString;
     public final SimpleObjectProperty<List<String>> amountStrings;
     private final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedModel;
-    private final UserPreferencesInterface prefs;
 
-    public TableViewData(final String category, boolean isTopMostCategory, final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedModel, final UserPreferencesInterface prefs) {
-        this.prefs = Objects.requireNonNull(prefs);
+    public TableViewData(
+            final String category, 
+            boolean isTopMostCategory, 
+            final Map<YearSlot, Collection<BankTransactionGroupInterface>> slottedModel, 
+            final UserPreferencesInterface prefs) {
         this.slottedModel = Objects.requireNonNull(slottedModel);
         this.topMostCategoryString = new SimpleObjectProperty<>(isTopMostCategory ? Objects.requireNonNull(category) : "");
         this.subCategoryString = new SimpleObjectProperty<>(isTopMostCategory ? "" : category);

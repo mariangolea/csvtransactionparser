@@ -40,9 +40,7 @@ public class CategoriesPersistenceHandler extends UserPreferencesHandlerBase {
         Set<String> categoryNames = new HashSet<>(
                 convertPersistedStringToList(categoryNamesString, SEPARATOR));
         userPreferences.appendDefinition(CategoriesTree.ROOT, categoryNames);
-        categoryNames.forEach((topMostCategory) -> {
-            loadCategoryName(topMostCategory);
-        });
+        categoryNames.forEach(topMostCategory -> loadCategoryName(topMostCategory));
     }
 
     protected boolean storeCategoriesFile() {
@@ -50,9 +48,7 @@ public class CategoriesPersistenceHandler extends UserPreferencesHandlerBase {
         String categoryNamesValue = convertStringsForStorage(categoryNames, SEPARATOR);
         if (categoryNamesValue != null && !categoryNamesValue.isEmpty()) {
             categoriesFile.setProperty(CATEGORY_NAMES, categoryNamesValue);
-            categoryNames.forEach((categoryName) -> {
-                storeTopMostCategoryName(categoryName);
-            });
+            categoryNames.forEach(categoryName -> storeTopMostCategoryName(categoryName));
         }
 
         return storeProperties(CATEGORIES_FILE_DEFAULT_NAME, categoriesFile, COMMENTS);
@@ -62,9 +58,7 @@ public class CategoriesPersistenceHandler extends UserPreferencesHandlerBase {
         Collection<String> subCategories = userPreferences.getSubCategories(topMostCategory);
         if (subCategories != null && !subCategories.isEmpty()) {
             categoriesFile.setProperty(topMostCategory, convertStringsForStorage(subCategories, SEPARATOR));
-            subCategories.forEach((category) -> {
-                storeTopMostCategoryName(category);
-            });
+            subCategories.forEach(category -> storeTopMostCategoryName(category));
         }
     }
 
@@ -76,9 +70,7 @@ public class CategoriesPersistenceHandler extends UserPreferencesHandlerBase {
             return;
         }
         userPreferences.appendDefinition(category, subCategories);
-        subCategories.forEach((subCategoy) -> {
-            loadCategoryName(subCategoy);
-        });
+        subCategories.forEach(subCategoy -> loadCategoryName(subCategoy));
     }
 
 }

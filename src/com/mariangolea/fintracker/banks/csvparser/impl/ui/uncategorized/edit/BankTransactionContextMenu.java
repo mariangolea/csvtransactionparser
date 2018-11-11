@@ -20,9 +20,7 @@ public class BankTransactionContextMenu extends ContextMenu {
 
     protected final MenuItem constructEditMenu() {
         MenuItem edit = new MenuItem("Edit");
-        edit.setOnAction(e -> {
-            edit();
-        });
+        edit.setOnAction(e -> edit());
         return edit;
     }
 

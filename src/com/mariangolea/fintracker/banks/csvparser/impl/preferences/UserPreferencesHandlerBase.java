@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public abstract class UserPreferencesHandlerBase {
 
-    protected final static String COMMENTS = "Automatically generated. DO NOT EDIT YOURSELF!!!";
+    protected static final String COMMENTS = "Automatically generated. DO NOT EDIT YOURSELF!!!";
     protected static final String SUB_FOLDER = "preferences";
 
     protected final UserPreferences userPreferences;

@@ -35,4 +35,27 @@ public class UserPreferencesTest {
         assertEquals(topMost.size(), expectedList.size());
         assertTrue(topMost.containsAll(expectedList));
     }
+    
+    @Test
+    public void testDeepClone(){
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
+        UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
+        other.setCompanyDisplayName("company", "name");
+        
+        UserPreferencesInterface copied = factory.getUserPreferencesHandler().deepCopyPreferences(other);
+        assertEquals(other.getCompanyDisplayName("name"), copied.getCompanyDisplayName("name"));
+    }
+    
+    @Test
+    public void testApplyChanges(){
+        UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
+        UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
+        other.setCompanyDisplayName("name", "company");
+        UserPreferencesInterface copied = factory.getUserPreferencesHandler().deepCopyPreferences(other);
+        copied.editCompanyName("company", "edited");
+        
+        other.applyChanges(copied);
+        assertEquals("edited", other.getCompanyDisplayName("name"));
+    }
+    
 }

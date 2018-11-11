@@ -30,7 +30,7 @@ public class BankTransactionEditPane extends GridPane {
     private ComboBox<String> categoryPicker;
     private ComboBox<String> parentCategoryPicker;
     private final UserPreferencesInterface userPrefs;
-    private final static String INVALID_STYLE = "-fx-border-color: red";
+    private static final String INVALID_STYLE = "-fx-border-color: red";
 
     public BankTransactionEditPane(final UserPreferencesInterface userPrefs) {
         this.userPrefs = Objects.requireNonNull(userPrefs);

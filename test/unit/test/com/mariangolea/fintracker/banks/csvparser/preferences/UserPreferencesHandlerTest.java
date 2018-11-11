@@ -2,11 +2,11 @@ package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesHandlerInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
+import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import java.io.File;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.junit.Rule;
@@ -19,6 +19,12 @@ public class UserPreferencesHandlerTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
+    @Test
+    public void testDefaultHandler(){
+        UserPreferencesHandlerFactory original = new UserPreferencesHandlerFactory();
+        assertNotNull(original.getUserPreferencesHandler());
+    }
+    
     @Test
     public void testFirstLoadPreferences() {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();

@@ -16,7 +16,7 @@ public class EditCompanyNamesDialog extends Dialog<UserPreferencesInterface>{
         ButtonType apply = new ButtonType("Apply", ButtonBar.ButtonData.OK_DONE);
         setResultConverter(dialogButton -> {
             if (dialogButton == apply) {
-                return editPane.getUserEdited();
+                return editPane.getResult();
             }
             return null;
         });

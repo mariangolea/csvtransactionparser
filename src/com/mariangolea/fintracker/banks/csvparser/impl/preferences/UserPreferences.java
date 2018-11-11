@@ -3,7 +3,6 @@ package com.mariangolea.fintracker.banks.csvparser.impl.preferences;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface.Timeframe;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.categories.CategoriesPreferences;
-import java.util.Objects;
 
 public class UserPreferences extends CategoriesPreferences implements UserPreferencesInterface {
 

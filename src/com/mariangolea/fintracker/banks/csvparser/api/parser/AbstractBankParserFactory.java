@@ -25,12 +25,6 @@ public abstract class AbstractBankParserFactory {
     }
     
     private boolean matchesBank(final Bank bank, final List<String> fileLines){
-        for (String line : Objects.requireNonNull(fileLines)){
-            if (Objects.requireNonNull(line).contains(bank.relevantContentHeaderLine)){
-                return true;
-            }
-        }
-        
-        return false;
+        return Objects.requireNonNull(fileLines).stream().anyMatch((line) -> (Objects.requireNonNull(line).contains(bank.relevantContentHeaderLine)));
     }
 }

@@ -28,7 +28,7 @@ public class EditCompanyNamesPane extends FlowPane {
         createComponents();
     }
 
-    protected UserPreferencesInterface getUserEdited() {
+    public UserPreferencesInterface getResult() {
         return prefs;
     }
 
@@ -40,7 +40,7 @@ public class EditCompanyNamesPane extends FlowPane {
         getChildren().add(companyNamesView);
     }
 
-    private void editCompanyName(final String companyName) {
+    public void editCompanyName(final String companyName) {
         EditCompanyNamePane pane = new EditCompanyNamePane(companyName, prefs.getCompanyIdentifierStrings(companyName));
         EditCompanyNameDialog popup = new EditCompanyNameDialog(pane);
         Optional<EditCompanyNameResult> result = popup.showAndWait();

@@ -79,7 +79,7 @@ public class TableViewData {
         return result;
     }
 
-    protected BankTransactionGroupInterface findSubGroup(BankTransactionGroupInterface target, String category) {
+    protected BankTransactionGroupInterface findSubGroup(final BankTransactionGroupInterface target, final String category) {
         if (category.equals(target.getCategoryName())) {
             return target;
         }

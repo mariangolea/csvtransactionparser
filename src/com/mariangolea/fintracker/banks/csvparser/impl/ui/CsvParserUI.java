@@ -147,7 +147,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
 
     protected void editCompanyNames() {
         final EditCompanyNamesPane pane = new EditCompanyNamesPane(userPrefs);
-        EditCompanyDialog popup = new EditCompanyDialog<>("Edit global company names preferences", pane, EditCompanyNamesPane::getResult, null);
+        EditDialog popup = new EditDialog<>("Edit global company names preferences", pane, EditCompanyNamesPane::getResult, null);
         Optional<UserPreferencesInterface> result = popup.showAndWait();
         result.ifPresent(userData -> {
             userPrefs.applyChanges(Objects.requireNonNull(userData));

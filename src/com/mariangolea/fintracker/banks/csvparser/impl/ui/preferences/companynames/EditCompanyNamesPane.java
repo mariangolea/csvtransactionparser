@@ -1,6 +1,6 @@
 package com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames;
 
-import com.mariangolea.fintracker.banks.csvparser.impl.ui.EditCompanyDialog;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.EditDialog;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.single.EditCompanyNamePane;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.single.EditCompanyNameResult;
@@ -42,7 +42,7 @@ public class EditCompanyNamesPane extends FlowPane {
 
     public void editCompanyName(final String companyName) {
         EditCompanyNamePane pane = new EditCompanyNamePane(companyName, prefs.getCompanyIdentifierStrings(companyName));
-        EditCompanyDialog popup = new EditCompanyDialog<>("Edit global company names preferences", pane, EditCompanyNamePane::getResult, null);
+        EditDialog popup = new EditDialog<>("Edit global company names preferences", pane, EditCompanyNamePane::getResult, null);
         Optional<EditCompanyNameResult> result = popup.showAndWait();
         result.ifPresent(userData -> {
             final String newName = userData.companyDisplayName;

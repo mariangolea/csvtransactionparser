@@ -26,9 +26,9 @@ public class BankTransactionEditPane extends GridPane {
 
     private TextArea companyDescriptionField;
     private TextField companyNameIdentifierField;
-    private ComboBox<String> companyDisplayNameField;
+    protected ComboBox<String> companyDisplayNameField;
     private ComboBox<String> categoryPicker;
-    private ComboBox<String> parentCategoryPicker;
+    protected ComboBox<String> parentCategoryPicker;
     private final UserPreferencesInterface userPrefs;
     private static final String INVALID_STYLE = "-fx-border-color: red";
 
@@ -56,8 +56,8 @@ public class BankTransactionEditPane extends GridPane {
         splitLines(transactionDescription);
         final Collection<String> substrings = userPrefs.getCompanyIdentifierStrings(transactionDescription);
         String substring = null;
-        for (String sub : substrings){
-            if (transactionDescription.contains(sub)){
+        for (String sub : substrings) {
+            if (transactionDescription.contains(sub)) {
                 substring = sub;
             }
         }
@@ -110,36 +110,40 @@ public class BankTransactionEditPane extends GridPane {
         companyDisplayNameField = new ComboBox<>();
         companyDisplayNameField.setEditable(true);
         companyDisplayNameField.setTooltip(new Tooltip("Select a substring that will be used to identify similar transactions"));
-        companyDisplayNameField.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
-                categoryPicker.setValue(null);
-            } else {
-                String category = userPrefs.getMatchingCategory(companyDescriptionField.getText());
-                if (Objects.equals(CategoriesTree.ROOT, category) || Objects.equals(UserPreferencesInterface.UNCATEGORIZED, category)) {
-                    categoryPicker.setValue(null);
-                } else {
-                    categoryPicker.setValue(category);
-                }
-            }
-        });
+        companyDisplayNameField.valueProperty().addListener((observable, oldValue, newValue) -> companyDisplayNameFieldChanged(newValue));
 
         categoryPicker = new ComboBox<>();
         categoryPicker.setEditable(true);
         categoryPicker.setTooltip(new Tooltip("Pick a category for this company name"));
-        categoryPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
-                parentCategoryPicker.setValue(null);
-            } else {
-                String parentCategory = userPrefs.getParent(newValue);
-                if (!Objects.equals(CategoriesTree.ROOT, parentCategory)) {
-                    parentCategoryPicker.setValue(parentCategory);
-                }
-            }
-        });
+        categoryPicker.valueProperty().addListener((observable, oldValue, newValue) -> categoryPickerChanged(newValue));
 
         parentCategoryPicker = new ComboBox<>();
         parentCategoryPicker.setEditable(true);
         parentCategoryPicker.setTooltip(new Tooltip("Pick a parent category for selected category, or leave blank"));
+    }
+
+    protected void companyDisplayNameFieldChanged(final String newValue) {
+        if (newValue == null) {
+            categoryPicker.setValue(null);
+        } else {
+            String category = userPrefs.getParent(newValue);
+            if (Objects.equals(CategoriesTree.ROOT, category) || Objects.equals(UserPreferencesInterface.UNCATEGORIZED, category)) {
+                categoryPicker.setValue(null);
+            } else {
+                categoryPicker.setValue(category);
+            }
+        }
+    }
+
+    protected void categoryPickerChanged(final String newValue) {
+        if (newValue == null) {
+            parentCategoryPicker.setValue(null);
+        } else {
+            String parentCategory = userPrefs.getParent(newValue);
+            if (!Objects.equals(CategoriesTree.ROOT, parentCategory)) {
+                parentCategoryPicker.setValue(parentCategory);
+            }
+        }
     }
 
     private void layoutComponents() {

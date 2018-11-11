@@ -23,6 +23,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;
@@ -129,19 +130,27 @@ public class CsvParserUITest extends FXUITest{
         local.getFeedbackPane().getChildren().clear();
         CsvFileParseResponse res = new CsvFileParseResponse(new BTParser(), 1, 1, new File("mock"), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
         local.appendReportText(res);
-        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        assertEquals(4, local.getFeedbackPane().getChildren().size());
         local.getFeedbackPane().getChildren().clear();
         res = new CsvFileParseResponse(new BTParser(), 1, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
         local.appendReportText(res);
-        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        assertEquals(4, local.getFeedbackPane().getChildren().size());
         local.getFeedbackPane().getChildren().clear();
         res = new CsvFileParseResponse(new BTParser(), 0, 1, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
         local.appendReportText(res);
-        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        assertEquals(4, local.getFeedbackPane().getChildren().size());
         local.getFeedbackPane().getChildren().clear();
         res = new CsvFileParseResponse(new BTParser(), 1, 0, new File("mock"), Collections.EMPTY_LIST, Arrays.asList("ddd"));
         local.appendReportText(res);
-        assertTrue(local.getFeedbackPane().getChildren().size() == 4);
+        assertEquals(4, local.getFeedbackPane().getChildren().size());
+        local.getFeedbackPane().getChildren().clear();
+        res = new CsvFileParseResponse(new BTParser(), 0, 1, new File("mock"), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        local.appendReportText(res);
+        assertEquals(4, local.getFeedbackPane().getChildren().size());
+        local.getFeedbackPane().getChildren().clear();
+        res = new CsvFileParseResponse(new BTParser(), 1, 0, new File("mock"), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        local.appendReportText(res);
+        assertEquals(4, local.getFeedbackPane().getChildren().size());
     }
 
     private class LocalListChangeListener implements ListChangeListener<Node> {

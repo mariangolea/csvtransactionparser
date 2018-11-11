@@ -12,7 +12,7 @@ public interface CompanyNamesInterface {
 
     public void deleteCompanyName(final String company);
 
-    public String getCompanyDisplayName(final String company);
+    public String getCompanyDisplayName(final String companyIdentifier);
 
     public Collection<String> getCompanyDisplayNames();
 

@@ -75,23 +75,7 @@ public class UncategorizedView extends FlowPane {
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.setContextMenu(contextMenu);
         listView.setCellFactory((param) -> {
-            UncategorizedTransactionCellRenderer renderer = new UncategorizedTransactionCellRenderer();
-            renderer.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-                if (isNowEmpty) {
-                    renderer.setContextMenu(null);
-                } else {
-                    renderer.setContextMenu(contextMenu);
-                    contextMenu.setBankTransaction(renderer.getItem());
-                }
-            });
-            renderer.setOnMouseClicked(mouseEvent -> {
-                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                    if (mouseEvent.getClickCount() == 2) {
-                        editHandler.editTransaction(renderer.getItem());
-                    }
-                }
-            });
-
+            UncategorizedTransactionCellRenderer renderer = new UncategorizedTransactionCellRenderer(contextMenu, editHandler);
             return renderer;
         });
         return new ScrollPane(listView);

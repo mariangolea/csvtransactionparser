@@ -5,9 +5,7 @@ import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.Ban
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.EditResult;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
 import static org.junit.Assert.assertEquals;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
 
 public class BankTransactionEditHandlerTest {

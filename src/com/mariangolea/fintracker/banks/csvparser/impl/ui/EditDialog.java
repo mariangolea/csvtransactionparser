@@ -9,9 +9,9 @@ import javafx.scene.control.Dialog;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 
-public class EditCompanyDialog<P extends Pane, R> extends Dialog<R> {
+public class EditDialog<P extends Pane, R> extends Dialog<R> {
 
-    public EditCompanyDialog(final String title, final P pane, final Callback<P, R> callback, final Callback<P, Boolean> validation) {
+    public EditDialog(final String title, final P pane, final Callback<P, R> callback, final Callback<P, Boolean> validation) {
         Objects.requireNonNull(pane);
 
         setTitle("Edit global company names preferences");

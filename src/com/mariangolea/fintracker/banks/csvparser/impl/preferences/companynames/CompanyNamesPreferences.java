@@ -25,8 +25,8 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
         this.companyIdentifiers = FXCollections.observableHashMap();
         companyIdentifiers.putAll(Objects.requireNonNull(companyNamesPreferences.companyIdentifiers));
         this.companyNames = FXCollections.observableHashMap();
-        Objects.requireNonNull(companyNamesPreferences.companyNames).entrySet().forEach(entry ->
-            companyNames.put(entry.getKey(), FXCollections.observableArrayList(entry.getValue()))
+        Objects.requireNonNull(companyNamesPreferences.companyNames).entrySet().forEach(entry
+                -> companyNames.put(entry.getKey(), FXCollections.observableArrayList(entry.getValue()))
         );
     }
 
@@ -38,11 +38,19 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
     @Override
     public Collection<String> getCompanyIdentifierStrings(final String companyDisplayName) {
         Collection<String> identifiers = companyNames.get(Objects.requireNonNull(companyDisplayName));
-        if (identifiers == null){
-            identifiers = FXCollections.emptyObservableList();
-        }
-        
-        return identifiers;
+        return identifiers == null ? FXCollections.observableArrayList() : identifiers;
+    }
+
+    @Override
+    public Collection<String> getMatchingIdentifierStrings(String transactionDescription) {
+        final Collection<String> existing = FXCollections.observableArrayList();
+        companyIdentifiers.keySet().forEach(existingIdentifier -> {
+            if (transactionDescription.toLowerCase().contains(existingIdentifier.toLowerCase())) {
+                existing.add(existingIdentifier);
+            }
+        });
+
+        return existing;
     }
 
     @Override
@@ -50,26 +58,6 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
         final String companyName = companyIdentifiers.get(Objects.requireNonNull(existingIdentifier));
         companyIdentifiers.remove(existingIdentifier);
         companyIdentifiers.put(Objects.requireNonNull(newIdentifier), companyName);
-    }
-
-    @Override
-    public void resetCompanyIdentifierStrings(final String companyName, final Collection<String> newIdentifiers) {
-        //remove existing identifiers
-        final Collection<String> existingIdentifiers = FXCollections.observableArrayList(companyNames.get(companyName));
-        existingIdentifiers.forEach(former ->
-            deleteCompanyIdentifier(former)
-        );
-        
-        //set up the new ones.
-        newIdentifiers.forEach(identifier ->
-            setCompanyDisplayName(identifier, companyName)
-        );
-    }
-    
-    @Override
-    public void deleteCompanyIdentifier(final String existingIdentifier) {
-        final String companyName = companyIdentifiers.remove(Objects.requireNonNull(existingIdentifier));
-        companyNames.get(companyName).remove(existingIdentifier);
     }
 
     @Override
@@ -83,14 +71,30 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
     }
 
     @Override
-    public void setCompanyDisplayName(final String descriptionString, final String displayName) {
-        companyIdentifiers.put(Objects.requireNonNull(descriptionString).toLowerCase(), Objects.requireNonNull(displayName));
-        Collection<String> identifiers = companyNames.get(displayName);
-        if (identifiers == null) {
-            identifiers = FXCollections.observableArrayList();
-            companyNames.put(displayName, identifiers);
+    public void resetCompanyIdentifierStrings(final String companyName, final Collection<String> newIdentifiers) {
+        //remove existing identifiers
+        Collection<String> existing = getCompanyIdentifierStrings(Objects.requireNonNull(companyName));
+        if (!hasCompanyDisplayName(companyName)){
+            companyNames.put(companyName, existing);
         }
-        identifiers.add(descriptionString.toLowerCase());
+
+        //compute orphanes and remove them.
+        Collection<String> orphaned = FXCollections.observableArrayList(existing);
+        orphaned.removeAll(Objects.requireNonNull(newIdentifiers));
+        deleteCompanyIdentifiers(orphaned);
+
+        //set the new ones.
+        newIdentifiers.forEach(identifier -> {
+            companyIdentifiers.put(Objects.requireNonNull(identifier).toLowerCase(), companyName);
+            companyNames.get(companyName).add(identifier.toLowerCase());
+        });
+    }
+
+    public void deleteCompanyIdentifiers(final Collection<String> existingIdentifiers) {
+        Objects.requireNonNull(existingIdentifiers).forEach(identifier -> {
+            final String companyName = companyIdentifiers.remove(Objects.requireNonNull(identifier));
+            companyNames.get(companyName).remove(identifier);
+        });
     }
 
     @Override
@@ -103,11 +107,10 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
 
     @Override
     public void editCompanyName(final String existingName, final String newName) {
-        Collection<String> identifiers = companyNames.get(existingName);
+        Collection<String> identifiers = companyNames.get(Objects.requireNonNull(existingName));
         companyNames.remove(existingName);
         companyNames.put(newName, identifiers);
         identifiers.forEach(identifier -> {
-            companyIdentifiers.remove(identifier);
             companyIdentifiers.put(identifier, newName);
         });
     }
@@ -116,12 +119,18 @@ public class CompanyNamesPreferences implements CompanyNamesInterface {
     public void applyChanges(final UserPreferencesInterface userEdited) {
         companyIdentifiers.clear();
         companyNames.clear();
-        Objects.requireNonNull(userEdited).getCompanyDisplayNames().forEach(companyName ->{
-            final Collection<String> companyLocalIdentifiers = Objects.requireNonNull(userEdited.getCompanyIdentifierStrings(companyName));
+        Objects.requireNonNull(userEdited).getCompanyDisplayNames().forEach(companyName -> {
+            final Collection<String> companyLocalIdentifiers = userEdited.getCompanyIdentifierStrings(companyName);
             companyNames.put(companyName, FXCollections.observableArrayList(companyLocalIdentifiers));
         });
-        userEdited.getAllCompanyIdentifierStrings().forEach(identifier ->
-            companyIdentifiers.put(identifier, Objects.requireNonNull(userEdited.getCompanyDisplayName(identifier)))
+        userEdited.getAllCompanyIdentifierStrings().forEach(identifier
+                -> companyIdentifiers.put(identifier, Objects.requireNonNull(userEdited.getCompanyDisplayName(identifier)))
         );
     }
+
+    @Override
+    public boolean hasCompanyDisplayName(String companyDisplayName) {
+        return companyNames.containsKey(Objects.requireNonNull(companyDisplayName));
+    }
+
 }

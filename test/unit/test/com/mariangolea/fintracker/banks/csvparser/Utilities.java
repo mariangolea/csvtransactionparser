@@ -1,24 +1,23 @@
 package test.com.mariangolea.fintracker.banks.csvparser;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.bancatransilvania.BTParser;
 import com.mariangolea.fintracker.banks.csvparser.impl.parsers.ing.INGParser;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.junit.rules.TemporaryFolder;
 
@@ -81,11 +80,12 @@ public class Utilities {
     }
 
     public static void populateUserPrefsWithCompanyAndGroupData(final UserPreferencesInterface userPrefs) {
-        userPrefs.setCompanyDisplayName("  Carrefour SRL ", "Carrefour");
-        userPrefs.setCompanyDisplayName("Petrom SA", "Petrom");
-        userPrefs.setCompanyDisplayName("Auchan Romania", "Auchan");
-        userPrefs.setCompanyDisplayName("Employer Company SRL", "Employer");
-
+        userPrefs.resetCompanyIdentifierStrings("Carrefour", Arrays.asList("  Carrefour SRL "));
+        userPrefs.resetCompanyIdentifierStrings("Petrom", Arrays.asList("Petrom SA"));
+        userPrefs.resetCompanyIdentifierStrings("Auchan", Arrays.asList("Auchan Romania"));
+        userPrefs.resetCompanyIdentifierStrings("Employer", Arrays.asList("Employer Company SRL"));
+        
+        
         userPrefs.appendDefinition("Food", createList("Auchan", "Carrefour"));
         userPrefs.appendDefinition("Fuel", createList("Petrom"));
         userPrefs.appendDefinition("Existential", createList("Food", "Fuel"));

@@ -2,15 +2,13 @@ package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import java.util.Arrays;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 
 public class UserPreferencesTest {
 
@@ -18,7 +16,7 @@ public class UserPreferencesTest {
     public void testMethods() {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
-        other.setCompanyDisplayName("company", "name");
+        other.resetCompanyIdentifierStrings("name", Arrays.asList("company"));
         Collection<String> expected = other.getCompanyIdentifierStrings("name");
         assertEquals(expected, Arrays.asList("company"));
         assertTrue(other.getAllCompanyIdentifierStrings().containsAll(Utilities.createList("company")));
@@ -36,44 +34,42 @@ public class UserPreferencesTest {
     public void testDeepClone() {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
-        other.setCompanyDisplayName("company", "name");
+        other.resetCompanyIdentifierStrings("name", Arrays.asList("company"));
 
         UserPreferencesInterface copied = factory.getUserPreferencesHandler().deepCopyPreferences(other);
-        assertEquals(other.getCompanyDisplayName("name"), copied.getCompanyDisplayName("name"));
+        assertEquals(other.getCompanyDisplayName("company"), copied.getCompanyDisplayName("company"));
     }
 
     @Test
     public void testApplyChanges() {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
-        other.setCompanyDisplayName("name", "company");
+        other.resetCompanyIdentifierStrings("name", Arrays.asList("company"));
         UserPreferencesInterface copied = factory.getUserPreferencesHandler().deepCopyPreferences(other);
-        copied.editCompanyName("company", "edited");
+        copied.editCompanyName("name", "edited");
 
         other.applyChanges(copied);
-        assertEquals("edited", other.getCompanyDisplayName("name"));
+        assertEquals("edited", other.getCompanyDisplayName("company"));
     }
 
     @Test
     public void testCompanyPreferences() {
         UserPreferencesTestFactory factory = new UserPreferencesTestFactory();
         UserPreferencesInterface other = factory.getUserPreferencesHandler().getPreferences();
-        other.setCompanyDisplayName("name", "company");
-        other.deleteCompanyName("company");
-        assertNull(other.getCompanyDisplayName("name"));
+        other.resetCompanyIdentifierStrings("name", Arrays.asList("company"));
+        other.deleteCompanyName("name");
+        assertNull(other.getCompanyDisplayName("company"));
 
-        other.setCompanyDisplayName("name", "company");
-        other.deleteCompanyIdentifier("name");
+        other.resetCompanyIdentifierStrings("name", Arrays.asList("company"));
+        other.resetCompanyIdentifierStrings("name", Arrays.asList("company"));
         assertNull(other.getCompanyDisplayName("name"));
         
-        other.setCompanyDisplayName("name", "company");
-        other.resetCompanyIdentifierStrings("company", Arrays.asList("name1"));
-        assertNull(other.getCompanyDisplayName("name"));
-        assertEquals("company", other.getCompanyDisplayName("name1"));
+        other.resetCompanyIdentifierStrings("name1", Arrays.asList("company"));
+        assertEquals("name1", other.getCompanyDisplayName("company"));
         
         other.editCompanyIdentifier("name1", "name");
         assertNull(other.getCompanyDisplayName("name1"));
-        assertEquals("company", other.getCompanyDisplayName("name"));
+        assertEquals("name1", other.getCompanyDisplayName("company"));
     }
 
 }

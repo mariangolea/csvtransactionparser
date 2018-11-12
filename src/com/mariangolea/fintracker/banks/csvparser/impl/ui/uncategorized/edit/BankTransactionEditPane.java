@@ -4,7 +4,6 @@ import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreference
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.categories.CategoriesTree;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -54,29 +53,24 @@ public class BankTransactionEditPane extends GridPane {
 
         String transactionDescription = transaction.description;
         splitLines(transactionDescription);
-        final Collection<String> substrings = userPrefs.getCompanyIdentifierStrings(transactionDescription);
-        String substring = null;
-        for (String sub : substrings) {
-            if (transactionDescription.contains(sub)) {
-                substring = sub;
-            }
-        }
-        companyNameIdentifierField.setText(substring);
         companyDisplayNameField.setItems(FXCollections.observableArrayList(userPrefs.getCompanyDisplayNames()));
-        companyDisplayNameField.setValue(substring == null ? null : userPrefs.getCompanyDisplayName(substring));
         categoryPicker.setItems(originalCategories);
         parentCategoryPicker.setItems(originalCategories);
+        TextFields.bindAutoCompletion(companyDisplayNameField.getEditor(), companyDisplayNameField.getItems());
         TextFields.bindAutoCompletion(categoryPicker.getEditor(), categoryPicker.getItems());
         TextFields.bindAutoCompletion(parentCategoryPicker.getEditor(), parentCategoryPicker.getItems());
     }
 
     protected void clearFields() {
         companyDescriptionField.setText(null);
-        companyDisplayNameField.setValue(null);
+        companyNameIdentifierField.setText(null);
+
         companyDisplayNameField.getItems().clear();
-        categoryPicker.setValue(null);
         categoryPicker.getItems().clear();
         parentCategoryPicker.getItems().clear();
+        
+        companyDisplayNameField.setValue(null);
+        categoryPicker.setValue(null);
     }
 
     protected boolean isValid() {
@@ -106,7 +100,9 @@ public class BankTransactionEditPane extends GridPane {
         companyDescriptionField.autosize();
 
         companyNameIdentifierField = new TextField();
-        companyNameIdentifierField.setPromptText("Company name substring to apply when looking for similar transactions");
+        companyNameIdentifierField.setEditable(true);
+        companyNameIdentifierField.setTooltip(new Tooltip("Company name substring to apply when looking for similar transactions"));
+
         companyDisplayNameField = new ComboBox<>();
         companyDisplayNameField.setEditable(true);
         companyDisplayNameField.setTooltip(new Tooltip("Select a substring that will be used to identify similar transactions"));

@@ -4,9 +4,9 @@ import com.mariangolea.fintracker.banks.csvparser.api.filters.YearSlot;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransaction;
 import com.mariangolea.fintracker.banks.csvparser.api.transaction.BankTransactionGroupInterface;
+import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView.AmountStringPropertyValueFactory;
-import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class TransactionTableViewTest extends FXUITest{
         BankTransaction transaction = Utilities.createTransaction(Utilities.createDate(1, 2017), BigDecimal.ONE, BigDecimal.ZERO, "company1 identifier");
         UserPreferencesInterface prefs = factory.getUserPreferencesHandler().getPreferences();
         prefs.setTransactionGroupingTimeframe(UserPreferencesInterface.Timeframe.MONTH);
-        prefs.setCompanyDisplayName("company1", "Company");
+        prefs.resetCompanyIdentifierStrings("Company", Arrays.asList("company1"));
         prefs.appendDefinition("CompanyGroup", Arrays.asList("Company"));
 
         TransactionTableView view = new TransactionTableView(prefs);

@@ -56,7 +56,7 @@ public class BankTransactionEditPaneTest extends FXUITest {
         UserPreferencesInterface prefs = factory.getUserPreferencesHandler().getPreferences();
         prefs.appendDefinition("one", Arrays.asList("aloha"));
         prefs.appendDefinition("two", Arrays.asList("one"));
-        prefs.setCompanyDisplayName("alo", "aloha");
+        prefs.resetCompanyIdentifierStrings("aloha", Arrays.asList("alo"));
         String desc = "aloha random text to get to more than 50 lines so that text splitter kicks in eventually";
         dialog.setBankTransaction(Utilities.createTransaction(new Date(), BigDecimal.ONE, BigDecimal.ZERO, desc));
         dialog.categoryPickerChanged(null);
@@ -67,7 +67,7 @@ public class BankTransactionEditPaneTest extends FXUITest {
         dialog.companyDisplayNameFieldChanged("aloha");
         assertEquals("two", dialog.getParentCategoryPickerText());
         dialog.companyDisplayNameFieldChanged(null);
-        prefs.setCompanyDisplayName(desc, "fake");
+        prefs.resetCompanyIdentifierStrings("fake", Arrays.asList(desc));
         assertNull(dialog.getParentCategoryPickerText());
     }
 

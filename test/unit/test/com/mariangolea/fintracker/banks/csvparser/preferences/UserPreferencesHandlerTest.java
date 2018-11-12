@@ -3,14 +3,13 @@ package test.com.mariangolea.fintracker.banks.csvparser.preferences;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesHandlerInterface;
 import com.mariangolea.fintracker.banks.csvparser.api.preferences.UserPreferencesInterface;
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
+import java.util.Arrays;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 import test.com.mariangolea.fintracker.banks.csvparser.UserPreferencesTestFactory;
+import test.com.mariangolea.fintracker.banks.csvparser.Utilities;
 
 public class UserPreferencesHandlerTest {
 
@@ -38,7 +37,7 @@ public class UserPreferencesHandlerTest {
         UserPreferencesInterface prefs = handler.getPreferences();
         prefs.setCSVInputFolder("useless");
         prefs.appendDefinition("category1", Utilities.createList("1", "2"));
-        prefs.setCompanyDisplayName("incasare", "incasareDisplayName");
+        prefs.resetCompanyIdentifierStrings("incasareDisplayName", Arrays.asList("incasare"));
         // after this store, next load should retrieve a different objects with same
         // contents.
         boolean stored = handler.storePreferences();

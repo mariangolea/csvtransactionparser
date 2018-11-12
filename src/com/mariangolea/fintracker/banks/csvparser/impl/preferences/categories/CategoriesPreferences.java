@@ -96,11 +96,33 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
             applyCategory(topMost, userEdited, userEdited.getSubCategories(topMost));
         });
     }
-    
-    private void applyCategory(final String category, final UserPreferencesInterface userEdited, final Collection<String> subCategories){
+
+    private void applyCategory(final String category, final UserPreferencesInterface userEdited, final Collection<String> subCategories) {
         appendDefinition(category, subCategories);
-        subCategories.forEach(subCategory ->{
+        subCategories.forEach(subCategory -> {
             applyCategory(subCategory, userEdited, userEdited.getSubCategories(subCategory));
         });
     }
+
+    @Override
+    public void editCompanyName(final String existingName, final String newName) {
+        super.editCompanyName(existingName, newName);
+        CategoriesTree cat = categories.getCategory(existingName);
+        if (cat != null) {
+            cat.setCategoryName(newName);
+        }
+    }
+
+    @Override
+    public void deleteCompanyName(String companyDisplayName) {
+        super.deleteCompanyName(companyDisplayName);
+        CategoriesTree cat = categories.getCategory(companyDisplayName);
+        if (cat != null) {
+            CategoriesTree parent = cat.getParentCategory();
+            if (parent != null){
+                parent.removeSubCategories(Arrays.asList(cat));
+            }
+        }
+    }
+
 }

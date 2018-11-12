@@ -23,8 +23,8 @@ public class CategoriesTree {
     
     public CategoriesTree(final CategoriesTree copiedTree) {
         this(copiedTree.categoryName, copiedTree.parent);
-        subCategoriesTrees.forEach(subTree -> {
-            copiedTree.subCategoriesTrees.add(new CategoriesTree(subTree));
+        copiedTree.subCategoriesTrees.forEach(subTree -> {
+            subCategoriesTrees.add(new CategoriesTree(subTree));
         });
     }
     
@@ -107,5 +107,9 @@ public class CategoriesTree {
             CategoriesTree subcategory = new CategoriesTree(subCategoryName, this);
             subCategoriesTrees.add(subcategory);
         });
+    }
+    
+    public void removeSubCategories(final Collection<CategoriesTree> toRemove){
+        subCategoriesTrees.removeAll(Objects.requireNonNull(toRemove));
     }
 }

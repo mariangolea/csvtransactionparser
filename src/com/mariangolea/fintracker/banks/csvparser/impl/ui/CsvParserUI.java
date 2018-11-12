@@ -152,6 +152,7 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         result.ifPresent(userData -> {
             userPrefs.applyChanges(Objects.requireNonNull(userData));
             userPrefsHandler.storePreferences();
+            updateView();
         });
     }
 

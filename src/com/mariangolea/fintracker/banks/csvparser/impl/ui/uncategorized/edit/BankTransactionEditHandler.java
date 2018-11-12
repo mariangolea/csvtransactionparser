@@ -32,7 +32,7 @@ public class BankTransactionEditHandler {
     }
 
     protected void applyResult(final EditResult result) {
-        userPrefs.setCompanyDisplayName(result.companyIdentifierString, result.companyDisplayName);
+        userPrefs.resetCompanyIdentifierStrings(result.companyDisplayName, Arrays.asList(result.companyIdentifierString));
         userPrefs.appendDefinition(result.categoryName, Arrays.asList(result.companyDisplayName));
         if (result.parentCategory != null && !result.parentCategory.isEmpty()) {
             userPrefs.appendDefinition(result.parentCategory, Arrays.asList(result.categoryName));

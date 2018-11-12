@@ -21,64 +21,71 @@ import javafx.scene.layout.VBox;
 public class EditCompanyNamePane extends FlowPane {
 
     private final ObservableList<String> identifierStrings = FXCollections.observableArrayList();
+    protected final FilteredList<String> filtered = new FilteredList<>(identifierStrings, s -> true);
     private final String companyName;
     private final TextField companyDisplayName = new TextField();
-    
+    protected Button add;
+    protected final TextField searchField = new TextField();
+
     public EditCompanyNamePane(final String companyName, final Collection<String> companyIdentifiers) {
         super(Orientation.VERTICAL);
         this.companyName = Objects.requireNonNull(companyName);
         identifierStrings.addAll(companyIdentifiers);
         createCompanyNamePane();
     }
-    
-    public EditCompanyNameResult getResult(){
+
+    public EditCompanyNameResult getResult() {
         return new EditCompanyNameResult(companyDisplayName.getText(), identifierStrings);
     }
-    
+
     protected final void createCompanyNamePane() {
-        FilteredList<String> filtered = new FilteredList<>(identifierStrings, s -> true);
-        
-        final Button add = new Button("Add");
+        add = new Button("Add");
         add.disableProperty().set(true);
-        final TextField searchField = new TextField();
         searchField.setPromptText("Search a identifier");
         searchField.textProperty().addListener(listener -> {
-                String filter = searchField.getText();
-                if (filter == null || filter.length() == 0) {
-                    filtered.setPredicate(s -> true);
-                    add.disableProperty().set(true);
-                } else {
-                    filtered.setPredicate(s -> s.toLowerCase().contains(filter.toLowerCase()));
-                    add.disableProperty().set(!filtered.isEmpty());
-                }
-            });
-        add.setOnAction(action ->{
-            String identifier = searchField.getText();
-            if (!identifierStrings.contains(identifier)){
-                identifierStrings.add(searchField.getText());
-                searchField.setText(null);
-            }
+            searchFieldTextChanged(searchField.getText());
         });
-        
+        add.setOnAction(action -> {
+            addButtonClicked();
+        });
+
         VBox box = new VBox(searchField, add);
         ListView<String> view = new ListView<>(filtered);
         view.setTooltip(new Tooltip("All string identifiers used to correlate transactions to mentioned company display name."));
-        view.setCellFactory(value -> new CompanyIdentifierListCell());
+        view.setCellFactory(value -> new CompanyIdentifierListCell(identifierStrings));
         view.setEditable(true);
         companyDisplayName.setText(companyName);
         companyDisplayName.setTooltip(new Tooltip("Company Display Name"));
-        
+
         getChildren().addAll(Arrays.asList(companyDisplayName, box, view));
     }
 
-    private class CompanyIdentifierListCell extends ListCell<String> {
+    protected void addButtonClicked() {
+        String identifier = searchField.getText();
+        if (!identifierStrings.contains(identifier)) {
+            identifierStrings.add(searchField.getText());
+            searchField.setText(null);
+        }
+    }
+
+    protected void searchFieldTextChanged(final String filter) {
+        if (filter == null || filter.length() == 0) {
+            filtered.setPredicate(s -> true);
+            add.disableProperty().set(true);
+        } else {
+            filtered.setPredicate(s -> s.toLowerCase().contains(filter.toLowerCase()));
+            add.disableProperty().set(!filtered.isEmpty());
+        }
+    }
+
+    protected class CompanyIdentifierListCell extends ListCell<String> {
 
         HBox hbox = new HBox();
         TextField label = new TextField();
         Pane pane = new Pane();
         Button button = new Button("Delete");
 
-        public CompanyIdentifierListCell() {
+        public CompanyIdentifierListCell(final ObservableList<String> identifierStrings) {
             super();
 
             hbox.getChildren().addAll(label, pane, button);

@@ -25,6 +25,7 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
         this.categories = new CategoriesTree(Objects.requireNonNull(prefs.categories));
     }
 
+    
     @Override
     public Collection<String> getUserDefinedCategoryNames() {
         return categories.getAllSubCategoryNames();

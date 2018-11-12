@@ -17,5 +17,4 @@ public interface CategoriesInterface extends CompanyNamesInterface{
     public void appendDefinition(final String categoryName, final Collection<String> subCategories);
 
     public String getParent(final String categoryName);
-
 }

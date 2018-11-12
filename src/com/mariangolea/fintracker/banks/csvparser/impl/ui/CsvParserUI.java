@@ -9,6 +9,7 @@ import com.mariangolea.fintracker.banks.csvparser.impl.parsers.BankTransactionsP
 import com.mariangolea.fintracker.banks.csvparser.impl.preferences.UserPreferencesHandlerFactory;
 import com.mariangolea.fintracker.banks.csvparser.impl.transaction.TransactionsCategorizedSlotter;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.categorized.table.TransactionTableView;
+import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.categories.CategoriesView;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.preferences.companynames.EditCompanyNamesPane;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.UncategorizedView;
 import com.mariangolea.fintracker.banks.csvparser.impl.ui.uncategorized.edit.UncategorizedTransactionApplyListener;
@@ -106,7 +107,11 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         MenuItem editCompanies = new MenuItem("Edit company names");
         editCompanies.setAccelerator(KeyCombination.keyCombination("c"));
         editCompanies.setOnAction((ActionEvent e) -> editCompanyNames());
+        MenuItem editCategories = new MenuItem("Edit categories");
+        editCategories.setAccelerator(KeyCombination.keyCombination("d"));
+        editCategories.setOnAction((ActionEvent e) -> editCategories());
         edit.getItems().add(editCompanies);
+        edit.getItems().add(editCategories);
         menu.getMenus().add(edit);
 
         menu.setUseSystemMenuBar(true);
@@ -145,6 +150,17 @@ public class CsvParserUI extends Application implements UncategorizedTransaction
         }
     }
 
+    protected void editCategories() {
+        final CategoriesView pane = new CategoriesView(userPrefs);
+        EditDialog popup = new EditDialog<>("Edit global company names preferences", pane, CategoriesView::getResult, null);
+        Optional<UserPreferencesInterface> result = popup.showAndWait();
+        result.ifPresent(userData -> {
+            userPrefs.applyChanges(Objects.requireNonNull(userData));
+            userPrefsHandler.storePreferences();
+            updateView();
+        });
+    }
+    
     protected void editCompanyNames() {
         final EditCompanyNamesPane pane = new EditCompanyNamesPane(userPrefs);
         EditDialog popup = new EditDialog<>("Edit global company names preferences", pane, EditCompanyNamesPane::getResult, null);

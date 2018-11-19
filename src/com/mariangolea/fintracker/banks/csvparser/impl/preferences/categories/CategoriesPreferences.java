@@ -25,7 +25,6 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
         this.categories = new CategoriesTree(Objects.requireNonNull(prefs.categories));
     }
 
-    
     @Override
     public Collection<String> getUserDefinedCategoryNames() {
         return categories.getAllSubCategoryNames();
@@ -38,8 +37,7 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
 
     @Override
     public Collection<String> getSubCategories(final String categoryName) {
-        Objects.requireNonNull(categoryName);
-        CategoriesTree tree = categories.getCategory(categoryName);
+        CategoriesTree tree = categories.getCategory(Objects.requireNonNull(categoryName));
         if (tree == null) {
             return FXCollections.emptyObservableList();
         }
@@ -82,6 +80,24 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
     }
 
     @Override
+    public Collection<String> removeSubCategory(final String parentCategory, final String category) {
+        CategoriesTree parentCategoryTree = categories.getCategory(Objects.requireNonNull(parentCategory));
+        CategoriesTree categoryTree = parentCategoryTree.getCategory(Objects.requireNonNull(category));
+        final Collection<String> categoryChildren = categoryTree.getNodeSubCategoryNames();
+
+        final Collection<CategoriesTree> existingCategories = FXCollections.observableArrayList();
+        categoryChildren.forEach(subcategory -> {
+            CategoriesTree existing = categoryTree.getCategory(subcategory);
+            existingCategories.add(existing);
+        });
+        
+        parentCategoryTree.removeSubCategories(Arrays.asList(categoryTree));
+        parentCategoryTree.reparent(existingCategories);
+        
+        return categoryChildren;
+    }
+
+    @Override
     public String getParent(final String categoryName) {
         CategoriesTree tree = categories.getCategory(categoryName);
         return tree == null ? null : tree.getParentCategory().getCategoryName();
@@ -120,7 +136,7 @@ public class CategoriesPreferences extends CompanyNamesPreferences implements Ca
         CategoriesTree cat = categories.getCategory(companyDisplayName);
         if (cat != null) {
             CategoriesTree parent = cat.getParentCategory();
-            if (parent != null){
+            if (parent != null) {
                 parent.removeSubCategories(Arrays.asList(cat));
             }
         }

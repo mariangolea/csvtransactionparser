@@ -15,6 +15,8 @@ public interface CategoriesInterface extends CompanyNamesInterface{
     public String getMatchingCategory(String companyDescriptionString);
 
     public void appendDefinition(final String categoryName, final Collection<String> subCategories);
+    
+    public Collection<String> removeSubCategory(final String parentCategory, final String category);
 
     public String getParent(final String categoryName);
 }
